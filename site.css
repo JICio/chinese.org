@@ -60,7 +60,10 @@ button { color: inherit; }
 .primary-nav a { position: relative; padding: 9px 0; font-size: 12px; font-weight: 700; }
 .primary-nav a::after { position: absolute; right: 0; bottom: 2px; left: 0; height: 1px; content: ""; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform .2s ease; }
 .primary-nav a:hover::after, .primary-nav a:focus-visible::after { transform: scaleX(1); }
-.language-toggle { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; background: transparent; cursor: pointer; font-size: 10px; font-weight: 800; }
+.language-switcher { flex: 0 0 auto; display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 999px; }
+.language-switcher button { min-width: 34px; height: 32px; border: 0; border-right: 1px solid var(--line); padding: 0 9px; background: transparent; cursor: pointer; color: var(--muted); font-size: 9px; font-weight: 800; }
+.language-switcher button:last-child { border-right: 0; }
+.language-switcher button:hover, .language-switcher button:focus-visible, .language-switcher button.is-active { background: var(--ink); color: var(--white); }
 .menu-toggle { display: none; width: 40px; height: 40px; border: 0; background: transparent; cursor: pointer; }
 .menu-toggle > span:not(.sr-only) { display: block; width: 22px; height: 1px; margin: 6px auto; background: var(--ink); }
 
@@ -336,7 +339,7 @@ h2 { margin: 0; font-family: "Songti SC", "STSong", serif; font-size: clamp(36px
   .primary-nav { position: absolute; top: 100%; right: 0; left: 0; display: none; align-items: stretch; flex-direction: column; gap: 0; margin: 0; padding: 12px 4vw 22px; background: var(--paper); border-bottom: 1px solid var(--line); }
   .primary-nav.is-open { display: flex; }
   .primary-nav a { border-bottom: 1px solid var(--line); padding: 13px 0; }
-  .language-toggle { padding: 7px 10px; }
+  .language-switcher button { min-width: 30px; height: 30px; padding: 0 7px; }
   .hero { min-height: calc(100svh - 104px); }
   .hero-image { object-position: 62% center; }
   .hero-shade { background: linear-gradient(90deg, rgba(7,7,6,.9), rgba(7,7,6,.36)), linear-gradient(0deg, rgba(7,7,6,.72), transparent 70%); }

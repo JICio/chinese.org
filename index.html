@@ -1,120 +1,124 @@
 <!doctype html>
-<html lang="zh-Hans">
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chinese.org — 每个华人的文化智能体</title>
-  <meta name="description" content="Chinese.org 为每个华人打造一个属于自己的文化智能体，理解个人的文化根脉，基于可查证的知识，用多语言向世界传播华夏文明。">
+  <title>Chinese.org — 每個華人的文化智能體</title>
+  <meta name="description" content="Chinese.org 為每個華人打造一個屬於自己的文化智能體，理解個人的文化根脈，基於可查證的知識，用多語言向世界傳播華夏文明。">
   <meta name="theme-color" content="#10100f">
-  <meta property="og:title" content="Chinese.org — 每个华人的文化智能体">
-  <meta property="og:description" content="让每个华人，都有一个向世界传播华夏文明的 AI 伙伴。">
+  <meta property="og:title" content="Chinese.org — 每個華人的文化智能體">
+  <meta property="og:description" content="讓每個華人，都有一個向世界傳播華夏文明的 AI 夥伴。">
   <meta property="og:image" content="assets/global-chinese-hero.jpg">
   <link rel="icon" href="assets/logo-hua.png" type="image/png">
   <link rel="stylesheet" href="site.css">
 </head>
 <body>
-  <a class="skip-link" href="#main">跳到主要内容</a>
+  <a class="skip-link" href="#main">跳到主要內容</a>
 
   <div class="topline">
-    <p data-zh="连接全球华人 · 共同书写我们的文化" data-en="Connecting Chinese communities worldwide · Telling our stories together">连接全球华人 · 共同书写我们的文化</p>
-    <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">加入 ChineseDAO 社区 <span>↗</span></a>
+    <p data-zht="連線全球華人 · 共同書寫我們的文化" data-zhs="连接全球华人 · 共同书写我们的文化" data-en="Connecting Chinese communities worldwide · Telling our stories together">連線全球華人 · 共同書寫我們的文化</p>
+    <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer"><span data-zht="加入 ChineseDAO 社區" data-zhs="加入 ChineseDAO 社区" data-en="Join the ChineseDAO community">加入 ChineseDAO 社區</span> <span>↗</span></a>
   </div>
 
   <header class="site-header">
-    <a class="brand" href="#home" aria-label="Chinese.org 首页">
+    <a class="brand" href="#home" aria-label="Chinese.org 首頁">
       <span class="brand-stamp" aria-hidden="true"><img src="assets/logo-hua.png" alt=""></span>
       <span class="brand-word">CHINESE<span>.ORG</span></span>
-      <span class="brand-line" data-zh="全球华人文化共同体" data-en="Global Chinese Culture Commons">全球华人文化共同体</span>
+      <span class="brand-line" data-zht="全球華人文化共同體" data-zhs="全球华人文化共同体" data-en="Global Chinese Culture Commons">全球華人文化共同體</span>
     </a>
 
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
       <span></span><span></span>
-      <span class="sr-only">打开菜单</span>
+      <span class="sr-only">開啟選單</span>
     </button>
 
-    <nav class="primary-nav" id="primary-nav" aria-label="主要导航">
-      <a href="#agent" data-zh="文化智能体" data-en="Culture Agent">文化智能体</a>
-      <a href="#diaspora" data-zh="全球华人" data-en="Diaspora">全球华人</a>
-      <a href="#civilization" data-zh="华夏文明" data-en="Civilization">华夏文明</a>
-      <a href="#gallery" data-zh="文化画廊" data-en="Gallery">文化画廊</a>
-      <a href="#governance" data-zh="共建计划" data-en="Contribute">共建计划</a>
+    <nav class="primary-nav" id="primary-nav" aria-label="主要導航">
+      <a href="#agent" data-zht="文化智能體" data-zhs="文化智能体" data-en="Culture Agent">文化智能體</a>
+      <a href="#diaspora" data-zht="全球華人" data-zhs="全球华人" data-en="Diaspora">全球華人</a>
+      <a href="#civilization" data-zht="華夏文明" data-zhs="华夏文明" data-en="Civilization">華夏文明</a>
+      <a href="#gallery" data-zht="文化畫廊" data-zhs="文化画廊" data-en="Gallery">文化畫廊</a>
+      <a href="#governance" data-zht="共建計劃" data-zhs="共建计划" data-en="Contribute">共建計劃</a>
     </nav>
 
-    <button class="language-toggle" type="button" aria-label="Switch language" data-language-toggle>中 / EN</button>
+    <div class="language-switcher" role="group" aria-label="選擇語言">
+      <button class="is-active" type="button" data-language-option="zht" aria-label="繁體中文" aria-pressed="true">繁</button>
+      <button type="button" data-language-option="zhs" aria-label="简体中文" aria-pressed="false">简</button>
+      <button type="button" data-language-option="en" aria-label="English" aria-pressed="false">EN</button>
+    </div>
   </header>
 
   <main id="main">
     <section class="hero" id="home" aria-labelledby="hero-title">
-      <img class="hero-image" src="assets/global-chinese-hero.jpg" alt="不同世代的华人在图书馆中围坐长桌，共同翻阅家庭照片与文化资料">
+      <img class="hero-image" src="assets/global-chinese-hero.jpg" alt="不同世代的華人在圖書館中圍坐長桌，共同翻閱家庭照片與文化資料">
       <div class="hero-shade"></div>
       <div class="hero-content">
         <p class="eyebrow">AI FOR CULTURAL CONTINUITY</p>
-        <h1 id="hero-title" data-zh="让每个华人，都拥有自己的文化智能体。" data-en="A personal culture agent for every Chinese person.">让每个华人，都拥有自己的文化智能体。</h1>
-        <p class="hero-copy" data-zh="它理解你的家乡、语言、家族记忆与文化兴趣；基于可查证的华夏文明知识，帮你创作、翻译，并向世界讲述属于你的中国文化故事。" data-en="It understands your roots, languages, family memories and cultural interests—then helps you create, translate and share Chinese civilization with the world using verifiable knowledge.">它理解你的家乡、语言、家族记忆与文化兴趣；基于可查证的华夏文明知识，帮你创作、翻译，并向世界讲述属于你的中国文化故事。</p>
+        <h1 id="hero-title" data-zht="讓每個華人，都擁有自己的文化智能體。" data-zhs="让每个华人，都拥有自己的文化智能体。" data-en="A personal culture agent for every Chinese person.">讓每個華人，都擁有自己的文化智能體。</h1>
+        <p class="hero-copy" data-zht="它理解你的家鄉、語言、家族記憶與文化興趣；基於可查證的華夏文明知識，幫你創作、翻譯，並向世界講述屬於你的中國文化故事。" data-zhs="它理解你的家乡、语言、家族记忆与文化兴趣；基于可查证的华夏文明知识，帮你创作、翻译，并向世界讲述属于你的中国文化故事。" data-en="It understands your roots, languages, family memories and cultural interests—then helps you create, translate and share Chinese civilization with the world using verifiable knowledge.">它理解你的家鄉、語言、家族記憶與文化興趣；基於可查證的華夏文明知識，幫你創作、翻譯，並向世界講述屬於你的中國文化故事。</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#agent" data-zh="认识文化智能体" data-en="Meet your culture agent">认识文化智能体</a>
-          <a class="button button-ghost" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zh="参与首批共创" data-en="Join the early cohort">参与首批共创</a>
+          <a class="button button-primary" href="#agent" data-zht="認識文化智能體" data-zhs="认识文化智能体" data-en="Meet your culture agent">認識文化智能體</a>
+          <a class="button button-ghost" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zht="參與首批共創" data-zhs="参与首批共创" data-en="Join the early cohort">參與首批共創</a>
         </div>
       </div>
       <div class="hero-caption">
         <span>01</span>
-        <p data-zh="不是让 AI 替你定义文化，而是让它帮你记住、理解和传播。" data-en="AI does not define your culture. It helps you remember, understand and share it.">不是让 AI 替你定义文化，而是让它帮你记住、理解和传播。</p>
+        <p data-zht="不是讓 AI 替你定義文化，而是讓它幫你記住、理解和傳播。" data-zhs="不是让 AI 替你定义文化，而是让它帮你记住、理解和传播。" data-en="AI does not define your culture. It helps you remember, understand and share it.">不是讓 AI 替你定義文化，而是讓它幫你記住、理解和傳播。</p>
       </div>
-      <a class="hero-scroll" href="#mission" aria-label="继续向下浏览">↓</a>
+      <a class="hero-scroll" href="#mission" aria-label="繼續向下瀏覽">↓</a>
     </section>
 
     <section class="mission section" id="mission">
       <div class="section-index">001 — OUR PURPOSE</div>
       <div class="mission-grid">
         <div>
-          <p class="eyebrow red" data-zh="我们的方向" data-en="Our purpose">我们的方向</p>
-          <h2 data-zh="连接彼此，也连接文化的过去与未来。" data-en="Connecting one another—and culture's past with its future.">连接彼此，也连接文化的过去与未来。</h2>
+          <p class="eyebrow red" data-zht="我們的方向" data-zhs="我们的方向" data-en="Our purpose">我們的方向</p>
+          <h2 data-zht="連線彼此，也連線文化的過去與未來。" data-zhs="连接彼此，也连接文化的过去与未来。" data-en="Connecting one another—and culture's past with its future.">連線彼此，也連線文化的過去與未來。</h2>
         </div>
         <div class="mission-copy">
-          <p data-zh="Chinese.org 不替全球华人定义一种标准答案。我们提供一个开放的空间，让来自不同国家、地区、语言与世代的人记录自己的经验，并共同整理我们共享的文化根脉。" data-en="Chinese.org does not impose a single definition of Chinese identity. We make room for people across countries, languages and generations to document their own experiences and explore the roots we share.">Chinese.org 不替全球华人定义一种标准答案。我们提供一个开放的空间，让来自不同国家、地区、语言与世代的人记录自己的经验，并共同整理我们共享的文化根脉。</p>
-          <p data-zh="我们相信，最有生命力的文化传播不是单向输出，而是翻译、讨论、修正、再创造。" data-en="The most vital cultural exchange is never one-way. It grows through translation, conversation, correction and reinvention.">我们相信，最有生命力的文化传播不是单向输出，而是翻译、讨论、修正、再创造。</p>
+          <p data-zht="Chinese.org 不替全球華人定義一種標準答案。我們提供一個開放的空間，讓來自不同國家、地區、語言與世代的人記錄自己的經驗，並共同整理我們共享的文化根脈。" data-zhs="Chinese.org 不替全球华人定义一种标准答案。我们提供一个开放的空间，让来自不同国家、地区、语言与世代的人记录自己的经验，并共同整理我们共享的文化根脉。" data-en="Chinese.org does not impose a single definition of Chinese identity. We make room for people across countries, languages and generations to document their own experiences and explore the roots we share.">Chinese.org 不替全球華人定義一種標準答案。我們提供一個開放的空間，讓來自不同國家、地區、語言與世代的人記錄自己的經驗，並共同整理我們共享的文化根脈。</p>
+          <p data-zht="我們相信，最有生命力的文化傳播不是單向輸出，而是翻譯、討論、修正、再創造。" data-zhs="我们相信，最有生命力的文化传播不是单向输出，而是翻译、讨论、修正、再创造。" data-en="The most vital cultural exchange is never one-way. It grows through translation, conversation, correction and reinvention.">我們相信，最有生命力的文化傳播不是單向輸出，而是翻譯、討論、修正、再創造。</p>
         </div>
       </div>
 
       <div class="purpose-cards">
         <article>
-          <span>记录</span>
-          <h3 data-zh="全球华人故事" data-en="Diaspora stories">全球华人故事</h3>
-          <p data-zh="迁徙、家庭、身份、社区与每一代人的真实生活。" data-en="Migration, family, identity, community and everyday life across generations.">迁徙、家庭、身份、社区与每一代人的真实生活。</p>
+          <span data-zht="記錄" data-zhs="记录" data-en="DOCUMENT">記錄</span>
+          <h3 data-zht="全球華人故事" data-zhs="全球华人故事" data-en="Diaspora stories">全球華人故事</h3>
+          <p data-zht="遷徙、家庭、身份、社區與每一代人的真實生活。" data-zhs="迁徙、家庭、身份、社区与每一代人的真实生活。" data-en="Migration, family, identity, community and everyday life across generations.">遷徙、家庭、身份、社區與每一代人的真實生活。</p>
         </article>
         <article>
-          <span>整理</span>
-          <h3 data-zh="华夏文明知识" data-en="Civilization library">华夏文明知识</h3>
-          <p data-zh="从神话、医药、建筑到戏曲与非遗，建立可理解、可查证的文化脉络。" data-en="A clear, sourced path through mythology, medicine, architecture, opera and heritage.">从神话、医药、建筑到戏曲与非遗，建立可理解、可查证的文化脉络。</p>
+          <span data-zht="整理" data-zhs="整理" data-en="CURATE">整理</span>
+          <h3 data-zht="華夏文明知識" data-zhs="华夏文明知识" data-en="Civilization library">華夏文明知識</h3>
+          <p data-zht="從神話、醫藥、建築到戲曲與非遺，建立可理解、可查證的文化脈絡。" data-zhs="从神话、医药、建筑到戏曲与非遗，建立可理解、可查证的文化脉络。" data-en="A clear, sourced path through mythology, medicine, architecture, opera and heritage.">從神話、醫藥、建築到戲曲與非遺，建立可理解、可查證的文化脈絡。</p>
         </article>
         <article>
-          <span>连接</span>
-          <h3 data-zh="世界各地社区" data-en="Communities worldwide">世界各地社区</h3>
-          <p data-zh="让城市、社团、学校、创作者与青年找到彼此。" data-en="Helping cities, associations, schools, creators and young people find one another.">让城市、社团、学校、创作者与青年找到彼此。</p>
+          <span data-zht="連線" data-zhs="连接" data-en="CONNECT">連線</span>
+          <h3 data-zht="世界各地社區" data-zhs="世界各地社区" data-en="Communities worldwide">世界各地社區</h3>
+          <p data-zht="讓城市、社團、學校、創作者與青年找到彼此。" data-zhs="让城市、社团、学校、创作者与青年找到彼此。" data-en="Helping cities, associations, schools, creators and young people find one another.">讓城市、社團、學校、創作者與青年找到彼此。</p>
         </article>
         <article>
-          <span>共创</span>
-          <h3 data-zh="下一代文化" data-en="Culture's next chapter">下一代文化</h3>
-          <p data-zh="支持双语表达、青年创作与传统在当代的新形态。" data-en="Supporting bilingual expression, young creators and new forms of tradition.">支持双语表达、青年创作与传统在当代的新形态。</p>
+          <span data-zht="共創" data-zhs="共创" data-en="CO-CREATE">共創</span>
+          <h3 data-zht="下一代文化" data-zhs="下一代文化" data-en="Culture's next chapter">下一代文化</h3>
+          <p data-zht="支援雙語表達、青年創作與傳統在當代的新形態。" data-zhs="支持双语表达、青年创作与传统在当代的新形态。" data-en="Supporting bilingual expression, young creators and new forms of tradition.">支援雙語表達、青年創作與傳統在當代的新形態。</p>
         </article>
       </div>
     </section>
 
     <section class="origin-note">
       <p class="origin-label">FROM WEB3 TO CULTURE COMMONS</p>
-      <p data-zh="Chinese.org 从 Web3 社区实验出发，曾探索文化创作、数字收藏与社区治理。新的阶段把重心放回人物、内容与公共文化服务，同时保留开放共建和创作者参与的精神。" data-en="Chinese.org began as a Web3 community experiment in cultural creation, digital collecting and community governance. Its next chapter puts people, content and public cultural service first—while preserving the spirit of open participation.">Chinese.org 从 Web3 社区实验出发，曾探索文化创作、数字收藏与社区治理。新的阶段把重心放回人物、内容与公共文化服务，同时保留开放共建和创作者参与的精神。</p>
+      <p data-zht="Chinese.org 從 Web3 社區實驗出發，曾探索文化創作、數位收藏與社區治理。新的階段把重心放回人物、內容與公共文化服務，同時保留開放共建和創作者參與的精神。" data-zhs="Chinese.org 从 Web3 社区实验出发，曾探索文化创作、数字收藏与社区治理。新的阶段把重心放回人物、内容与公共文化服务，同时保留开放共建和创作者参与的精神。" data-en="Chinese.org began as a Web3 community experiment in cultural creation, digital collecting and community governance. Its next chapter puts people, content and public cultural service first—while preserving the spirit of open participation.">Chinese.org 從 Web3 社區實驗出發，曾探索文化創作、數位收藏與社區治理。新的階段把重心放回人物、內容與公共文化服務，同時保留開放共建和創作者參與的精神。</p>
     </section>
 
     <section class="culture-agent section dark-section" id="agent">
       <div class="agent-intro">
         <div>
           <div class="section-index">002 — YOUR CULTURE AGENT</div>
-          <p class="eyebrow coral" data-zh="每个华人的 AI 文化伙伴" data-en="An AI culture companion for every Chinese person">每个华人的 AI 文化伙伴</p>
-          <h2 data-zh="一个懂你的根，也懂世界的文化智能体。" data-en="A culture agent that understands your roots—and the world.">一个懂你的根，也懂世界的文化智能体。</h2>
+          <p class="eyebrow coral" data-zht="每個華人的 AI 文化夥伴" data-zhs="每个华人的 AI 文化伙伴" data-en="An AI culture companion for every Chinese person">每個華人的 AI 文化夥伴</p>
+          <h2 data-zht="一個懂你的根，也懂世界的文化智能體。" data-zhs="一个懂你的根，也懂世界的文化智能体。" data-en="A culture agent that understands your roots—and the world.">一個懂你的根，也懂世界的文化智能體。</h2>
         </div>
         <div class="agent-intro-copy">
-          <p data-zh="你来教它你是谁，Chinese.org 的文明知识库帮它理解上下文。它不复制一种标准答案，而是尊重地方、家族与世代差异，帮你将文化变成可以继续生长的内容。" data-en="You teach it who you are; the Chinese.org civilization library provides context. It avoids one standard answer, respects regional, family and generational differences, and helps your culture keep growing through new content.">你来教它你是谁，Chinese.org 的文明知识库帮它理解上下文。它不复制一种标准答案，而是尊重地方、家族与世代差异，帮你将文化变成可以继续生长的内容。</p>
-          <a class="button button-outline" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zh="参与智能体共创" data-en="Co-create the culture agent">参与智能体共创</a>
+          <p data-zht="你來教它你是誰，Chinese.org 的文明知識庫幫它理解上下文。它不複製一種標準答案，而是尊重地方、家族與世代差異，幫你將文化變成可以繼續生長的內容。" data-zhs="你来教它你是谁，Chinese.org 的文明知识库帮它理解上下文。它不复制一种标准答案，而是尊重地方、家族与世代差异，帮你将文化变成可以继续生长的内容。" data-en="You teach it who you are; the Chinese.org civilization library provides context. It avoids one standard answer, respects regional, family and generational differences, and helps your culture keep growing through new content.">你來教它你是誰，Chinese.org 的文明知識庫幫它理解上下文。它不複製一種標準答案，而是尊重地方、家族與世代差異，幫你將文化變成可以繼續生長的內容。</p>
+          <a class="button button-outline" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zht="參與智能體共創" data-zhs="参与智能体共创" data-en="Co-create the culture agent">參與智能體共創</a>
         </div>
       </div>
 
@@ -126,59 +130,59 @@
             <img src="assets/logo-hua.png" alt="">
             <span>HUA · 001</span>
           </div>
-          <p data-zh="你的记忆是起点，文明知识是地图，世界是目的地。" data-en="Your memory is the starting point, civilization is the map, and the world is the destination.">你的记忆是起点，文明知识是地图，世界是目的地。</p>
+          <p data-zht="你的記憶是起點，文明知識是地圖，世界是目的地。" data-zhs="你的记忆是起点，文明知识是地图，世界是目的地。" data-en="Your memory is the starting point, civilization is the map, and the world is the destination.">你的記憶是起點，文明知識是地圖，世界是目的地。</p>
         </div>
 
         <div class="agent-demo">
           <div class="agent-window-bar">
-            <div><span class="agent-status-dot"></span><strong data-zh="华华 · 我的文化智能体" data-en="Hua · My culture agent">华华 · 我的文化智能体</strong></div>
+            <div><span class="agent-status-dot"></span><strong data-zht="華華 · 我的文化智能體" data-zhs="华华 · 我的文化智能体" data-en="Hua · My culture agent">華華 · 我的文化智能體</strong></div>
             <span>EARLY CONCEPT</span>
           </div>
           <div class="agent-profile">
-            <span data-zh="现居 · 多伦多" data-en="Lives in · Toronto">现居 · 多伦多</span>
-            <span data-zh="家乡 · 广东" data-en="Roots · Guangdong">家乡 · 广东</span>
-            <span data-zh="语言 · 普通话 / 粤语 / English" data-en="Languages · Mandarin / Cantonese / English">语言 · 普通话 / 粤语 / English</span>
+            <span data-zht="現居 · 多倫多" data-zhs="现居 · 多伦多" data-en="Lives in · Toronto">現居 · 多倫多</span>
+            <span data-zht="家鄉 · 廣東" data-zhs="家乡 · 广东" data-en="Roots · Guangdong">家鄉 · 廣東</span>
+            <span data-zht="語言 · 普通話 / 粵語 / English" data-zhs="语言 · 普通话 / 粤语 / English" data-en="Languages · Mandarin / Cantonese / English">語言 · 普通話 / 粵語 / English</span>
           </div>
-          <div class="agent-examples" aria-label="选择文化智能体示例">
-            <button class="is-active" type="button" data-agent-example="festival" aria-pressed="true" data-zh="向下一代解释节日" data-en="Explain a festival">向下一代解释节日</button>
-            <button type="button" data-agent-example="family" aria-pressed="false" data-zh="整理家族故事" data-en="Preserve a family story">整理家族故事</button>
-            <button type="button" data-agent-example="share" aria-pressed="false" data-zh="生成海外传播内容" data-en="Create content for the world">生成海外传播内容</button>
+          <div class="agent-examples" aria-label="選擇文化智能體示例">
+            <button class="is-active" type="button" data-agent-example="festival" aria-pressed="true" data-zht="向下一代解釋節日" data-zhs="向下一代解释节日" data-en="Explain a festival">向下一代解釋節日</button>
+            <button type="button" data-agent-example="family" aria-pressed="false" data-zht="整理家族故事" data-zhs="整理家族故事" data-en="Preserve a family story">整理家族故事</button>
+            <button type="button" data-agent-example="share" aria-pressed="false" data-zht="生成海外傳播內容" data-zhs="生成海外传播内容" data-en="Create content for the world">生成海外傳播內容</button>
           </div>
           <div class="agent-conversation" aria-live="polite">
             <div class="agent-message agent-user-message">
-              <span data-zh="我" data-en="Me">我</span>
-              <p class="agent-question" data-zh="我想向在加拿大长大的女儿解释清明节，不要只说“扫墓”。" data-en="I want to explain Qingming to my daughter growing up in Canada—beyond simply calling it tomb-sweeping.">我想向在加拿大长大的女儿解释清明节，不要只说“扫墓”。</p>
+              <span data-zht="我" data-zhs="我" data-en="Me">我</span>
+              <p class="agent-question" data-zht="我想向在加拿大長大的女兒解釋清明節，不要只說“掃墓”。" data-zhs="我想向在加拿大长大的女儿解释清明节，不要只说“扫墓”。" data-en="I want to explain Qingming to my daughter growing up in Canada—beyond simply calling it tomb-sweeping.">我想向在加拿大長大的女兒解釋清明節，不要只說“掃墓”。</p>
             </div>
             <div class="agent-message agent-ai-message">
-              <span data-zh="华华" data-en="Hua">华华</span>
-              <p class="agent-answer" data-zh="我会用中英双语讲清节气、祭祖与踏青的关系，标明不同地区的习俗差异，并为她生成一段可以与同学分享的短故事。" data-en="I’ll explain—in Chinese and English—how the solar term connects remembrance, ancestors and spring outings, note regional differences, and create a short story she can share with classmates.">我会用中英双语讲清节气、祭祖与踏青的关系，标明不同地区的习俗差异，并为她生成一段可以与同学分享的短故事。</p>
-              <div class="agent-citations"><span data-zh="已核对 4 个来源" data-en="4 sources checked">已核对 4 个来源</span><span data-zh="显示地区差异" data-en="Regional differences shown">显示地区差异</span></div>
+              <span data-zht="華華" data-zhs="华华" data-en="Hua">華華</span>
+              <p class="agent-answer" data-zht="我會用中英雙語講清節氣、祭祖與踏青的關係，標明不同地區的習俗差異，並為她生成一段可以與同學分享的短故事。" data-zhs="我会用中英双语讲清节气、祭祖与踏青的关系，标明不同地区的习俗差异，并为她生成一段可以与同学分享的短故事。" data-en="I’ll explain—in Chinese and English—how the solar term connects remembrance, ancestors and spring outings, note regional differences, and create a short story she can share with classmates.">我會用中英雙語講清節氣、祭祖與踏青的關係，標明不同地區的習俗差異，並為她生成一段可以與同學分享的短故事。</p>
+              <div class="agent-citations"><span data-zht="已核對 4 個來源" data-zhs="已核对 4 个来源" data-en="4 sources checked">已核對 4 個來源</span><span data-zht="顯示地區差異" data-zhs="显示地区差异" data-en="Regional differences shown">顯示地區差異</span></div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="agent-capabilities">
-        <article><span>01</span><h3 data-zh="认识你" data-en="Know you">认识你</h3><p data-zh="由你选择家乡、语言、家族记忆和兴趣，不代替你定义身份。" data-en="You choose the roots, languages, family memories and interests it knows. It never defines your identity for you.">由你选择家乡、语言、家族记忆和兴趣，不代替你定义身份。</p></article>
-        <article><span>02</span><h3 data-zh="学习文明" data-en="Learn civilization">学习文明</h3><p data-zh="从经过编辑、专家与社区校验的知识库中获得上下文。" data-en="It draws context from a civilization library reviewed by editors, experts and communities.">从经过编辑、专家与社区校验的知识库中获得上下文。</p></article>
-        <article><span>03</span><h3 data-zh="与你创作" data-en="Create with you">与你创作</h3><p data-zh="将记忆整理成双语文章、短视频脚本、音频和教学内容。" data-en="Turn memory into bilingual articles, short-video scripts, audio and learning materials.">将记忆整理成双语文章、短视频脚本、音频和教学内容。</p></article>
-        <article><span>04</span><h3 data-zh="传播世界" data-en="Share with the world">传播世界</h3><p data-zh="根据受众、语言与平台调整表达，保留出处、署名与文化语境。" data-en="Adapt expression by audience, language and platform while keeping sources, credit and cultural context.">根据受众、语言与平台调整表达，保留出处、署名与文化语境。</p></article>
+        <article><span>01</span><h3 data-zht="認識你" data-zhs="认识你" data-en="Know you">認識你</h3><p data-zht="由你選擇家鄉、語言、家族記憶和興趣，不代替你定義身份。" data-zhs="由你选择家乡、语言、家族记忆和兴趣，不代替你定义身份。" data-en="You choose the roots, languages, family memories and interests it knows. It never defines your identity for you.">由你選擇家鄉、語言、家族記憶和興趣，不代替你定義身份。</p></article>
+        <article><span>02</span><h3 data-zht="學習文明" data-zhs="学习文明" data-en="Learn civilization">學習文明</h3><p data-zht="從經過編輯、專家與社區校驗的知識庫中獲得上下文。" data-zhs="从经过编辑、专家与社区校验的知识库中获得上下文。" data-en="It draws context from a civilization library reviewed by editors, experts and communities.">從經過編輯、專家與社區校驗的知識庫中獲得上下文。</p></article>
+        <article><span>03</span><h3 data-zht="與你創作" data-zhs="与你创作" data-en="Create with you">與你創作</h3><p data-zht="將記憶整理成雙語文章、短影片指令碼、音訊和教學內容。" data-zhs="将记忆整理成双语文章、短视频脚本、音频和教学内容。" data-en="Turn memory into bilingual articles, short-video scripts, audio and learning materials.">將記憶整理成雙語文章、短影片指令碼、音訊和教學內容。</p></article>
+        <article><span>04</span><h3 data-zht="傳播世界" data-zhs="传播世界" data-en="Share with the world">傳播世界</h3><p data-zht="根據受眾、語言與平臺調整表達，保留出處、署名與文化語境。" data-zhs="根据受众、语言与平台调整表达，保留出处、署名与文化语境。" data-en="Adapt expression by audience, language and platform while keeping sources, credit and cultural context.">根據受眾、語言與平臺調整表達，保留出處、署名與文化語境。</p></article>
       </div>
 
-      <div class="agent-pipeline" aria-label="文化智能体工作流程">
-        <span data-zh="你的文化记忆" data-en="Your cultural memory">你的文化记忆</span><i>→</i>
-        <span data-zh="可查证知识库" data-en="Verified knowledge">可查证知识库</span><i>→</i>
-        <span data-zh="AI 整理与创作" data-en="AI-assisted creation">AI 整理与创作</span><i>→</i>
-        <span data-zh="多语言传播" data-en="Multilingual sharing">多语言传播</span><i>→</i>
-        <span data-zh="社区反馈与修正" data-en="Community feedback">社区反馈与修正</span>
+      <div class="agent-pipeline" aria-label="文化智能體工作流程">
+        <span data-zht="你的文化記憶" data-zhs="你的文化记忆" data-en="Your cultural memory">你的文化記憶</span><i>→</i>
+        <span data-zht="可查證知識庫" data-zhs="可查证知识库" data-en="Verified knowledge">可查證知識庫</span><i>→</i>
+        <span data-zht="AI 整理與創作" data-zhs="AI 整理与创作" data-en="AI-assisted creation">AI 整理與創作</span><i>→</i>
+        <span data-zht="多語言傳播" data-zhs="多语言传播" data-en="Multilingual sharing">多語言傳播</span><i>→</i>
+        <span data-zht="社區反饋與修正" data-zhs="社区反馈与修正" data-en="Community feedback">社區反饋與修正</span>
       </div>
 
       <div class="agent-trust">
-        <strong data-zh="智能体的边界" data-en="Agent boundaries">智能体的边界</strong>
-        <p data-zh="你拥有自己的记忆与创作" data-en="You own your memories and creations">你拥有自己的记忆与创作</p>
-        <p data-zh="私密资料默认不公开" data-en="Private material stays private by default">私密资料默认不公开</p>
-        <p data-zh="事实带来源，争议展示多种解释" data-en="Facts cite sources; contested topics show multiple views">事实带来源，争议展示多种解释</p>
-        <p data-zh="AI 不冒充传承人、学者或家族当事人" data-en="AI never impersonates practitioners, scholars or family members">AI 不冒充传承人、学者或家族当事人</p>
+        <strong data-zht="智能體的邊界" data-zhs="智能体的边界" data-en="Agent boundaries">智能體的邊界</strong>
+        <p data-zht="你擁有自己的記憶與創作" data-zhs="你拥有自己的记忆与创作" data-en="You own your memories and creations">你擁有自己的記憶與創作</p>
+        <p data-zht="私密資料預設不公開" data-zhs="私密资料默认不公开" data-en="Private material stays private by default">私密資料預設不公開</p>
+        <p data-zht="事實帶來源，爭議展示多種解釋" data-zhs="事实带来源，争议展示多种解释" data-en="Facts cite sources; contested topics show multiple views">事實帶來源，爭議展示多種解釋</p>
+        <p data-zht="AI 不冒充傳承人、學者或家族當事人" data-zhs="AI 不冒充传承人、学者或家族当事人" data-en="AI never impersonates practitioners, scholars or family members">AI 不冒充傳承人、學者或家族當事人</p>
       </div>
     </section>
 
@@ -186,44 +190,44 @@
       <div class="section-head light">
         <div>
           <div class="section-index">003 — STORIES ACROSS BORDERS</div>
-          <p class="eyebrow coral" data-zh="全球华人" data-en="Global Chinese stories">全球华人</p>
-          <h2 data-zh="每一次迁徙，都留下新的文化坐标。" data-en="Every migration leaves a new cultural coordinate.">每一次迁徙，都留下新的文化坐标。</h2>
+          <p class="eyebrow coral" data-zht="全球華人" data-zhs="全球华人" data-en="Global Chinese stories">全球華人</p>
+          <h2 data-zht="每一次遷徙，都留下新的文化座標。" data-zhs="每一次迁徙，都留下新的文化坐标。" data-en="Every migration leaves a new cultural coordinate.">每一次遷徙，都留下新的文化座標。</h2>
         </div>
-        <p data-zh="从第一代落脚，到第二、第三代重新寻找身份；从唐人街的变迁，到新移民在数字时代建立社区。我们记录具体的人，而不是抽象的“海外华人”。" data-en="From first-generation arrival to later generations rediscovering identity; from changing Chinatowns to digital-age communities. We document real people, not an abstract diaspora.">从第一代落脚，到第二、第三代重新寻找身份；从唐人街的变迁，到新移民在数字时代建立社区。我们记录具体的人，而不是抽象的“海外华人”。</p>
+        <p data-zht="從第一代落腳，到第二、第三代重新尋找身份；從唐人街的變遷，到新移民在數位時代建立社區。我們記錄具體的人，而不是抽象的“海外華人”。" data-zhs="从第一代落脚，到第二、第三代重新寻找身份；从唐人街的变迁，到新移民在数字时代建立社区。我们记录具体的人，而不是抽象的“海外华人”。" data-en="From first-generation arrival to later generations rediscovering identity; from changing Chinatowns to digital-age communities. We document real people, not an abstract diaspora.">從第一代落腳，到第二、第三代重新尋找身份；從唐人街的變遷，到新移民在數位時代建立社區。我們記錄具體的人，而不是抽象的“海外華人”。</p>
       </div>
 
       <div class="story-grid">
         <article class="story story-featured">
           <div class="story-art art-home"><span>家</span></div>
           <div class="story-body">
-            <div class="story-meta"><span>家庭记忆</span><span>TORONTO</span></div>
-            <h3 data-zh="从一张旧餐桌开始：三代人的迁徙与团圆" data-en="A family migration story, beginning at an old dining table">从一张旧餐桌开始：三代人的迁徙与团圆</h3>
-            <p data-zh="邀请家庭用照片、食谱和口述记忆，保存那些没有写进历史书的生活。" data-en="Using photographs, recipes and oral histories to preserve lives left outside textbooks.">邀请家庭用照片、食谱和口述记忆，保存那些没有写进历史书的生活。</p>
-            <span class="story-status">开放征集 · OPEN CALL</span>
+            <div class="story-meta"><span data-zht="家庭記憶" data-zhs="家庭记忆" data-en="FAMILY MEMORY">家庭記憶</span><span>TORONTO</span></div>
+            <h3 data-zht="從一張舊餐桌開始：三代人的遷徙與團圓" data-zhs="从一张旧餐桌开始：三代人的迁徙与团圆" data-en="A family migration story, beginning at an old dining table">從一張舊餐桌開始：三代人的遷徙與團圓</h3>
+            <p data-zht="邀請家庭用照片、食譜和口述記憶，儲存那些沒有寫進歷史書的生活。" data-zhs="邀请家庭用照片、食谱和口述记忆，保存那些没有写进历史书的生活。" data-en="Using photographs, recipes and oral histories to preserve lives left outside textbooks.">邀請家庭用照片、食譜和口述記憶，儲存那些沒有寫進歷史書的生活。</p>
+            <span class="story-status" data-zht="開放徵集 · OPEN CALL" data-zhs="开放征集 · OPEN CALL" data-en="OPEN CALL">開放徵集 · OPEN CALL</span>
           </div>
         </article>
 
         <article class="story">
           <div class="story-art art-name"><span>名</span></div>
           <div class="story-body">
-            <div class="story-meta"><span>身份认同</span><span>VANCOUVER</span></div>
-            <h3 data-zh="我的中文名字，从什么时候变得陌生？" data-en="When did my Chinese name begin to feel unfamiliar?">我的中文名字，从什么时候变得陌生？</h3>
-            <p data-zh="关于发音、误读、改名，以及重新认领名字的年轻人。" data-en="On pronunciation, renaming and a younger generation reclaiming their names.">关于发音、误读、改名，以及重新认领名字的年轻人。</p>
+            <div class="story-meta"><span data-zht="身份認同" data-zhs="身份认同" data-en="IDENTITY">身份認同</span><span>VANCOUVER</span></div>
+            <h3 data-zht="我的中文名字，從什麼時候變得陌生？" data-zhs="我的中文名字，从什么时候变得陌生？" data-en="When did my Chinese name begin to feel unfamiliar?">我的中文名字，從什麼時候變得陌生？</h3>
+            <p data-zht="關於發音、誤讀、改名，以及重新認領名字的年輕人。" data-zhs="关于发音、误读、改名，以及重新认领名字的年轻人。" data-en="On pronunciation, renaming and a younger generation reclaiming their names.">關於發音、誤讀、改名，以及重新認領名字的年輕人。</p>
           </div>
         </article>
 
         <article class="story">
           <div class="story-art art-street"><span>埠</span></div>
           <div class="story-body">
-            <div class="story-meta"><span>社区现场</span><span>NEW YORK</span></div>
-            <h3 data-zh="唐人街不是纪念品，它仍是一座活着的社区" data-en="Chinatown is not a souvenir. It is a living community.">唐人街不是纪念品，它仍是一座活着的社区</h3>
-            <p data-zh="记录老店、租金、语言服务和新一代如何参与社区未来。" data-en="Documenting legacy shops, housing, language access and youth-led futures.">记录老店、租金、语言服务和新一代如何参与社区未来。</p>
+            <div class="story-meta"><span data-zht="社區現場" data-zhs="社区现场" data-en="COMMUNITY">社區現場</span><span>NEW YORK</span></div>
+            <h3 data-zht="唐人街不是紀念品，它仍是一座活著的社區" data-zhs="唐人街不是纪念品，它仍是一座活着的社区" data-en="Chinatown is not a souvenir. It is a living community.">唐人街不是紀念品，它仍是一座活著的社區</h3>
+            <p data-zht="記錄老店、租金、語言服務和新一代如何參與社區未來。" data-zhs="记录老店、租金、语言服务和新一代如何参与社区未来。" data-en="Documenting legacy shops, housing, language access and youth-led futures.">記錄老店、租金、語言服務和新一代如何參與社區未來。</p>
           </div>
         </article>
 
         <article class="story story-quote">
           <p>“</p>
-          <blockquote data-zh="我们不只是从哪里来，也正在决定要把文化带向哪里。" data-en="We are not only where we came from. We are deciding where culture goes next.">我们不只是从哪里来，也正在决定要把文化带向哪里。</blockquote>
+          <blockquote data-zht="我們不只是從哪裡來，也正在決定要把文化帶向哪裡。" data-zhs="我们不只是从哪里来，也正在决定要把文化带向哪里。" data-en="We are not only where we came from. We are deciding where culture goes next.">我們不只是從哪裡來，也正在決定要把文化帶向哪裡。</blockquote>
           <span>CHINESE.ORG COMMUNITY NOTE</span>
         </article>
       </div>
@@ -233,51 +237,51 @@
       <div class="section-head">
         <div>
           <div class="section-index">004 — CIVILIZATION LIBRARY</div>
-          <p class="eyebrow red" data-zh="华夏文明知识库" data-en="Chinese civilization library">华夏文明知识库</p>
-          <h2 data-zh="从 Discord 频道，生长为一座开放的文化图书馆。" data-en="From Discord channels to an open cultural library.">从 Discord 频道，生长为一座开放的文化图书馆。</h2>
+          <p class="eyebrow red" data-zht="華夏文明知識庫" data-zhs="华夏文明知识库" data-en="Chinese civilization library">華夏文明知識庫</p>
+          <h2 data-zht="從 Discord 頻道，生長為一座開放的文化圖書館。" data-zhs="从 Discord 频道，生长为一座开放的文化图书馆。" data-en="From Discord channels to an open cultural library.">從 Discord 頻道，生長為一座開放的文化圖書館。</h2>
         </div>
-        <p data-zh="保留社区已有的兴趣结构，再用导读、时间线、术语解释、参考来源和多语言内容，让每个主题更容易进入，也更经得起查证。" data-en="We preserve the community's existing interests, then add guides, timelines, terminology, sources and multilingual context—making each subject accessible and verifiable.">保留社区已有的兴趣结构，再用导读、时间线、术语解释、参考来源和多语言内容，让每个主题更容易进入，也更经得起查证。</p>
+        <p data-zht="保留社區已有的興趣結構，再用導讀、時間線、術語解釋、參考來源和多語言內容，讓每個主題更容易進入，也更經得起查證。" data-zhs="保留社区已有的兴趣结构，再用导读、时间线、术语解释、参考来源和多语言内容，让每个主题更容易进入，也更经得起查证。" data-en="We preserve the community's existing interests, then add guides, timelines, terminology, sources and multilingual context—making each subject accessible and verifiable.">保留社區已有的興趣結構，再用導讀、時間線、術語解釋、參考來源和多語言內容，讓每個主題更容易進入，也更經得起查證。</p>
       </div>
 
       <div class="library-grid">
         <article class="library-card tone-ink">
           <div class="library-number">01</div>
           <div class="library-symbol">易</div>
-          <h3 data-zh="思想与宇宙观" data-en="Thought & cosmology">思想与宇宙观</h3>
+          <h3 data-zht="思想與宇宙觀" data-zhs="思想与宇宙观" data-en="Thought & cosmology">思想與宇宙觀</h3>
           <ul>
-            <li>神话传说</li><li>易经命理</li><li>风水占卜</li><li>太极八卦</li><li>奇门遁甲</li>
+            <li data-zht="神話傳說" data-zhs="神话传说" data-en="Myth & legends">神話傳說</li><li data-zht="易經命理" data-zhs="易经命理" data-en="I Ching & destiny">易經命理</li><li data-zht="風水占卜" data-zhs="风水占卜" data-en="Feng shui & divination">風水占卜</li><li data-zht="太極八卦" data-zhs="太极八卦" data-en="Tai chi & bagua">太極八卦</li><li data-zht="奇門遁甲" data-zhs="奇门遁甲" data-en="Qimen Dunjia">奇門遁甲</li>
           </ul>
         </article>
         <article class="library-card tone-herb">
           <div class="library-number">02</div>
           <div class="library-symbol">生</div>
-          <h3 data-zh="生命与身体" data-en="Life & the body">生命与身体</h3>
+          <h3 data-zht="生命與身體" data-zhs="生命与身体" data-en="Life & the body">生命與身體</h3>
           <ul>
-            <li>中医中药</li><li>养生修炼</li><li>武术功夫</li><li>节气生活</li>
+            <li data-zht="中醫中藥" data-zhs="中医中药" data-en="Chinese medicine">中醫中藥</li><li data-zht="養生修煉" data-zhs="养生修炼" data-en="Wellness cultivation">養生修煉</li><li data-zht="武術功夫" data-zhs="武术功夫" data-en="Martial arts">武術功夫</li><li data-zht="節氣生活" data-zhs="节气生活" data-en="Seasonal living">節氣生活</li>
           </ul>
         </article>
         <article class="library-card tone-red">
           <div class="library-number">03</div>
-          <div class="library-symbol">艺</div>
-          <h3 data-zh="艺术与生活" data-en="Arts & everyday life">艺术与生活</h3>
+          <div class="library-symbol" data-zht="藝" data-zhs="艺" data-en="藝">藝</div>
+          <h3 data-zht="藝術與生活" data-zhs="艺术与生活" data-en="Arts & everyday life">藝術與生活</h3>
           <ul>
-            <li>汉服国风</li><li>传统美食</li><li>书法字画</li><li>戏曲杂技</li><li>相声小品</li>
+            <li data-zht="漢服國風" data-zhs="汉服国风" data-en="Hanfu & Chinese style">漢服國風</li><li data-zht="傳統美食" data-zhs="传统美食" data-en="Traditional food">傳統美食</li><li data-zht="書法字畫" data-zhs="书法字画" data-en="Calligraphy & painting">書法字畫</li><li data-zht="戲曲雜技" data-zhs="戏曲杂技" data-en="Opera & acrobatics">戲曲雜技</li><li data-zht="相聲小品" data-zhs="相声小品" data-en="Xiangsheng & sketches">相聲小品</li>
           </ul>
         </article>
         <article class="library-card tone-stone">
           <div class="library-number">04</div>
           <div class="library-symbol">史</div>
-          <h3 data-zh="历史与地方" data-en="History & place">历史与地方</h3>
+          <h3 data-zht="歷史與地方" data-zhs="历史与地方" data-en="History & place">歷史與地方</h3>
           <ul>
-            <li>姓氏族谱</li><li>历史地理</li><li>古代建筑</li><li>古玩收藏</li>
+            <li data-zht="姓氏族譜" data-zhs="姓氏族谱" data-en="Surname genealogies">姓氏族譜</li><li data-zht="歷史地理" data-zhs="历史地理" data-en="Historical geography">歷史地理</li><li data-zht="古代建築" data-zhs="古代建筑" data-en="Ancient architecture">古代建築</li><li data-zht="古玩收藏" data-zhs="古玩收藏" data-en="Antiques & collecting">古玩收藏</li>
           </ul>
         </article>
         <article class="library-card tone-gold">
           <div class="library-number">05</div>
-          <div class="library-symbol">传</div>
-          <h3 data-zh="技艺与传承" data-en="Craft & heritage">技艺与传承</h3>
+          <div class="library-symbol" data-zht="傳" data-zhs="传" data-en="傳">傳</div>
+          <h3 data-zht="技藝與傳承" data-zhs="技艺与传承" data-en="Craft & heritage">技藝與傳承</h3>
           <ul>
-            <li>非遗传承</li><li>手工技艺</li><li>师承口述</li><li>数字典藏</li>
+            <li data-zht="非遺傳承" data-zhs="非遗传承" data-en="Intangible heritage">非遺傳承</li><li data-zht="手工技藝" data-zhs="手工技艺" data-en="Handcrafts">手工技藝</li><li data-zht="師承口述" data-zhs="师承口述" data-en="Oral lineages">師承口述</li><li data-zht="數位典藏" data-zhs="数字典藏" data-en="Digital archives">數位典藏</li>
           </ul>
         </article>
       </div>
@@ -285,9 +289,9 @@
       <div class="library-cta">
         <div>
           <span>18+ COMMUNITY TOPICS</span>
-          <p data-zh="社区讨论提供问题，编辑与专家把讨论整理成可靠、易读的知识内容。" data-en="Community discussion surfaces the questions; editors and experts shape them into reliable, readable knowledge.">社区讨论提供问题，编辑与专家把讨论整理成可靠、易读的知识内容。</p>
+          <p data-zht="社區討論提供問題，編輯與專家把討論整理成可靠、易讀的知識內容。" data-zhs="社区讨论提供问题，编辑与专家把讨论整理成可靠、易读的知识内容。" data-en="Community discussion surfaces the questions; editors and experts shape them into reliable, readable knowledge.">社區討論提供問題，編輯與專家把討論整理成可靠、易讀的知識內容。</p>
         </div>
-        <a class="arrow-link" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zh="进入 Discord 讨论 ↗" data-en="Join the Discord discussion ↗">进入 Discord 讨论 ↗</a>
+        <a class="arrow-link" href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zht="進入 Discord 討論 ↗" data-zhs="进入 Discord 讨论 ↗" data-en="Join the Discord discussion ↗">進入 Discord 討論 ↗</a>
       </div>
     </section>
 
@@ -295,10 +299,10 @@
       <div class="section-head light">
         <div>
           <div class="section-index">005 — CULTURE, CURATED</div>
-          <p class="eyebrow coral" data-zh="文化画廊与创作者" data-en="Gallery & creators">文化画廊与创作者</p>
-          <h2 data-zh="不只展示一张图，更完整讲清一件文化作品。" data-en="Beyond displaying an image, we tell the full story of a cultural work.">不只展示一张图，更完整讲清一件文化作品。</h2>
+          <p class="eyebrow coral" data-zht="文化畫廊與創作者" data-zhs="文化画廊与创作者" data-en="Gallery & creators">文化畫廊與創作者</p>
+          <h2 data-zht="不只展示一張圖，更完整講清一件文化作品。" data-zhs="不只展示一张图，更完整讲清一件文化作品。" data-en="Beyond displaying an image, we tell the full story of a cultural work.">不只展示一張圖，更完整講清一件文化作品。</h2>
         </div>
-        <p data-zh="每个作品都附上作者、年代、地区、来源、授权与文化背景。Gallery 不是装饰性的轮播，而是一套可以持续策展、研究和传播的内容系统。" data-en="Every work carries authorship, date, place, provenance, permission and cultural context. The Gallery is not a decorative carousel, but a system for curation, research and sharing.">每个作品都附上作者、年代、地区、来源、授权与文化背景。Gallery 不是装饰性的轮播，而是一套可以持续策展、研究和传播的内容系统。</p>
+        <p data-zht="每個作品都附上作者、年代、地區、來源、授權與文化背景。Gallery 不是裝飾性的輪播，而是一套可以持續策展、研究和傳播的內容系統。" data-zhs="每个作品都附上作者、年代、地区、来源、授权与文化背景。Gallery 不是装饰性的轮播，而是一套可以持续策展、研究和传播的内容系统。" data-en="Every work carries authorship, date, place, provenance, permission and cultural context. The Gallery is not a decorative carousel, but a system for curation, research and sharing.">每個作品都附上作者、年代、地區、來源、授權與文化背景。Gallery 不是裝飾性的輪播，而是一套可以持續策展、研究和傳播的內容系統。</p>
       </div>
 
       <div class="gallery-grid">
@@ -308,57 +312,57 @@
             <span class="gallery-edition">CURATION 001</span>
           </div>
           <div class="gallery-card-body">
-            <div class="gallery-meta"><span data-zh="器物与文明" data-en="Objects & civilization">器物与文明</span><span data-zh="专题策划中" data-en="In curation">专题策划中</span></div>
-            <h3 data-zh="一件器物，如何穿过时间来到我们面前" data-en="How an object travels through time to reach us">一件器物，如何穿过时间来到我们面前</h3>
-            <p data-zh="从材质、工艺和纹样，到收藏经历与当代意义，建立完整的作品档案。" data-en="From material, craft and pattern to provenance and present-day meaning—a complete cultural record.">从材质、工艺和纹样，到收藏经历与当代意义，建立完整的作品档案。</p>
+            <div class="gallery-meta"><span data-zht="器物與文明" data-zhs="器物与文明" data-en="Objects & civilization">器物與文明</span><span data-zht="專題策劃中" data-zhs="专题策划中" data-en="In curation">專題策劃中</span></div>
+            <h3 data-zht="一件器物，如何穿過時間來到我們面前" data-zhs="一件器物，如何穿过时间来到我们面前" data-en="How an object travels through time to reach us">一件器物，如何穿過時間來到我們面前</h3>
+            <p data-zht="從材質、工藝和紋樣，到收藏經歷與當代意義，建立完整的作品檔案。" data-zhs="从材质、工艺和纹样，到收藏经历与当代意义，建立完整的作品档案。" data-en="From material, craft and pattern to provenance and present-day meaning—a complete cultural record.">從材質、工藝和紋樣，到收藏經歷與當代意義，建立完整的作品檔案。</p>
           </div>
         </article>
 
         <article class="gallery-card">
           <div class="gallery-visual visual-ink"><span class="gallery-glyph">墨</span></div>
           <div class="gallery-card-body">
-            <div class="gallery-meta"><span data-zh="书法字画" data-en="Calligraphy & painting">书法字画</span><span>OPEN CALL</span></div>
-            <h3 data-zh="笔墨不是风格标签" data-en="Ink is more than a visual style">笔墨不是风格标签</h3>
-            <p data-zh="读懂题跋、印章、材料和作品所处的时代。" data-en="Reading inscriptions, seals, materials and historical context.">读懂题跋、印章、材料和作品所处的时代。</p>
+            <div class="gallery-meta"><span data-zht="書法字畫" data-zhs="书法字画" data-en="Calligraphy & painting">書法字畫</span><span>OPEN CALL</span></div>
+            <h3 data-zht="筆墨不是風格標籤" data-zhs="笔墨不是风格标签" data-en="Ink is more than a visual style">筆墨不是風格標籤</h3>
+            <p data-zht="讀懂題跋、印章、材料和作品所處的時代。" data-zhs="读懂题跋、印章、材料和作品所处的时代。" data-en="Reading inscriptions, seals, materials and historical context.">讀懂題跋、印章、材料和作品所處的時代。</p>
           </div>
         </article>
 
         <article class="gallery-card">
-          <div class="gallery-visual visual-opera"><span class="gallery-glyph">戏</span></div>
+          <div class="gallery-visual visual-opera"><span class="gallery-glyph" data-zht="戲" data-zhs="戏" data-en="戲">戲</span></div>
           <div class="gallery-card-body">
-            <div class="gallery-meta"><span data-zh="戏曲与舞台" data-en="Opera & stage">戏曲与舞台</span><span data-zh="社区共建" data-en="Community-built">社区共建</span></div>
-            <h3 data-zh="一张脸谱背后的角色与声音" data-en="The role and voice behind an opera face">一张脸谱背后的角色与声音</h3>
-            <p data-zh="连接剧种、行当、唱腔、服饰与海外演出记忆。" data-en="Connecting genres, roles, music, costume and overseas performance memory.">连接剧种、行当、唱腔、服饰与海外演出记忆。</p>
+            <div class="gallery-meta"><span data-zht="戲曲與舞臺" data-zhs="戏曲与舞台" data-en="Opera & stage">戲曲與舞臺</span><span data-zht="社區共建" data-zhs="社区共建" data-en="Community-built">社區共建</span></div>
+            <h3 data-zht="一張臉譜背後的角色與聲音" data-zhs="一张脸谱背后的角色与声音" data-en="The role and voice behind an opera face">一張臉譜背後的角色與聲音</h3>
+            <p data-zht="連線劇種、行當、唱腔、服飾與海外演出記憶。" data-zhs="连接剧种、行当、唱腔、服饰与海外演出记忆。" data-en="Connecting genres, roles, music, costume and overseas performance memory.">連線劇種、行當、唱腔、服飾與海外演出記憶。</p>
           </div>
         </article>
       </div>
 
       <div class="creator-charter">
-        <article><span>01</span><h3 data-zh="署名" data-en="Credit">署名</h3><p data-zh="创作者姓名与贡献始终随作品展示。" data-en="Creator names and contributions stay with every work.">创作者姓名与贡献始终随作品展示。</p></article>
-        <article><span>02</span><h3 data-zh="来源" data-en="Provenance">来源</h3><p data-zh="记录出处、时间、修改和资料依据。" data-en="Sources, dates, revisions and evidence remain visible.">记录出处、时间、修改和资料依据。</p></article>
-        <article><span>03</span><h3 data-zh="授权" data-en="Permission">授权</h3><p data-zh="由创作者选择转载、翻译与使用方式。" data-en="Creators choose how work may be shared, translated or reused.">由创作者选择转载、翻译与使用方式。</p></article>
-        <article><span>04</span><h3 data-zh="收益" data-en="Value share">收益</h3><p data-zh="商业合作先说明规则，再与创作者公平分享。" data-en="Commercial use is transparent and value is shared fairly.">商业合作先说明规则，再与创作者公平分享。</p></article>
+        <article><span>01</span><h3 data-zht="署名" data-zhs="署名" data-en="Credit">署名</h3><p data-zht="創作者姓名與貢獻始終隨作品展示。" data-zhs="创作者姓名与贡献始终随作品展示。" data-en="Creator names and contributions stay with every work.">創作者姓名與貢獻始終隨作品展示。</p></article>
+        <article><span>02</span><h3 data-zht="來源" data-zhs="来源" data-en="Provenance">來源</h3><p data-zht="記錄出處、時間、修改和資料依據。" data-zhs="记录出处、时间、修改和资料依据。" data-en="Sources, dates, revisions and evidence remain visible.">記錄出處、時間、修改和資料依據。</p></article>
+        <article><span>03</span><h3 data-zht="授權" data-zhs="授权" data-en="Permission">授權</h3><p data-zht="由創作者選擇轉載、翻譯與使用方式。" data-zhs="由创作者选择转载、翻译与使用方式。" data-en="Creators choose how work may be shared, translated or reused.">由創作者選擇轉載、翻譯與使用方式。</p></article>
+        <article><span>04</span><h3 data-zht="收益" data-zhs="收益" data-en="Value share">收益</h3><p data-zht="商業合作先說明規則，再與創作者公平分享。" data-zhs="商业合作先说明规则，再与创作者公平分享。" data-en="Commercial use is transparent and value is shared fairly.">商業合作先說明規則，再與創作者公平分享。</p></article>
       </div>
 
       <div class="source-record">
-        <div><span data-zh="作品资料示例" data-en="Sample work record">作品资料示例</span><strong data-zh="作者 / 地区 / 年代 / 材料 / 收藏记录 / 授权方式" data-en="Creator / Place / Date / Material / Provenance / Permission">作者 / 地区 / 年代 / 材料 / 收藏记录 / 授权方式</strong></div>
-        <p data-zh="不以 NFT 证明文化价值，而以清楚的作者关系、资料来源和使用许可保护作品。" data-en="Cultural value is not proven by an NFT, but protected through clear authorship, provenance and permission.">不以 NFT 证明文化价值，而以清楚的作者关系、资料来源和使用许可保护作品。</p>
+        <div><span data-zht="作品資料示例" data-zhs="作品资料示例" data-en="Sample work record">作品資料示例</span><strong data-zht="作者 / 地區 / 年代 / 材料 / 收藏記錄 / 授權方式" data-zhs="作者 / 地区 / 年代 / 材料 / 收藏记录 / 授权方式" data-en="Creator / Place / Date / Material / Provenance / Permission">作者 / 地區 / 年代 / 材料 / 收藏記錄 / 授權方式</strong></div>
+        <p data-zht="不以 NFT 證明文化價值，而以清楚的作者關係、資料來源和使用許可保護作品。" data-zhs="不以 NFT 证明文化价值，而以清楚的作者关系、资料来源和使用许可保护作品。" data-en="Cultural value is not proven by an NFT, but protected through clear authorship, provenance and permission.">不以 NFT 證明文化價值，而以清楚的作者關係、資料來源和使用許可保護作品。</p>
       </div>
     </section>
 
     <section class="map-section section dark-section" id="map">
       <div class="map-copy">
         <div class="section-index">006 — A LIVING CULTURE MAP</div>
-        <p class="eyebrow coral" data-zh="全球文化地图" data-en="Global culture map">全球文化地图</p>
-        <h2 data-zh="一张不断生长的华人文化地图。" data-en="A living map of Chinese culture worldwide.">一张不断生长的华人文化地图。</h2>
-        <p data-zh="不是统计人口，而是标记文化正在发生的地方：社区档案、中文学校、老店、新空间、节庆、创作者与青年组织。" data-en="Not a population count, but a map of culture in motion: community archives, language schools, legacy businesses, new spaces, festivals, creators and youth organizations.">不是统计人口，而是标记文化正在发生的地方：社区档案、中文学校、老店、新空间、节庆、创作者与青年组织。</p>
-        <a class="button button-outline" href="#join" data-zh="添加你的城市" data-en="Add your city">添加你的城市</a>
-        <div class="circle-pills" aria-label="文化社区类型">
-          <span data-zh="同城" data-en="Local">同城</span><span data-zh="同乡" data-en="Hometown">同乡</span><span data-zh="姓氏" data-en="Surname">姓氏</span><span data-zh="方言" data-en="Dialect">方言</span><span data-zh="兴趣" data-en="Interest">兴趣</span>
+        <p class="eyebrow coral" data-zht="全球文化地圖" data-zhs="全球文化地图" data-en="Global culture map">全球文化地圖</p>
+        <h2 data-zht="一張不斷生長的華人文化地圖。" data-zhs="一张不断生长的华人文化地图。" data-en="A living map of Chinese culture worldwide.">一張不斷生長的華人文化地圖。</h2>
+        <p data-zht="不是統計人口，而是標記文化正在發生的地方：社區檔案、中文學校、老店、新空間、節慶、創作者與青年組織。" data-zhs="不是统计人口，而是标记文化正在发生的地方：社区档案、中文学校、老店、新空间、节庆、创作者与青年组织。" data-en="Not a population count, but a map of culture in motion: community archives, language schools, legacy businesses, new spaces, festivals, creators and youth organizations.">不是統計人口，而是標記文化正在發生的地方：社區檔案、中文學校、老店、新空間、節慶、創作者與青年組織。</p>
+        <a class="button button-outline" href="#join" data-zht="新增你的城市" data-zhs="添加你的城市" data-en="Add your city">新增你的城市</a>
+        <div class="circle-pills" aria-label="文化社區型別">
+          <span data-zht="同城" data-zhs="同城" data-en="Local">同城</span><span data-zht="同鄉" data-zhs="同乡" data-en="Hometown">同鄉</span><span data-zht="姓氏" data-zhs="姓氏" data-en="Surname">姓氏</span><span data-zht="方言" data-zhs="方言" data-en="Dialect">方言</span><span data-zht="興趣" data-zhs="兴趣" data-en="Interest">興趣</span>
         </div>
       </div>
       <div class="map-visual">
-        <div class="globe" aria-label="全球华人城市示意图">
+        <div class="globe" aria-label="全球華人城市示意圖">
           <div class="globe-ring ring-one"></div>
           <div class="globe-ring ring-two"></div>
           <div class="globe-line line-one"></div>
@@ -374,14 +378,14 @@
         </div>
         <article class="identity-card">
           <span>PRIVACY-FIRST CULTURE PROFILE</span>
-          <h3 data-zh="我的文化坐标" data-en="My cultural coordinates">我的文化坐标</h3>
+          <h3 data-zht="我的文化座標" data-zhs="我的文化坐标" data-en="My cultural coordinates">我的文化座標</h3>
           <dl>
-            <div><dt data-zh="现居" data-en="Lives in">现居</dt><dd data-zh="所在城市" data-en="City">所在城市</dd></div>
-            <div><dt data-zh="家乡" data-en="Roots">家乡</dt><dd data-zh="自愿填写到地区" data-en="Region, optional">自愿填写到地区</dd></div>
-            <div><dt data-zh="语言" data-en="Languages">语言</dt><dd data-zh="家庭语言" data-en="Family languages">家庭语言</dd></div>
-            <div><dt data-zh="文化圈" data-en="Circles">文化圈</dt><dd data-zh="按兴趣选择" data-en="Interest-based">按兴趣选择</dd></div>
+            <div><dt data-zht="現居" data-zhs="现居" data-en="Lives in">現居</dt><dd data-zht="所在城市" data-zhs="所在城市" data-en="City">所在城市</dd></div>
+            <div><dt data-zht="家鄉" data-zhs="家乡" data-en="Roots">家鄉</dt><dd data-zht="自願填寫到地區" data-zhs="自愿填写到地区" data-en="Region, optional">自願填寫到地區</dd></div>
+            <div><dt data-zht="語言" data-zhs="语言" data-en="Languages">語言</dt><dd data-zht="家庭語言" data-zhs="家庭语言" data-en="Family languages">家庭語言</dd></div>
+            <div><dt data-zht="文化圈" data-zhs="文化圈" data-en="Circles">文化圈</dt><dd data-zht="按興趣選擇" data-zhs="按兴趣选择" data-en="Interest-based">按興趣選擇</dd></div>
           </dl>
-          <p data-zh="默认私密，不收集精确地址；用户自己决定公开哪些文化信息。" data-en="Private by default, no precise address; each person chooses what cultural information to share.">默认私密，不收集精确地址；用户自己决定公开哪些文化信息。</p>
+          <p data-zht="預設私密，不收集精確地址；使用者自己決定公開哪些文化資訊。" data-zhs="默认私密，不收集精确地址；用户自己决定公开哪些文化信息。" data-en="Private by default, no precise address; each person chooses what cultural information to share.">預設私密，不收集精確地址；使用者自己決定公開哪些文化資訊。</p>
         </article>
       </div>
     </section>
@@ -390,59 +394,59 @@
       <div class="section-head">
         <div>
           <div class="section-index">007 — COMMUNITY STEWARDSHIP</div>
-          <p class="eyebrow red" data-zh="没有代币的社区共治" data-en="Community governance, without tokens">没有代币的社区共治</p>
-          <h2 data-zh="让社区决定问题，让可靠流程保证答案。" data-en="The community chooses the questions; a trusted process strengthens the answers.">让社区决定问题，让可靠流程保证答案。</h2>
+          <p class="eyebrow red" data-zht="沒有代幣的社區共治" data-zhs="没有代币的社区共治" data-en="Community governance, without tokens">沒有代幣的社區共治</p>
+          <h2 data-zht="讓社區決定問題，讓可靠流程保證答案。" data-zhs="让社区决定问题，让可靠流程保证答案。" data-en="The community chooses the questions; a trusted process strengthens the answers.">讓社區決定問題，讓可靠流程保證答案。</h2>
         </div>
-        <p data-zh="不按持币数量决定文化方向，也不奖励刷赞转发。社区负责发现问题、推荐人物和提出修正；编辑、研究者与传承人共同把内容做准确。" data-en="Culture is not directed by token holdings or engagement farming. The community surfaces questions, people and corrections; editors, researchers and practitioners make the work reliable.">不按持币数量决定文化方向，也不奖励刷赞转发。社区负责发现问题、推荐人物和提出修正；编辑、研究者与传承人共同把内容做准确。</p>
+        <p data-zht="不按持幣數量決定文化方向，也不獎勵刷贊轉發。社區負責發現問題、推薦人物和提出修正；編輯、研究者與傳承人共同把內容做準確。" data-zhs="不按持币数量决定文化方向，也不奖励刷赞转发。社区负责发现问题、推荐人物和提出修正；编辑、研究者与传承人共同把内容做准确。" data-en="Culture is not directed by token holdings or engagement farming. The community surfaces questions, people and corrections; editors, researchers and practitioners make the work reliable.">不按持幣數量決定文化方向，也不獎勵刷贊轉發。社區負責發現問題、推薦人物和提出修正；編輯、研究者與傳承人共同把內容做準確。</p>
       </div>
 
       <ol class="governance-flow">
-        <li><span>01</span><h3 data-zh="社区提问" data-en="Community question">社区提问</h3><p data-zh="从 Discord、城市和读者中发现真实问题。" data-en="Real questions from Discord, cities and readers.">从 Discord、城市和读者中发现真实问题。</p></li>
-        <li><span>02</span><h3 data-zh="编辑整理" data-en="Editorial framing">编辑整理</h3><p data-zh="确定范围、术语、作者与资料需求。" data-en="Define scope, terms, contributors and source needs.">确定范围、术语、作者与资料需求。</p></li>
-        <li><span>03</span><h3 data-zh="专家核查" data-en="Expert review">专家核查</h3><p data-zh="由研究者、传承人或社区当事人复核。" data-en="Review by researchers, practitioners or community members.">由研究者、传承人或社区当事人复核。</p></li>
-        <li><span>04</span><h3 data-zh="多语发布" data-en="Multilingual release">多语发布</h3><p data-zh="为不同背景的读者解释文化语境。" data-en="Explain cultural context across languages and backgrounds.">为不同背景的读者解释文化语境。</p></li>
-        <li><span>05</span><h3 data-zh="版本公开" data-en="Open revisions">版本公开</h3><p data-zh="保留来源、修改记录和社区纠错入口。" data-en="Keep sources, revision history and correction paths visible.">保留来源、修改记录和社区纠错入口。</p></li>
+        <li><span>01</span><h3 data-zht="社區提問" data-zhs="社区提问" data-en="Community question">社區提問</h3><p data-zht="從 Discord、城市和讀者中發現真實問題。" data-zhs="从 Discord、城市和读者中发现真实问题。" data-en="Real questions from Discord, cities and readers.">從 Discord、城市和讀者中發現真實問題。</p></li>
+        <li><span>02</span><h3 data-zht="編輯整理" data-zhs="编辑整理" data-en="Editorial framing">編輯整理</h3><p data-zht="確定範圍、術語、作者與資料需求。" data-zhs="确定范围、术语、作者与资料需求。" data-en="Define scope, terms, contributors and source needs.">確定範圍、術語、作者與資料需求。</p></li>
+        <li><span>03</span><h3 data-zht="專家核查" data-zhs="专家核查" data-en="Expert review">專家核查</h3><p data-zht="由研究者、傳承人或社區當事人複核。" data-zhs="由研究者、传承人或社区当事人复核。" data-en="Review by researchers, practitioners or community members.">由研究者、傳承人或社區當事人複核。</p></li>
+        <li><span>04</span><h3 data-zht="多語釋出" data-zhs="多语发布" data-en="Multilingual release">多語釋出</h3><p data-zht="為不同背景的讀者解釋文化語境。" data-zhs="为不同背景的读者解释文化语境。" data-en="Explain cultural context across languages and backgrounds.">為不同背景的讀者解釋文化語境。</p></li>
+        <li><span>05</span><h3 data-zht="版本公開" data-zhs="版本公开" data-en="Open revisions">版本公開</h3><p data-zht="保留來源、修改記錄和社區糾錯入口。" data-zhs="保留来源、修改记录和社区纠错入口。" data-en="Keep sources, revision history and correction paths visible.">保留來源、修改記錄和社區糾錯入口。</p></li>
       </ol>
 
       <div class="governance-rules">
-        <strong data-zh="共治原则" data-en="Stewardship principles">共治原则</strong>
-        <div><span>✓</span><p data-zh="贡献看质量，不看持币量" data-en="Contribution quality over token holdings">贡献看质量，不看持币量</p></div>
-        <div><span>✓</span><p data-zh="事实与观点明确区分" data-en="Facts and viewpoints clearly separated">事实与观点明确区分</p></div>
-        <div><span>✓</span><p data-zh="敏感身份与家族资料默认保护" data-en="Sensitive identity and family data protected by default">敏感身份与家族资料默认保护</p></div>
-        <div><span>✓</span><p data-zh="争议内容展示来源与不同解释" data-en="Contested topics show sources and multiple interpretations">争议内容展示来源与不同解释</p></div>
+        <strong data-zht="共治原則" data-zhs="共治原则" data-en="Stewardship principles">共治原則</strong>
+        <div><span>✓</span><p data-zht="貢獻看質量，不看持幣量" data-zhs="贡献看质量，不看持币量" data-en="Contribution quality over token holdings">貢獻看質量，不看持幣量</p></div>
+        <div><span>✓</span><p data-zht="事實與觀點明確區分" data-zhs="事实与观点明确区分" data-en="Facts and viewpoints clearly separated">事實與觀點明確區分</p></div>
+        <div><span>✓</span><p data-zht="敏感身份與家族資料預設保護" data-zhs="敏感身份与家族资料默认保护" data-en="Sensitive identity and family data protected by default">敏感身份與家族資料預設保護</p></div>
+        <div><span>✓</span><p data-zht="爭議內容展示來源與不同解釋" data-zhs="争议内容展示来源与不同解释" data-en="Contested topics show sources and multiple interpretations">爭議內容展示來源與不同解釋</p></div>
       </div>
     </section>
 
     <section class="join section" id="join">
       <div class="join-heading">
         <div class="section-index">008 — BUILD IT TOGETHER</div>
-        <p class="eyebrow red" data-zh="共建 Chinese.org" data-en="Build Chinese.org together">共建 Chinese.org</p>
-        <h2 data-zh="这座文化基地，需要来自世界各地的你。" data-en="This cultural commons needs people like you, everywhere.">这座文化基地，需要来自世界各地的你。</h2>
+        <p class="eyebrow red" data-zht="共建 Chinese.org" data-zhs="共建 Chinese.org" data-en="Build Chinese.org together">共建 Chinese.org</p>
+        <h2 data-zht="這座文化基地，需要來自世界各地的你。" data-zhs="这座文化基地，需要来自世界各地的你。" data-en="This cultural commons needs people like you, everywhere.">這座文化基地，需要來自世界各地的你。</h2>
       </div>
 
       <div class="join-grid">
         <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">
-          <span>01</span><h3>加入社区</h3><p>参与主题讨论，提出问题，认识同城伙伴。</p><i>↗</i>
+          <span>01</span><h3 data-zht="加入社區" data-zhs="加入社区" data-en="Join the community">加入社區</h3><p data-zht="參與主題討論，提出問題，認識同城夥伴。" data-zhs="参与主题讨论，提出问题，认识同城伙伴。" data-en="Join topic discussions, ask questions and meet people in your city.">參與主題討論，提出問題，認識同城夥伴。</p><i>↗</i>
         </a>
         <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">
-          <span>02</span><h3>分享故事</h3><p>提交人物、家庭、社区、老照片与口述记忆。</p><i>→</i>
+          <span>02</span><h3 data-zht="分享故事" data-zhs="分享故事" data-en="Share a story">分享故事</h3><p data-zht="提交人物、家庭、社區、老照片與口述記憶。" data-zhs="提交人物、家庭、社区、老照片与口述记忆。" data-en="Contribute people, families, communities, photographs and oral histories.">提交人物、家庭、社區、老照片與口述記憶。</p><i>→</i>
         </a>
         <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">
-          <span>03</span><h3>贡献知识</h3><p>成为作者、研究者、翻译者或事实核查志愿者。</p><i>→</i>
+          <span>03</span><h3 data-zht="貢獻知識" data-zhs="贡献知识" data-en="Contribute knowledge">貢獻知識</h3><p data-zht="成為作者、研究者、翻譯者或事實核查志願者。" data-zhs="成为作者、研究者、翻译者或事实核查志愿者。" data-en="Contribute as an author, researcher, translator or fact-checker.">成為作者、研究者、翻譯者或事實核查志願者。</p><i>→</i>
         </a>
         <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">
-          <span>04</span><h3>连接城市</h3><p>推荐当地社团、学校、文化空间和青年组织。</p><i>→</i>
+          <span>04</span><h3 data-zht="連線城市" data-zhs="连接城市" data-en="Connect a city">連線城市</h3><p data-zht="推薦當地社團、學校、文化空間和青年組織。" data-zhs="推荐当地社团、学校、文化空间和青年组织。" data-en="Recommend local associations, schools, cultural spaces and youth groups.">推薦當地社團、學校、文化空間和青年組織。</p><i>→</i>
         </a>
       </div>
 
       <div class="newsletter">
         <div>
           <span>THE LETTER FROM CHINESE.ORG</span>
-          <h3 data-zh="每月一封，来自全球华人社区。" data-en="One monthly letter from Chinese communities worldwide.">每月一封，来自全球华人社区。</h3>
+          <h3 data-zht="每月一封，來自全球華人社區。" data-zhs="每月一封，来自全球华人社区。" data-en="One monthly letter from Chinese communities worldwide.">每月一封，來自全球華人社區。</h3>
         </div>
         <div class="newsletter-action">
-          <p data-zh="邮件订阅即将开放。现在可先加入 Discord，获得更新并参与栏目共建。" data-en="Email subscriptions are coming soon. Join Discord now for updates and editorial collaboration.">邮件订阅即将开放。现在可先加入 Discord，获得更新并参与栏目共建。</p>
-          <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zh="加入社区 ↗" data-en="Join the community ↗">加入社区 ↗</a>
+          <p data-zht="郵件訂閱即將開放。現在可先加入 Discord，獲得更新並參與欄目共建。" data-zhs="邮件订阅即将开放。现在可先加入 Discord，获得更新并参与栏目共建。" data-en="Email subscriptions are coming soon. Join Discord now for updates and editorial collaboration.">郵件訂閱即將開放。現在可先加入 Discord，獲得更新並參與欄目共建。</p>
+          <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer" data-zht="加入社區 ↗" data-zhs="加入社区 ↗" data-en="Join the community ↗">加入社區 ↗</a>
         </div>
       </div>
     </section>
@@ -453,14 +457,14 @@
       <span class="brand-stamp" aria-hidden="true"><img src="assets/logo-hua.png" alt=""></span>
       <div><strong>CHINESE.ORG</strong><p>GLOBAL CHINESE CULTURE COMMONS</p></div>
     </div>
-    <p data-zh="文化属于每一个参与、记忆和创造它的人。" data-en="Culture belongs to everyone who carries, remembers and creates it.">文化属于每一个参与、记忆和创造它的人。</p>
+    <p data-zht="文化屬於每一個參與、記憶和創造它的人。" data-zhs="文化属于每一个参与、记忆和创造它的人。" data-en="Culture belongs to everyone who carries, remembers and creates it.">文化屬於每一個參與、記憶和創造它的人。</p>
     <div class="footer-links">
       <a href="https://discord.gg/chinese" target="_blank" rel="noreferrer">Discord</a>
       <a href="https://t.me/ChineseOfficial" target="_blank" rel="noreferrer">Telegram</a>
       <a href="https://twitter.com/chinese_org" target="_blank" rel="noreferrer">X / Twitter</a>
-      <a href="writing.html">汉字练习室</a>
+      <a href="writing.html" data-zht="漢字練習室" data-zhs="汉字练习室" data-en="Writing Studio">漢字練習室</a>
     </div>
-    <div class="footer-bottom"><span>© 2026 CHINESE.ORG</span><a href="#home">回到顶部 ↑</a></div>
+    <div class="footer-bottom"><span>© 2026 CHINESE.ORG</span><a href="#home" data-zht="回到頂部 ↑" data-zhs="回到顶部 ↑" data-en="Back to top ↑">回到頂部 ↑</a></div>
   </footer>
 
   <script src="site.js"></script>

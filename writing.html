@@ -1,0 +1,2728 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chinese.org — 每天写好一个汉字</title>
+  <meta name="description" content="免费的互动汉字写字教练：学习笔顺、偏旁、结构与唐诗，听笔画名称，得到即时纠正。">
+  <meta name="theme-color" content="#f4efe6">
+  <meta property="og:title" content="Chinese.org — 每天写好一个汉字">
+  <meta property="og:description" content="从第一笔开始，把中文写好。">
+  <link rel="icon" href="assets/logo-hua.png" type="image/png">
+  <script src="hanzi-writer.min.js"></script>
+  <script src="opencc-t2cn.js"></script>
+  <script src="tangshi300.js"></script>
+  <script src="stroke-order-jian.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5d6978;
+      --line: #d8e0e8;
+      --panel: #ffffff;
+      --paper: #f8fafc;
+      --bg: #eef4f7;
+      --accent: #0f766e;
+      --accent-dark: #115e59;
+      --reward: #f59e0b;
+      --good: #16a34a;
+      --warn: #dc2626;
+      --guide: #cfd8e3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    main {
+      width: 100%;
+      min-width: 0;
+      height: 100svh;
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) minmax(360px, 1fr) minmax(260px, 320px);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        "menu characters mission"
+        "menu characters lesson"
+        "menu characters note";
+      gap: 14px;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    aside {
+      grid-area: menu;
+      min-width: 0;
+      height: calc(100svh - 32px);
+      overflow-y: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    h2,
+    h3,
+    p {
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .coach-card,
+    .route-card,
+    .manual-card,
+    .lesson-panel,
+    .mission-card,
+    .character-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .coach-card,
+    .route-card,
+    .manual-card {
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .coach-title,
+    .route-title {
+      margin: 0 0 10px;
+      font-weight: 900;
+    }
+
+    .coach-message {
+      min-height: 44px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--accent);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #ffffff;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+      background: #ecfdf5;
+    }
+
+    .route-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .route-list li {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .route-list strong {
+      color: var(--ink);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 92px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px;
+      background: #ffffff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 20px;
+      line-height: 1.45;
+    }
+
+    textarea:focus,
+    button:focus-visible {
+      outline: 3px solid rgba(15, 118, 110, 0.22);
+      outline-offset: 2px;
+    }
+
+    .workspace {
+      min-width: 0;
+      display: contents;
+    }
+
+    .mission-card {
+      grid-area: mission;
+      width: 100%;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-content: start;
+      overflow-y: auto;
+    }
+
+    .mission-kicker {
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .mission-card h2 {
+      margin: 0;
+      font-size: clamp(22px, 2.2vw, 30px);
+      line-height: 1.16;
+    }
+
+    .mission-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .mission-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      justify-content: stretch;
+      gap: 8px;
+    }
+
+    .lesson-panel {
+      grid-area: lesson;
+      width: 100%;
+      max-width: none;
+      min-height: 0;
+      margin: 0;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-content: start;
+      gap: 14px;
+      overflow-y: auto;
+    }
+
+    .lesson-panel h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .lesson-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .focus-line {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      min-height: 112px;
+      border-left: 4px solid var(--accent);
+      padding: 12px;
+      background: #eefcf8;
+      font-size: clamp(24px, 2.4vw, 34px);
+      font-weight: 950;
+      line-height: 1.25;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 10px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .characters {
+      grid-area: characters;
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      margin: 0;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0 max(14px, calc((100% - 430px) / 2));
+      scroll-padding-inline: max(14px, calc((100% - 430px) / 2));
+      scroll-snap-type: x mandatory;
+    }
+
+    .character-card {
+      flex: 0 0 min(100%, 430px);
+      max-height: 100%;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      scroll-snap-align: center;
+    }
+
+    .char-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .char {
+      font-size: 32px;
+      font-weight: 950;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .writer {
+      position: relative;
+      width: min(100%, 50svh, 430px);
+      flex: 0 0 auto;
+      align-self: center;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(45deg, transparent 49.6%, var(--guide) 50%, transparent 50.4%),
+        linear-gradient(-45deg, transparent 49.6%, var(--guide) 50%, transparent 50.4%),
+        linear-gradient(90deg, transparent 49.6%, var(--guide) 50%, transparent 50.4%),
+        linear-gradient(0deg, transparent 49.6%, var(--guide) 50%, transparent 50.4%),
+        var(--paper);
+    }
+
+    .writer > svg {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .practice-status {
+      margin-top: 10px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .status-line {
+      min-height: 40px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e6edf4;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--reward));
+      transition: width 180ms ease;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .card-actions.exam-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .card-actions button {
+      padding: 0 6px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .word-panel {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid #cfe5df;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f0fdfa;
+    }
+
+    .word-panel.is-open {
+      display: block;
+    }
+
+    .word-panel strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent-dark);
+    }
+
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .word-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border: 1px solid #b7ddd3;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: #ffffff;
+      font-weight: 850;
+    }
+
+    .reward-pop {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      z-index: 2;
+      min-width: 54px;
+      translate: -50% -50%;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--reward);
+      color: #ffffff;
+      font-weight: 950;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(120, 53, 15, 0.28);
+      animation: reward-pop 850ms ease forwards;
+      pointer-events: none;
+    }
+
+    .reward-pop.big {
+      min-width: 78px;
+      background: var(--good);
+      animation-duration: 1100ms;
+    }
+
+    .character-card.celebrating {
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+    }
+
+    .celebration-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .celebration-badge {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      min-width: 92px;
+      translate: -50% -50%;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--good);
+      color: #ffffff;
+      font-weight: 950;
+      text-align: center;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.3);
+      animation: badge-bounce 1300ms ease forwards;
+    }
+
+    .celebration-spark {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: 10px;
+      height: 10px;
+      color: var(--reward);
+      font-weight: 950;
+      transform: rotate(var(--angle)) translateX(0);
+      animation: spark-fly 1100ms ease-out forwards;
+      animation-delay: var(--delay);
+    }
+
+    .celebration-confetti {
+      position: absolute;
+      top: -12px;
+      left: var(--x);
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      background: var(--color);
+      animation: confetti-fall 1300ms ease-in forwards;
+      animation-delay: var(--delay);
+    }
+
+    .celebration-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 42%;
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      border: 4px solid rgba(245, 158, 11, 0.82);
+      border-radius: 50%;
+      animation: ring-pulse 1150ms ease-out forwards;
+    }
+
+    .celebration-word {
+      position: absolute;
+      left: 50%;
+      top: 28%;
+      translate: -50% -50%;
+      color: var(--accent-dark);
+      font-size: 28px;
+      font-weight: 950;
+      white-space: nowrap;
+      animation: praise-drop 1200ms ease forwards;
+    }
+
+    .shake {
+      animation: shake 220ms ease;
+    }
+
+    .empty {
+      grid-area: characters;
+      max-width: 1180px;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .empty[hidden] {
+      display: none;
+    }
+
+    .note {
+      grid-area: note;
+      max-width: none;
+      margin: 0;
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @keyframes reward-pop {
+      0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(12px);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.06) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1) translateY(-48px);
+      }
+    }
+
+    @keyframes badge-bounce {
+      0% {
+        opacity: 0;
+        transform: scale(0.62) translateY(18px);
+      }
+      28% {
+        opacity: 1;
+        transform: scale(1.12) translateY(0);
+      }
+      68% {
+        opacity: 1;
+        transform: scale(1) translateY(-6px);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.96) translateY(-34px);
+      }
+    }
+
+    @keyframes spark-fly {
+      0% {
+        opacity: 0;
+        transform: rotate(var(--angle)) translateX(0) scale(0.35);
+      }
+      18% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: rotate(var(--angle)) translateX(var(--distance)) scale(1.15);
+      }
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg);
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(118%) rotate(260deg);
+      }
+    }
+
+    @keyframes ring-pulse {
+      0% {
+        opacity: 0;
+        transform: scale(0.45);
+      }
+      22% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.65);
+      }
+    }
+
+    @keyframes praise-drop {
+      0% {
+        opacity: 0;
+        transform: translateY(-22px) scale(0.85);
+      }
+      28% {
+        opacity: 1;
+        transform: translateY(0) scale(1.06);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(38px) scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      30% {
+        transform: translateX(-4px);
+      }
+      65% {
+        transform: translateX(4px);
+      }
+    }
+
+    @media (max-width: 920px) {
+      body {
+        overflow: hidden;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 152px minmax(0, 1fr) 126px;
+        grid-template-areas:
+          "mobile-menu"
+          "mobile-write"
+          "mobile-mission";
+        height: 100svh;
+        min-height: 100svh;
+        padding: 10px;
+        gap: 10px;
+        overflow: hidden;
+      }
+
+      aside {
+        grid-area: mobile-menu;
+        order: initial;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: grid;
+        grid-template-columns: 150px;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(190px, 1fr);
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+        scroll-snap-type: none;
+      }
+
+      h1 {
+        width: auto;
+        height: 100%;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        line-height: 1.15;
+        align-self: stretch;
+      }
+
+      .subtitle {
+        display: none;
+      }
+
+      .coach-card,
+      .route-card,
+      .manual-card {
+        height: 130px;
+        margin: 0;
+        padding: 10px;
+        overflow-y: auto;
+        scroll-snap-align: start;
+      }
+
+      .coach-title,
+      .route-title {
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .coach-message {
+        min-height: 0;
+        margin-bottom: 6px;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .route-list {
+        display: none;
+      }
+
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .stat {
+        display: grid;
+        place-items: center;
+        min-height: 30px;
+        padding: 6px;
+      }
+
+      .stat strong {
+        font-size: 18px;
+      }
+
+      .stat span {
+        display: none;
+      }
+
+      .button-grid {
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      button {
+        min-height: 30px;
+        padding: 0 8px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      #voice-toggle,
+      #voice-test {
+        display: none;
+      }
+
+      aside > .route-card:nth-of-type(2) .button-grid,
+      .manual-card .button-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .manual-card [data-sample="床前明月光"] {
+        display: none;
+      }
+
+      label {
+        margin-bottom: 5px;
+        font-size: 11px;
+      }
+
+      textarea {
+        min-height: 36px;
+        max-height: 36px;
+        padding: 6px 8px;
+        font-size: 17px;
+        resize: none;
+      }
+
+      .workspace {
+        display: contents;
+        order: initial;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 0;
+      }
+
+      .mission-card {
+        grid-area: mobile-mission;
+        grid-template-columns: 1fr;
+        max-height: none;
+        padding: 10px;
+        gap: 8px;
+        overflow-y: auto;
+      }
+
+      .mission-card h2 {
+        font-size: 21px;
+      }
+
+      .mission-subtitle {
+        -webkit-line-clamp: 1;
+        font-size: 13px;
+      }
+
+      .mission-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-content: stretch;
+        width: 100%;
+      }
+
+      .lesson-panel {
+        display: none;
+      }
+
+      .focus-line {
+        min-height: 54px;
+        border-left: 0;
+        border-top: 4px solid var(--accent);
+        font-size: 22px;
+      }
+
+      .characters {
+        grid-area: mobile-write;
+        height: 100%;
+        padding-inline: max(12px, calc((100% - 370px) / 2));
+        scroll-padding-inline: max(12px, calc((100% - 370px) / 2));
+      }
+
+      .character-card {
+        flex-basis: min(100%, 370px);
+        padding-bottom: 16px;
+      }
+
+      .writer {
+        width: min(100%, 44svh, 370px);
+      }
+
+      .card-actions {
+        margin-bottom: 8px;
+      }
+
+      .note {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      h1 {
+        font-size: 21px;
+      }
+
+      .subtitle {
+        margin-bottom: 12px;
+        font-size: 14px;
+      }
+
+      .workspace,
+      aside {
+        padding: 10px;
+      }
+
+      .workspace {
+        min-height: 100svh;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .coach-card,
+      .route-card,
+      .manual-card,
+      .lesson-panel,
+      .mission-card,
+      .character-card {
+        padding: 10px;
+      }
+
+      .route-list {
+        display: none;
+      }
+
+      .stats {
+        gap: 6px;
+      }
+
+      .stat {
+        min-height: 30px;
+        padding: 6px;
+      }
+
+      .stat strong {
+        font-size: 18px;
+      }
+
+      aside .coach-message {
+        display: none;
+      }
+
+      aside .button-grid {
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      button {
+        min-height: 44px;
+        padding: 0 10px;
+        font-size: 15px;
+      }
+
+      aside button {
+        min-height: 32px;
+        padding: 0 6px;
+        font-size: 12px;
+      }
+
+      .mission-card {
+        max-height: 126px;
+        gap: 8px;
+      }
+
+      .mission-card h2 {
+        font-size: 22px;
+      }
+
+      .mission-subtitle,
+      .lesson-copy,
+      .coach-message {
+        font-size: 14px;
+      }
+
+      .mission-subtitle {
+        -webkit-line-clamp: 1;
+      }
+
+      .lesson-panel {
+        max-height: 112px;
+        gap: 8px;
+      }
+
+      .lesson-panel h3 {
+        margin-bottom: 4px;
+        font-size: 16px;
+      }
+
+      .lesson-copy {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .chips {
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .chip {
+        min-height: 24px;
+        padding: 0 8px;
+        font-size: 12px;
+      }
+
+      .focus-line {
+        display: none;
+      }
+
+      .characters {
+        gap: 10px;
+        padding-inline: max(10px, calc((100% - 340px) / 2));
+        scroll-padding-inline: max(10px, calc((100% - 340px) / 2));
+      }
+
+      .character-card {
+        flex-basis: min(100%, 340px);
+      }
+
+      .char {
+        font-size: 30px;
+      }
+
+      .char-top {
+        margin-bottom: 6px;
+      }
+
+      .writer {
+        width: min(100%, 42svh, 340px);
+      }
+
+      .status-line {
+        min-height: 34px;
+        font-size: 12px;
+      }
+
+      .practice-status {
+        margin-top: 6px;
+      }
+
+      .card-actions {
+        gap: 6px;
+      }
+
+      .card-actions button {
+        min-height: 40px;
+        font-size: 13px;
+      }
+
+      textarea {
+        min-height: 72px;
+        font-size: 18px;
+      }
+
+      aside textarea {
+        min-height: 34px;
+        max-height: 34px;
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 560px) and (max-height: 680px) {
+      main {
+        grid-template-rows: 104px minmax(0, 1fr) 96px;
+        gap: 8px;
+        padding: 8px;
+      }
+
+      aside {
+        padding: 8px;
+        grid-auto-columns: minmax(170px, 1fr);
+      }
+
+      h1 {
+        width: 150px;
+        font-size: 19px;
+      }
+
+      .coach-card,
+      .route-card,
+      .manual-card {
+        height: 86px;
+        padding: 8px;
+      }
+
+      .coach-title,
+      .route-title {
+        display: none;
+      }
+
+      .coach-message {
+        display: none;
+      }
+
+      .stat {
+        padding: 4px;
+      }
+
+      .stat strong {
+        font-size: 16px;
+      }
+
+      .stat span {
+        display: none;
+      }
+
+      .button-grid {
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      button {
+        min-height: 30px;
+        font-size: 12px;
+      }
+
+      label {
+        display: none;
+      }
+
+      textarea {
+        min-height: 30px;
+        max-height: 30px;
+        font-size: 15px;
+      }
+
+      .mission-card {
+        padding: 8px;
+        gap: 5px;
+      }
+
+      .mission-card h2 {
+        font-size: 18px;
+      }
+
+      .mission-subtitle {
+        display: none;
+      }
+
+      .mission-actions button {
+        min-height: 32px;
+      }
+
+      .characters {
+        padding-inline: max(8px, calc((100% - 320px) / 2));
+        scroll-padding-inline: max(8px, calc((100% - 320px) / 2));
+      }
+
+      .character-card {
+        flex-basis: min(100%, 320px);
+        padding: 8px;
+      }
+
+      .char-top {
+        margin-bottom: 4px;
+      }
+
+      .writer {
+        width: min(100%, 34svh, 300px);
+      }
+
+      .practice-status {
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      .status-line {
+        min-height: 24px;
+        font-size: 11px;
+        line-height: 1.25;
+      }
+
+      .progress {
+        height: 6px;
+      }
+
+      .card-actions {
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .card-actions button {
+        min-height: 32px;
+      }
+
+      .lesson-panel {
+        display: none;
+      }
+    }
+
+    @media (min-width: 700px) and (max-width: 1100px) and (orientation: portrait) {
+      body {
+        overflow: hidden;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: 166px minmax(0, 1fr) 172px;
+        grid-template-areas:
+          "tablet-menu tablet-menu"
+          "tablet-write tablet-write"
+          "tablet-mission tablet-lesson";
+        height: 100svh;
+        min-height: 100svh;
+        gap: 12px;
+        padding: 12px;
+        overflow: hidden;
+      }
+
+      aside {
+        grid-area: tablet-menu;
+        order: initial;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: grid;
+        grid-template-columns: 156px;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(190px, 1fr);
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+      }
+
+      h1 {
+        width: auto;
+        height: 100%;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        line-height: 1.15;
+        align-self: stretch;
+      }
+
+      .subtitle {
+        display: none;
+      }
+
+      .coach-card,
+      .route-card,
+      .manual-card {
+        height: 144px;
+        margin: 0;
+        padding: 10px;
+        overflow-y: auto;
+      }
+
+      .coach-title,
+      .route-title {
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .coach-message {
+        min-height: 0;
+        margin-bottom: 6px;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .route-list {
+        display: none;
+      }
+
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .stat {
+        display: grid;
+        place-items: center;
+        min-height: 30px;
+        padding: 6px;
+      }
+
+      .stat strong {
+        font-size: 18px;
+      }
+
+      .stat span {
+        display: none;
+      }
+
+      .button-grid {
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      button {
+        min-height: 30px;
+        padding: 0 8px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      #voice-toggle,
+      #voice-test {
+        display: none;
+      }
+
+      aside > .route-card:nth-of-type(2) .button-grid,
+      .manual-card .button-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .manual-card [data-sample="床前明月光"] {
+        display: none;
+      }
+
+      label {
+        margin-bottom: 5px;
+        font-size: 11px;
+      }
+
+      textarea {
+        min-height: 36px;
+        max-height: 36px;
+        padding: 6px 8px;
+        font-size: 17px;
+        resize: none;
+      }
+
+      .workspace {
+        display: contents;
+        order: initial;
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 0;
+      }
+
+      .mission-card {
+        grid-area: tablet-mission;
+        max-height: none;
+        padding: 12px;
+        gap: 8px;
+        overflow-y: auto;
+      }
+
+      .mission-card h2 {
+        font-size: 22px;
+      }
+
+      .mission-subtitle {
+        -webkit-line-clamp: 2;
+        font-size: 13px;
+      }
+
+      .mission-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      .lesson-panel {
+        display: grid;
+        grid-area: tablet-lesson;
+        max-height: none;
+        padding: 12px;
+        gap: 8px;
+        overflow-y: auto;
+      }
+
+      .lesson-panel h3 {
+        margin-bottom: 4px;
+        font-size: 17px;
+      }
+
+      .lesson-copy {
+        font-size: 13px;
+      }
+
+      .focus-line {
+        min-height: 56px;
+        border-left: 0;
+        border-top: 4px solid var(--accent);
+        font-size: 22px;
+      }
+
+      .chips {
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .chip {
+        min-height: 24px;
+        padding: 0 8px;
+        font-size: 12px;
+      }
+
+      .characters {
+        grid-area: tablet-write;
+        height: 100%;
+        padding-inline: max(12px, calc((100% - 540px) / 2));
+        scroll-padding-inline: max(12px, calc((100% - 540px) / 2));
+      }
+
+      .character-card {
+        flex-basis: min(100%, 540px);
+        max-height: 100%;
+        padding: 14px 14px 18px;
+      }
+
+      .practice-status {
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .status-line {
+        min-height: 30px;
+        font-size: 13px;
+      }
+
+      .card-actions {
+        gap: 8px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .writer {
+        width: min(100%, max(400px, calc(100svh - 560px)), 500px);
+      }
+
+      .note {
+        display: none;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="redesign.css">
+</head>
+<body>
+  <a class="home-return" href="index.html">← 返回 Chinese.org</a>
+  <main>
+    <header class="site-header">
+      <div class="brand" aria-label="Chinese.org 首页">
+        <span class="brand-seal" aria-hidden="true"><img src="assets/logo-hua.png" alt=""></span>
+        <span class="brand-name">CHINESE<span>.ORG</span></span>
+      </div>
+      <p class="brand-promise">从第一笔开始，把中文写好。</p>
+      <div class="header-meta" aria-label="学习内容">
+        <span>笔顺</span><i>·</i><span>结构</span><i>·</i><span>唐诗</span>
+      </div>
+    </header>
+    <aside>
+      <div class="sidebar-intro">
+        <p class="eyebrow">你的今日书案</p>
+        <h1>写好一个字，<br>看懂一种文化。</h1>
+        <p class="subtitle">先测水平，再练笔画、结构与偏旁，最后把汉字写回唐诗里。</p>
+      </div>
+
+      <div class="coach-card" aria-live="polite">
+        <p class="coach-title"><span class="section-mark">01</span> 智能教练</p>
+        <p class="coach-message" id="coach-message">先点“水平测试”。我会看孩子哪类笔画最容易错，再安排下一关。</p>
+        <div class="stats">
+          <div class="stat">
+            <strong id="reward-points">0</strong>
+            <span>奖励点数</span>
+          </div>
+          <div class="stat">
+            <strong id="reward-complete">0</strong>
+            <span>完成汉字</span>
+          </div>
+          <div class="stat">
+            <strong id="accuracy">100%</strong>
+            <span>笔画正确率</span>
+          </div>
+          <div class="stat">
+            <strong id="weak-stroke">-</strong>
+            <span>重点笔画</span>
+          </div>
+        </div>
+        <div class="button-grid">
+          <button class="primary" type="button" id="start-assessment">水平测试</button>
+          <button type="button" id="next-ai">AI 下一步</button>
+          <button type="button" id="voice-toggle" aria-pressed="true">语音：开</button>
+          <button type="button" id="voice-test">试听：横</button>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <p class="route-title"><span class="section-mark">02</span> 学习路线</p>
+        <ul class="route-list">
+          <li><strong>0-15 分</strong><span>测水平：笔顺、方向、控笔。</span></li>
+          <li><strong>15-35 分</strong><span>练 8 个核心笔画，听名称再下笔。</span></li>
+          <li><strong>35-65 分</strong><span>学独体、左右、上下、包围结构。</span></li>
+          <li><strong>65-100 分</strong><span>用偏旁家族批量记字。</span></li>
+          <li><strong>100-110 分</strong><span>挑战笔画多、结构复杂的难字。</span></li>
+          <li><strong>110-120 分</strong><span>唐诗闯关，把字放回真实句子。</span></li>
+        </ul>
+        <div class="button-grid">
+          <button type="button" id="stroke-warmup">笔画热身</button>
+          <button type="button" id="structure-lesson">结构拼字</button>
+          <button type="button" id="radical-lesson">偏旁练习</button>
+          <button type="button" id="hard-lesson">难字练习</button>
+          <button type="button" id="tang-poem">唐诗闯关</button>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <p class="route-title"><span class="section-mark">03</span> 独立考试</p>
+        <ul class="route-list">
+          <li><strong>入门</strong><span>独体字和简单笔画，先看孩子敢不敢独立写。</span></li>
+          <li><strong>基础</strong><span>常用字和偏旁字，检查笔顺是否稳定。</span></li>
+          <li><strong>进阶</strong><span>结构更复杂的字，检查左右、上下和包围结构。</span></li>
+          <li><strong>挑战</strong><span>高难字考试，最后集中纠正。</span></li>
+        </ul>
+        <div class="button-grid">
+          <button type="button" data-exam-level="starter">入门考试</button>
+          <button type="button" data-exam-level="basic">基础考试</button>
+          <button type="button" data-exam-level="advanced">进阶考试</button>
+          <button type="button" data-exam-level="challenge">挑战考试</button>
+        </div>
+      </div>
+
+      <div class="manual-card">
+        <label for="manual-input"><span class="section-mark">04</span> 自选汉字</label>
+        <textarea id="manual-input" spellcheck="false" maxlength="80">艾斯</textarea>
+        <div class="button-grid">
+          <button type="button" data-sample="艾斯">Ace</button>
+          <button type="button" data-sample="爱丽丝">Alice</button>
+          <button type="button" data-sample="床前明月光">唐诗</button>
+          <button type="button" id="manual-apply">生成</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <div class="mission-card">
+        <div>
+          <p class="mission-kicker" id="mission-stage">准备开始</p>
+          <h2 id="mission-title">先测孩子的写字水平</h2>
+          <p class="mission-subtitle" id="mission-subtitle">系统会随机出几个简单汉字，看笔顺、方向和控笔是否稳定。</p>
+        </div>
+        <div class="mission-actions">
+          <button class="primary" type="button" id="follow-all">跟写全部</button>
+          <button type="button" id="animate-all">播放全部</button>
+        </div>
+      </div>
+
+      <div class="lesson-panel">
+        <div>
+          <h3 id="lesson-title">今天的目标</h3>
+          <p class="lesson-copy" id="lesson-body">先知道孩子会不会顺着笔画走，再把难点拆成小关卡。</p>
+          <div class="chips" id="lesson-chips">
+            <span class="chip">听笔画名</span>
+            <span class="chip">按笔顺写</span>
+            <span class="chip">写对得奖励</span>
+          </div>
+        </div>
+        <div class="focus-line" id="focus-line">点“水平测试”开始</div>
+      </div>
+
+      <div class="characters" id="characters"></div>
+      <div class="empty" id="empty">当前没有题目。点“水平测试”或“唐诗闯关”开始。</div>
+      <p class="note" id="mode-note">写对一笔会语音播报笔画名称。系统会记录错得最多的笔画，并用它安排下一步练习。</p>
+    </section>
+  </main>
+
+  <script>
+    const el = {
+      coach: document.querySelector('#coach-message'),
+      points: document.querySelector('#reward-points'),
+      complete: document.querySelector('#reward-complete'),
+      accuracy: document.querySelector('#accuracy'),
+      weakStroke: document.querySelector('#weak-stroke'),
+      voiceToggle: document.querySelector('#voice-toggle'),
+      voiceTest: document.querySelector('#voice-test'),
+      startAssessment: document.querySelector('#start-assessment'),
+      nextAi: document.querySelector('#next-ai'),
+      strokeWarmup: document.querySelector('#stroke-warmup'),
+      structureLesson: document.querySelector('#structure-lesson'),
+      radicalLesson: document.querySelector('#radical-lesson'),
+      hardLesson: document.querySelector('#hard-lesson'),
+      tangPoem: document.querySelector('#tang-poem'),
+      examButtons: document.querySelectorAll('[data-exam-level]'),
+      manualInput: document.querySelector('#manual-input'),
+      manualApply: document.querySelector('#manual-apply'),
+      stage: document.querySelector('#mission-stage'),
+      title: document.querySelector('#mission-title'),
+      subtitle: document.querySelector('#mission-subtitle'),
+      lessonTitle: document.querySelector('#lesson-title'),
+      lessonBody: document.querySelector('#lesson-body'),
+      chips: document.querySelector('#lesson-chips'),
+      focusLine: document.querySelector('#focus-line'),
+      characters: document.querySelector('#characters'),
+      empty: document.querySelector('#empty'),
+      note: document.querySelector('#mode-note'),
+      followAll: document.querySelector('#follow-all'),
+      animateAll: document.querySelector('#animate-all')
+    };
+
+    const strokeNameByCode = {
+      a: '横折折撇',
+      b: '竖弯',
+      c: '横折',
+      d: '点',
+      e: '横撇',
+      f: '竖',
+      g: '竖钩',
+      h: '竖提',
+      i: '提',
+      j: '横',
+      k: '点',
+      l: '捺',
+      m: '撇点',
+      n: '撇折',
+      o: '横斜钩',
+      p: '横折提',
+      q: '横折折折',
+      r: '横折钩',
+      s: '撇',
+      t: '弯钩',
+      u: '竖弯钩',
+      v: '横折折',
+      w: '横撇弯钩',
+      x: '竖折折',
+      y: '斜钩',
+      z: '竖折折钩'
+    };
+
+    const strokeShapes = {
+      横: '一',
+      竖: '丨',
+      撇: '丿',
+      捺: '㇏',
+      点: '丶',
+      提: '㇀',
+      横折: '𠃍',
+      竖钩: '亅',
+      横撇: '㇇',
+      竖弯钩: '乚'
+    };
+
+    const strokeTips = {
+      横: '横像小桥，稳稳往右走。',
+      竖: '竖像小柱子，从上到下站直。',
+      撇: '撇像滑梯，往左下轻轻滑。',
+      捺: '捺像大脚，往右下慢慢压。',
+      点: '点像小雨滴，短短落下来。',
+      提: '提像小火箭，从左下往右上飞。',
+      横折: '横折先横后转弯，拐角要清楚。',
+      竖钩: '竖钩先竖到底，再轻轻钩起来。'
+    };
+
+    const structures = [
+      { name: '独体字', text: '人口日月山', tip: '独体字像一个整体，先看最高、最低、最宽在哪里。' },
+      { name: '左右结构', text: '你们明河林', tip: '左右结构像两个人并排站，左边通常窄一点，右边稳一点。' },
+      { name: '上下结构', text: '字安花草', tip: '上下结构像汉堡，上面别压太低，下面要托住。' },
+      { name: '包围结构', text: '国园问间', tip: '包围结构先搭房子，再把里面的东西放进去。' },
+      { name: '半包围结构', text: '这远进过', tip: '半包围像开口的门，走之旁通常最后写。' }
+    ];
+
+    const radicalFamilies = [
+      { name: '亻 人旁', text: '你他们休', tip: '亻像站着的人，常和人、动作、身份有关。' },
+      { name: '氵 水旁', text: '江河海洗', tip: '氵像三滴水，常和水、液体有关。' },
+      { name: '扌 手旁', text: '打拉找推', tip: '扌像一只手，常和手部动作有关。' },
+      { name: '讠 言旁', text: '说话读请', tip: '讠像说话，常和语言、表达有关。' },
+      { name: '艹 草头', text: '花草茶菜', tip: '艹像小草，常和植物、食物有关。' },
+      { name: '宀 宝盖', text: '字安家室', tip: '宀像屋顶，常和房屋、室内有关。' }
+    ];
+
+    const assessmentPool = '一二三十人口日月山水木火大小白天子你们爱春明';
+    const coreStrokeNames = ['横', '竖', '撇', '捺', '点', '横折', '提', '竖钩'];
+    const commonPracticeChars = '一二三十王土木本日月口中山水火人大天小六文心子白你他们休江河海洗打拉找推说话读请花草茶菜字安家室国园问间这远进过床前明月光春眠不觉晓白日依山尽';
+    const hardCharacterGroups = [
+      { name: '多笔画挑战', text: '赢藏疆鼻', tip: '这些字笔画多，先看整体结构，再一笔一笔拆开。' },
+      { name: '上下左右都复杂', text: '餐鹰瀑耀', tip: '先找主干，再看上下左右的空间怎么分。' },
+      { name: '部件很多的字', text: '魏魔嚷壤', tip: '把大字拆成小部件，不要一口气硬记。' },
+      { name: '容易写散的字', text: '攀蹦霜霞', tip: '复杂字最怕散，先定中线，再写四周。' },
+      { name: '考试难写字', text: '繁薄瓣髓', tip: '这些字常见但不好写，重点练笔顺和结构压缩。' },
+      { name: '终极挑战', text: '鹤麟懿曦', tip: '终极难字慢慢来，先看偏旁，再写主体。' }
+    ];
+    const examLevels = {
+      starter: {
+        name: '入门',
+        text: '一二三十人口日月山水木火大小天子',
+        count: 4,
+        leniency: 1.45,
+        tip: '不显示笔顺，先看孩子能不能独立写简单字。'
+      },
+      basic: {
+        name: '基础',
+        text: '王土木本日月口中山水火人大天小六文心子白你们爱春明江河海洗',
+        count: 5,
+        leniency: 1.25,
+        tip: '常用字和基础偏旁混合，检查笔顺是否稳定。'
+      },
+      advanced: {
+        name: '进阶',
+        text: '你们明河林字安花草国园问间这远进过床前明月光春眠不觉晓白日依山尽',
+        count: 6,
+        leniency: 1.08,
+        tip: '结构更复杂，重点看左右、上下、包围结构能不能写稳。'
+      },
+      challenge: {
+        name: '挑战',
+        text: hardCharacterGroups.map(group => group.text).join(''),
+        count: 4,
+        leniency: 0.98,
+        tip: '高难字考试，写的时候不提示，结束后集中纠正。'
+      }
+    };
+    const commonWordBank = {
+      一: ['一个', '一天', '一起', '第一', '一边', '一会儿'],
+      二: ['二月', '二十', '第二', '二人'],
+      三: ['三个', '三月', '三天', '三年'],
+      十: ['十个', '十月', '十分', '十年'],
+      人: ['大人', '人们', '好人', '家人', '人口'],
+      口: ['口水', '门口', '开口', '人口', '口语'],
+      日: ['日子', '生日', '明日', '日月', '白日'],
+      月: ['月亮', '月光', '明月', '月牙', '一月'],
+      山: ['大山', '上山', '山水', '山河', '山里'],
+      水: ['水果', '喝水', '水里', '山水', '水面'],
+      木: ['木头', '木马', '树木', '木门'],
+      火: ['火车', '大火', '火山', '火光'],
+      大: ['大家', '大人', '大山', '大小', '长大'],
+      小: ['小孩', '小鸟', '大小', '小时', '小学'],
+      白: ['白天', '白云', '白色', '明白', '白日'],
+      天: ['天空', '今天', '明天', '天气', '白天'],
+      子: ['孩子', '儿子', '日子', '本子'],
+      你: ['你好', '你们', '你的'],
+      他: ['他们', '他的', '他人'],
+      们: ['我们', '你们', '他们', '人们'],
+      爱: ['爱心', '可爱', '爱好', '热爱', '爱人'],
+      春: ['春天', '春节', '春风', '春雨'],
+      明: ['明天', '明白', '明月', '光明'],
+      王: ['王子', '国王', '王国'],
+      土: ['土地', '泥土', '土山'],
+      本: ['本子', '书本', '日本', '本来'],
+      中: ['中国', '中间', '中文', '中心'],
+      六: ['六月', '六个', '六天'],
+      文: ['中文', '文字', '语文', '课文'],
+      心: ['爱心', '开心', '小心', '中心'],
+      休: ['休息', '午休', '休假'],
+      江: ['江河', '长江', '江水'],
+      河: ['小河', '河水', '江河', '黄河'],
+      海: ['大海', '海水', '上海', '海边'],
+      洗: ['洗手', '洗衣', '洗脸'],
+      打: ['打球', '打开', '打字', '打水'],
+      拉: ['拉手', '拉开', '拉车'],
+      找: ['找到', '找人', '寻找'],
+      推: ['推开', '推动', '推车'],
+      说: ['说话', '小说', '说明', '听说'],
+      话: ['说话', '电话', '好话', '童话'],
+      读: ['读书', '朗读', '读写'],
+      请: ['请问', '请坐', '请客'],
+      花: ['花朵', '开花', '鲜花', '花草'],
+      草: ['小草', '花草', '草地', '草原'],
+      茶: ['喝茶', '茶水', '茶叶'],
+      菜: ['白菜', '青菜', '饭菜', '蔬菜'],
+      字: ['汉字', '写字', '生字', '文字'],
+      安: ['安全', '安心', '平安'],
+      家: ['大家', '家人', '回家', '国家'],
+      室: ['教室', '卧室', '室内'],
+      国: ['中国', '国家', '国王', '外国'],
+      园: ['公园', '花园', '校园'],
+      问: ['请问', '问题', '问好'],
+      间: ['中间', '时间', '房间', '人间'],
+      这: ['这个', '这里', '这样'],
+      远: ['远方', '很远', '远近'],
+      进: ['进去', '进来', '前进'],
+      过: ['过去', '过来', '经过'],
+      床: ['床上', '床前', '木床'],
+      前: ['前面', '以前', '床前', '前后'],
+      光: ['月光', '阳光', '光明', '灯光'],
+      眠: ['睡眠', '春眠', '安眠'],
+      不: ['不是', '不用', '不见', '不好'],
+      觉: ['觉得', '睡觉', '感觉', '不觉'],
+      晓: ['春晓', '知晓', '破晓'],
+      尽: ['尽头', '尽力', '尽快', '白日依山尽'],
+      泉: ['泉水', '山泉', '清泉'],
+      声: ['声音', '笑声', '歌声', '泉声'],
+      咽: ['呜咽', '咽喉'],
+      危: ['危险', '危机', '危石'],
+      石: ['石头', '石子', '山石', '危石'],
+      色: ['颜色', '白色', '红色', '日色'],
+      已: ['已经', '已知', '已尽'],
+      含: ['包含', '含笑', '含有'],
+      烟: ['烟火', '烟花', '云烟'],
+      斯: ['斯文', '艾斯'],
+      赢: ['赢得', '输赢', '赢家', '赢球'],
+      藏: ['隐藏', '收藏', '西藏', '躲藏'],
+      疆: ['边疆', '新疆', '疆土'],
+      鼻: ['鼻子', '鼻音', '鼻尖'],
+      餐: ['早餐', '午餐', '餐厅', '用餐'],
+      鹰: ['老鹰', '鹰眼', '雄鹰'],
+      瀑: ['瀑布', '飞瀑'],
+      耀: ['闪耀', '荣耀', '照耀'],
+      魏: ['魏国', '北魏'],
+      魔: ['魔法', '魔术', '魔力'],
+      嚷: ['叫嚷', '吵嚷', '嚷嚷'],
+      壤: ['土壤', '接壤'],
+      攀: ['攀登', '攀爬'],
+      蹦: ['蹦跳', '蹦床'],
+      霜: ['白霜', '霜降', '风霜'],
+      霞: ['晚霞', '彩霞', '云霞'],
+      繁: ['繁忙', '繁星', '繁体'],
+      薄: ['薄片', '薄荷', '单薄'],
+      瓣: ['花瓣', '蒜瓣'],
+      髓: ['骨髓', '精髓'],
+      鹤: ['白鹤', '仙鹤'],
+      麟: ['麒麟'],
+      懿: ['懿德'],
+      曦: ['晨曦']
+    };
+
+    const state = {
+      points: 0,
+      completedChars: 0,
+      correctStrokes: 0,
+      mistakes: 0,
+      streak: 0,
+      assessmentRuns: 0,
+      assessmentDone: false,
+      strokeMistakes: {},
+      strokeCorrect: {},
+      currentMission: null,
+      currentExam: null
+    };
+
+    let writers = [];
+    let renderId = 0;
+    let poemQuestions = [];
+    let voiceEnabled = true;
+    let mandarinVoice = null;
+
+    const toSimplified = window.OpenCC
+      ? window.OpenCC.Converter({ from: 't', to: 'cn' })
+      : text => text;
+
+    function hanziOnly(text) {
+      return Array.from(text).filter(char => /\p{Script=Han}/u.test(char));
+    }
+
+    function sample(source, count) {
+      const chars = Array.from(new Set(hanziOnly(source)));
+      const result = [];
+      while (result.length < count && chars.length > 0) {
+        const index = Math.floor(Math.random() * chars.length);
+        result.push(chars.splice(index, 1)[0]);
+      }
+      return result.join('');
+    }
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function getStrokeNamesForChar(char) {
+      const code = window.STROKE_ORDER_JIAN && window.STROKE_ORDER_JIAN[char];
+      if (!code) return [];
+      return Array.from(code).map(letter => strokeNameByCode[letter] || '笔画');
+    }
+
+    function strokeNameAt(strokeNames, strokeNum) {
+      return strokeNames[strokeNum] || `第 ${strokeNum + 1} 笔`;
+    }
+
+    function weakStrokeName() {
+      const entries = Object.entries(state.strokeMistakes).sort((a, b) => b[1] - a[1]);
+      return entries[0] && entries[0][1] > 0 ? entries[0][0] : null;
+    }
+
+    function updateStats(message) {
+      const total = state.correctStrokes + state.mistakes;
+      const accuracy = total ? Math.round((state.correctStrokes / total) * 100) : 100;
+      const weak = weakStrokeName();
+      el.points.textContent = String(state.points);
+      el.complete.textContent = String(state.completedChars);
+      el.accuracy.textContent = `${accuracy}%`;
+      el.weakStroke.textContent = weak || '-';
+      if (message) el.coach.textContent = message;
+    }
+
+    function coachRecommendation() {
+      const weak = weakStrokeName();
+      if (!state.assessmentDone) {
+        return '先完成水平测试。我会看孩子是笔顺、方向，还是折笔更需要练。';
+      }
+      if (weak) {
+        return `最近“${weak}”错得最多，下一步先用含有“${weak}”的字做短练习。`;
+      }
+      if (state.completedChars < 12) {
+        return '基础不错。下一步先练核心笔画，把下笔方向变成肌肉记忆。';
+      }
+      if (state.completedChars < 28) {
+        return '可以进入结构拼字了。学会左右、上下、包围结构后，写新字会快很多。';
+      }
+      if (state.completedChars < 48) {
+        return '进入偏旁家族。一个偏旁带一串字，识字写字会一起提速。';
+      }
+      if (state.completedChars < 60) {
+        return '可以挑战难字了。难字练习会出笔画多、结构复杂的字，训练拆部件能力。';
+      }
+      return '可以上唐诗闯关了。把字放进真实诗句里练，记得更牢。';
+    }
+
+    function setChips(items) {
+      el.chips.innerHTML = items.map(item => `<span class="chip">${item}</span>`).join('');
+    }
+
+    function setMission(mission) {
+      state.currentMission = mission;
+      const isExam = mission.mode === 'exam';
+      state.currentExam = isExam
+        ? { difficulty: mission.difficulty, label: mission.difficultyName, records: [], rewardPoints: 0, finished: false }
+        : null;
+      renderId += 1;
+      const currentRender = renderId;
+      writers = [];
+
+      const chars = hanziOnly(mission.text);
+      el.stage.textContent = mission.stage;
+      el.title.textContent = mission.title;
+      el.subtitle.textContent = mission.subtitle;
+      el.lessonTitle.textContent = mission.lessonTitle;
+      el.lessonBody.textContent = mission.lessonBody;
+      el.focusLine.textContent = mission.text || '准备开始';
+      setChips(mission.chips || []);
+      el.followAll.textContent = isExam ? '开始考试' : '跟写全部';
+      el.animateAll.hidden = isExam;
+      el.note.textContent = isExam
+        ? '考试模式不会播放笔顺，也不会在写错时提示正确笔画；每写完一个字按完成情况给奖励，全部写完后才显示纠正清单。'
+        : '写对一笔会语音播报笔画名称。系统会记录错得最多的笔画，并用它安排下一步练习。';
+      el.characters.innerHTML = '';
+      el.empty.hidden = chars.length > 0;
+
+      const cards = chars.map((char, index) => {
+        const strokeNames = getStrokeNamesForChar(char);
+        const initialStatus = isExam
+          ? '考试中不显示笔顺，也不会即时提示错笔画。写完后再看纠正。'
+          : strokeNames.length ? `笔画：${strokeNames.join('、')}` : '点“开始跟写”，会语音报每一笔名称。';
+        const card = document.createElement('article');
+        card.className = 'character-card';
+        card.dataset.char = char;
+        card.dataset.index = String(index + 1);
+        card.innerHTML = `
+          <div class="char-top">
+            <span class="char">${char}</span>
+            <span class="hint">第 ${index + 1} 字</span>
+          </div>
+          <div class="writer"></div>
+          <div class="practice-status">
+            <div class="status-line">${initialStatus}</div>
+            <div class="progress" aria-hidden="true"><div class="progress-fill"></div></div>
+          </div>
+          <div class="card-actions${isExam ? ' exam-actions' : ''}">
+            ${
+              isExam
+                ? '<button class="primary" type="button" data-action="quiz">开始考试</button>'
+                : '<button type="button" data-action="animate">播放</button><button type="button" data-action="quiz">开始跟写</button><button type="button" data-action="words">组词</button>'
+            }
+          </div>
+          <div class="word-panel"></div>
+        `;
+        el.characters.appendChild(card);
+        return { card, char, strokeNames };
+      });
+
+      window.setTimeout(() => {
+        if (currentRender !== renderId) return;
+        writers = [];
+        cards.forEach(({ card, char, strokeNames }) => {
+          const writerBox = card.querySelector('.writer');
+          const size = Math.floor(writerBox.getBoundingClientRect().width);
+          const writer = HanziWriter.create(writerBox, char, {
+            width: size,
+            height: size,
+            padding: 14,
+            showOutline: false,
+            showCharacter: true,
+            strokeColor: '#17202a',
+            outlineColor: '#cfd8e3',
+            radicalColor: '#0f766e',
+            drawingColor: '#0f766e',
+            highlightColor: '#dc2626',
+            highlightCompleteColor: '#16a34a',
+            drawingWidth: 28,
+            showHintAfterMisses: 1,
+            leniency: 1.25,
+            strokeAnimationSpeed: 1,
+            delayBetweenStrokes: 180
+          });
+          writer.showCharacter({ duration: 0 });
+
+          const item = { writer, card, char, strokeNames, index: writers.length };
+          writers.push(item);
+
+          card.querySelector('[data-action="animate"]')?.addEventListener('click', () => {
+            writer.cancelQuiz();
+            writer.hideCharacter({ duration: 0 });
+            writer.showOutline({ duration: 0 });
+            setCardStatus(card, '正在播放笔顺。');
+            writer.animateCharacter();
+          });
+          card.querySelector('[data-action="quiz"]').addEventListener('click', () => startQuiz(item));
+          card.querySelector('[data-action="words"]')?.addEventListener('click', () => toggleWordPanel(card, char));
+        });
+      }, 0);
+
+      updateStats(mission.coach || coachRecommendation());
+    }
+
+    function setCardStatus(card, message, progress) {
+      card.querySelector('.status-line').textContent = message;
+      if (typeof progress === 'number') {
+        card.querySelector('.progress-fill').style.width = `${Math.max(0, Math.min(100, progress))}%`;
+      }
+    }
+
+    function missionPhrasesForChar(char) {
+      const mission = state.currentMission;
+      if (!mission) return [];
+      const text = `${mission.title || ''}${mission.subtitle || ''}${mission.text || ''}`;
+      const chars = hanziOnly(text);
+      const phrases = new Set();
+      chars.forEach((current, index) => {
+        if (current !== char) return;
+        const before = chars[index - 1] || '';
+        const after = chars[index + 1] || '';
+        if (before) phrases.add(`${before}${char}`);
+        if (after) phrases.add(`${char}${after}`);
+        if (before && after) phrases.add(`${before}${char}${after}`);
+      });
+      return Array.from(phrases);
+    }
+
+    function wordsForChar(char) {
+      const bankWords = commonWordBank[char] || [];
+      const words = bankWords.length ? bankWords : missionPhrasesForChar(char);
+      return Array.from(new Set(words)).slice(0, 8);
+    }
+
+    function toggleWordPanel(card, char) {
+      const panel = card.querySelector('.word-panel');
+      const words = wordsForChar(char);
+      const isOpen = panel.classList.contains('is-open');
+      if (isOpen) {
+        panel.classList.remove('is-open');
+        return;
+      }
+
+      panel.innerHTML = `
+        <strong>“${char}”的常用组词</strong>
+        <div class="word-list">
+          ${
+            words.length
+              ? words.map(word => `<span class="word-pill">${word}</span>`).join('')
+              : '<span class="word-pill">暂未收录</span><span class="word-pill">先看诗句里的用法</span>'
+          }
+        </div>
+      `;
+      panel.classList.add('is-open');
+      updateStats(words.length ? `${char} 可以这样组词：${words.join('、')}。` : `${char} 的常用组词还没收录，先在当前句子里观察它。`);
+      speak(words.length ? `${char}。${words.slice(0, 4).join('，')}` : `${char}`);
+    }
+
+    function showRewardPop(card, text, isBig = false) {
+      const writerBox = card.querySelector('.writer');
+      const pop = document.createElement('div');
+      pop.className = `reward-pop${isBig ? ' big' : ''}`;
+      pop.textContent = text;
+      writerBox.appendChild(pop);
+      window.setTimeout(() => pop.remove(), isBig ? 1150 : 900);
+    }
+
+    function makeCelebrationLayer(card) {
+      const writerBox = card.querySelector('.writer');
+      writerBox.querySelector('.celebration-layer')?.remove();
+      const layer = document.createElement('div');
+      layer.className = 'celebration-layer';
+      writerBox.appendChild(layer);
+      card.classList.add('celebrating');
+      window.setTimeout(() => {
+        layer.remove();
+        card.classList.remove('celebrating');
+      }, 1700);
+      return layer;
+    }
+
+    function addBadge(layer, text) {
+      const badge = document.createElement('div');
+      badge.className = 'celebration-badge';
+      badge.textContent = text;
+      layer.appendChild(badge);
+    }
+
+    function addSparkBurst(layer) {
+      addBadge(layer, '+5 真棒');
+      for (let index = 0; index < 14; index += 1) {
+        const spark = document.createElement('span');
+        spark.className = 'celebration-spark';
+        spark.textContent = index % 3 === 0 ? '★' : '✦';
+        spark.style.setProperty('--angle', `${index * 25 + Math.random() * 12}deg`);
+        spark.style.setProperty('--distance', `${78 + Math.random() * 48}px`);
+        spark.style.setProperty('--delay', `${index * 22}ms`);
+        layer.appendChild(spark);
+      }
+    }
+
+    function addConfetti(layer) {
+      addBadge(layer, '+5 完成');
+      const colors = ['#0f766e', '#f59e0b', '#16a34a', '#2563eb', '#dc2626'];
+      for (let index = 0; index < 22; index += 1) {
+        const confetti = document.createElement('span');
+        confetti.className = 'celebration-confetti';
+        confetti.style.setProperty('--x', `${6 + Math.random() * 88}%`);
+        confetti.style.setProperty('--color', colors[index % colors.length]);
+        confetti.style.setProperty('--delay', `${Math.random() * 280}ms`);
+        layer.appendChild(confetti);
+      }
+    }
+
+    function addRing(layer) {
+      const ring = document.createElement('div');
+      ring.className = 'celebration-ring';
+      layer.appendChild(ring);
+      addBadge(layer, '写对了');
+    }
+
+    function addPraiseWord(layer, char) {
+      const praise = document.createElement('div');
+      praise.className = 'celebration-word';
+      praise.textContent = `会写“${char}”了`;
+      layer.appendChild(praise);
+      addBadge(layer, '+5');
+    }
+
+    function showCompletionReward(card, char) {
+      const layer = makeCelebrationLayer(card);
+      const animations = [addSparkBurst, addConfetti, addRing, addPraiseWord];
+      const animation = randomItem(animations);
+      animation(layer, char);
+    }
+
+    function loadMandarinVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      mandarinVoice =
+        voices.find(voice => /zh[-_]?CN/i.test(voice.lang)) ||
+        voices.find(voice => /zh/i.test(voice.lang)) ||
+        voices.find(voice => /Chinese|Mandarin|普通话|中文/i.test(voice.name)) ||
+        null;
+      return mandarinVoice;
+    }
+
+    function speak(text) {
+      if (!voiceEnabled || !('speechSynthesis' in window) || !text) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.rate = 0.86;
+      utterance.pitch = 1.08;
+      utterance.volume = 1;
+      utterance.voice = mandarinVoice || loadMandarinVoice();
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function examRewardForRecord(record) {
+      if (!record) {
+        return {
+          points: 0,
+          label: '完成',
+          pop: '+0',
+          status: '本字完成。',
+          coach: '本字完成。'
+        };
+      }
+      if (record.totalMistakes === 0) {
+        return {
+          points: 4,
+          label: '满分通过',
+          pop: '+4 满分',
+          status: `本字完成：“${record.char}”满分通过，奖励 +4。`,
+          coach: `${record.char} 满分通过，奖励 +4。`
+        };
+      }
+      if (record.totalMistakes === 1) {
+        return {
+          points: 3,
+          label: '优秀完成',
+          pop: '+3 优秀',
+          status: `本字完成：“${record.char}”优秀完成，奖励 +3。最后再看纠正。`,
+          coach: `${record.char} 优秀完成，奖励 +3。最后会给纠正提示。`
+        };
+      }
+      if (record.totalMistakes <= 3) {
+        return {
+          points: 2,
+          label: '坚持完成',
+          pop: '+2 完成',
+          status: `本字完成：“${record.char}”坚持完成，奖励 +2。最后集中纠正。`,
+          coach: `${record.char} 坚持完成，奖励 +2。先继续考试，最后再纠正。`
+        };
+      }
+      return {
+        points: 1,
+        label: '完成挑战',
+        pop: '+1 坚持',
+        status: `本字完成：“${record.char}”完成挑战，奖励 +1。最后重点纠正。`,
+        coach: `${record.char} 完成挑战，奖励 +1。先把考试写完，最后重点纠正。`
+      };
+    }
+
+    function recordExamResult(item, summaryData) {
+      if (!state.currentExam || state.currentExam.finished) return null;
+      const grouped = {};
+      (item.examMistakes || []).forEach(mistake => {
+        const key = `${mistake.strokeNum}-${mistake.strokeName}`;
+        if (!grouped[key]) {
+          grouped[key] = {
+            strokeNum: mistake.strokeNum,
+            strokeName: mistake.strokeName,
+            count: 0,
+            backwards: false
+          };
+        }
+        grouped[key].count += 1;
+        grouped[key].backwards = grouped[key].backwards || mistake.isBackwards;
+      });
+
+      const record = {
+        index: item.index,
+        char: item.char,
+        totalMistakes: summaryData.totalMistakes,
+        strokes: Object.values(grouped).sort((a, b) => a.strokeNum - b.strokeNum)
+      };
+      const reward = examRewardForRecord(record);
+      record.rewardPoints = reward.points;
+      record.rewardLabel = reward.label;
+      const existingIndex = state.currentExam.records.findIndex(entry => entry.index === item.index);
+      const oldReward = existingIndex >= 0 ? state.currentExam.records[existingIndex].rewardPoints || 0 : 0;
+      if (existingIndex >= 0) {
+        state.currentExam.records[existingIndex] = record;
+      } else {
+        state.currentExam.records.push(record);
+      }
+      const rewardDelta = record.rewardPoints - oldReward;
+      state.currentExam.rewardPoints += rewardDelta;
+      state.points += rewardDelta;
+      return record;
+    }
+
+    function formatExamCorrection(record) {
+      if (!record || record.totalMistakes === 0) return `“${record.char}”通过`;
+      const detail = record.strokes
+        .map(stroke => `第 ${stroke.strokeNum + 1} 笔“${stroke.strokeName}”${stroke.count > 1 ? `错 ${stroke.count} 次` : '需要重练'}${stroke.backwards ? '，方向反了' : ''}`)
+        .join('；');
+      return `“${record.char}”：${detail}`;
+    }
+
+    function finishExamMission() {
+      const exam = state.currentExam;
+      if (!exam) return;
+      if (exam.finished) return;
+      exam.finished = true;
+      const records = exam.records.slice().sort((a, b) => a.index - b.index);
+      const wrongRecords = records.filter(record => record.totalMistakes > 0);
+      const totalMistakes = wrongRecords.reduce((sum, record) => sum + record.totalMistakes, 0);
+      const bonus = exam.rewardPoints || records.reduce((sum, record) => sum + (record.rewardPoints || 0), 0);
+
+      if (!wrongRecords.length) {
+        el.lessonTitle.textContent = '考试结果';
+        el.lessonBody.textContent = `完成 ${exam.label}考试：全部通过，没有发现需要纠正的笔画。`;
+        el.focusLine.textContent = '全部通过';
+        writers.forEach(item => {
+          setCardStatus(item.card, '考试通过：没有错笔画。', 100);
+          showCompletionReward(item.card, item.char);
+        });
+        updateStats(`考试完成：全部通过，考试奖励 +${bonus}。`);
+        speak(`考试完成，全部通过`);
+        return;
+      }
+
+      const focusStrokes = Array.from(new Set(wrongRecords.flatMap(record => record.strokes.map(stroke => stroke.strokeName)))).slice(0, 4);
+      el.lessonTitle.textContent = '考试纠正提示';
+      el.lessonBody.textContent = wrongRecords.map(formatExamCorrection).join('；');
+      el.focusLine.textContent = `重点改：${focusStrokes.join('、')}`;
+
+        writers.forEach(item => {
+          const record = records.find(entry => entry.index === item.index);
+          if (!record || record.totalMistakes === 0) {
+            setCardStatus(item.card, '考试通过：这个字没有错笔画。', 100);
+            return;
+        }
+        const firstWrongStroke = record.strokes[0];
+        setCardStatus(item.card, `纠正：${formatExamCorrection(record)}。`, 100);
+        item.writer.highlightStroke(firstWrongStroke.strokeNum);
+      });
+      updateStats(`考试完成：发现 ${totalMistakes} 次需要纠正的笔画。先重练 ${focusStrokes.join('、')}。考试奖励 +${bonus}。`);
+      speak(`考试完成。请看纠正提示`);
+    }
+
+    function startQuiz(item, autoNext = false) {
+      const { writer, card, char, strokeNames } = item;
+      const isExam = state.currentMission && state.currentMission.mode === 'exam';
+      const quizLeniency = state.currentMission && state.currentMission.leniency ? state.currentMission.leniency : 1.25;
+      const firstStrokeName = strokeNameAt(strokeNames, 0);
+      item.examMistakes = [];
+      writer.cancelQuiz();
+      writer.hideCharacter({ duration: 120 });
+      if (isExam) {
+        writer.hideOutline({ duration: 120 });
+      } else {
+        writer.showOutline({ duration: 120 });
+      }
+      card.classList.remove('shake');
+      if (isExam) {
+        setCardStatus(card, `考试开始：请独立写“${char}”。系统只记录，最后再纠正。`, 0);
+        speak(char);
+      } else {
+        setCardStatus(card, `开始写“${char}”。第 1 笔：${firstStrokeName}。沿着高亮笔画写。`, 0);
+        speak(`${char}。第一笔，${firstStrokeName}`);
+      }
+
+      writer.quiz({
+        showHintAfterMisses: isExam ? false : 1,
+        leniency: quizLeniency,
+        highlightOnComplete: !isExam,
+        onCorrectStroke(strokeData) {
+          const total = strokeData.strokeNum + 1 + strokeData.strokesRemaining;
+          const done = strokeData.strokeNum + 1;
+          const strokeName = strokeNameAt(strokeNames, strokeData.strokeNum);
+          const progress = total > 0 ? (done / total) * 100 : 100;
+          state.correctStrokes += 1;
+          if (!isExam) state.points += 1;
+          state.streak += 1;
+          state.strokeCorrect[strokeName] = (state.strokeCorrect[strokeName] || 0) + 1;
+          if (isExam) {
+            setCardStatus(card, `考试进行中：已完成 ${done}/${total} 笔。`, progress);
+            return;
+          }
+          setCardStatus(card, `第 ${done} 笔：${strokeName}，正确。还剩 ${strokeData.strokesRemaining} 笔。`, progress);
+          showRewardPop(card, '+1');
+          speak(strokeName);
+          updateStats(`${char}：第 ${done} 笔“${strokeName}”写对了，奖励 +1。`);
+        },
+        onMistake(strokeData) {
+          const strokeName = strokeNameAt(strokeNames, strokeData.strokeNum);
+          state.mistakes += 1;
+          state.streak = 0;
+          state.strokeMistakes[strokeName] = (state.strokeMistakes[strokeName] || 0) + 1;
+          if (isExam) {
+            item.examMistakes.push({
+              strokeNum: strokeData.strokeNum,
+              strokeName,
+              isBackwards: strokeData.isBackwards
+            });
+            return;
+          }
+          card.classList.remove('shake');
+          void card.offsetWidth;
+          card.classList.add('shake');
+          setCardStatus(card, `这一笔是“${strokeName}”。看红色正确笔画，再写一次。`, undefined);
+          speak(`这一笔是${strokeName}`);
+          updateStats(`${char}：方向或顺序不对。红色显示的是正确的“${strokeName}”。`);
+        },
+        onComplete(summaryData) {
+          state.completedChars += 1;
+          if (isExam) {
+            const record = recordExamResult(item, summaryData);
+            const reward = examRewardForRecord(record);
+            setCardStatus(card, reward.status, 100);
+            showRewardPop(card, reward.pop, reward.points >= 3);
+            updateStats(reward.coach);
+            speak(reward.label);
+            if (autoNext) {
+              const next = writers[item.index + 1];
+              if (next) {
+                window.setTimeout(() => startQuiz(next, true), 650);
+              } else {
+                finishMission();
+              }
+            } else if (state.currentExam && state.currentExam.records.length >= writers.length) {
+              finishMission();
+            }
+            return;
+          }
+          state.points += 5;
+          showCompletionReward(card, summaryData.character);
+          setCardStatus(card, `完成！错误 ${summaryData.totalMistakes} 次。`, 100);
+          updateStats(`${summaryData.character} 写完了，完成奖励 +5。`);
+          if (autoNext) {
+            const next = writers[item.index + 1];
+            if (next) {
+              window.setTimeout(() => startQuiz(next, true), 850);
+            } else {
+              finishMission();
+            }
+          }
+        }
+      });
+    }
+
+    function finishMission() {
+      if (state.currentMission && state.currentMission.mode === 'exam') {
+        finishExamMission();
+      } else if (state.currentMission && state.currentMission.mode === 'assessment') {
+        state.assessmentDone = true;
+        state.assessmentRuns += 1;
+        const total = state.correctStrokes + state.mistakes;
+        const accuracy = total ? Math.round((state.correctStrokes / total) * 100) : 100;
+        const weak = weakStrokeName();
+        const result = accuracy >= 90
+          ? '测试结果：基础很好，可以直接进入结构和偏旁。'
+          : accuracy >= 72
+            ? '测试结果：已经能跟写，建议补一轮核心笔画。'
+            : '测试结果：先练笔画方向和起笔，不急着写复杂字。';
+        updateStats(`${result}${weak ? ` 当前最需要照顾的是“${weak}”。` : ''}`);
+      } else {
+        updateStats(coachRecommendation());
+      }
+    }
+
+    function buildPoemQuestions() {
+      const rawPoems = Array.isArray(window.TANGSHI_300) ? window.TANGSHI_300 : [];
+      const seen = new Set();
+      const questions = [];
+      rawPoems.forEach((poem, poemIndex) => {
+        const title = toSimplified(poem.title || '无题');
+        const author = toSimplified(poem.author || '佚名');
+        (poem.paragraphs || []).forEach(paragraph => {
+          toSimplified(paragraph)
+            .split(/[，。！？；：、]/)
+            .map(line => line.trim())
+            .filter(Boolean)
+            .forEach(line => {
+              const text = hanziOnly(line).join('');
+              if (text.length < 2 || text.length > 12) return;
+              const key = `${title}-${author}-${text}`;
+              if (seen.has(key)) return;
+              seen.add(key);
+              questions.push({ text, line, title, author, poemIndex, length: text.length });
+            });
+        });
+      });
+      return questions;
+    }
+
+    function missionAssessment() {
+      const text = sample(assessmentPool, 6);
+      return {
+        mode: 'assessment',
+        stage: '第 1 关：水平测试',
+        title: '随机测一组基础汉字',
+        subtitle: '不要追求快，先看笔顺、方向和控笔是否稳定。',
+        text,
+        lessonTitle: '怎么判断水平',
+        lessonBody: '孩子写错时，系统会记录是哪一类笔画出问题。写完这一组后，AI 教练会推荐下一关。',
+        chips: ['随机汉字', '记录错笔画', '自动建议'],
+        coach: '测试开始。点“跟写全部”，孩子顺着高亮笔画写。'
+      };
+    }
+
+    function missionStrokeWarmup(targetName = weakStrokeName() || randomItem(coreStrokeNames)) {
+      const code = Object.entries(strokeNameByCode).find(([, name]) => name === targetName)?.[0];
+      const chars = code
+        ? Array.from(commonPracticeChars).filter(char => (window.STROKE_ORDER_JIAN && window.STROKE_ORDER_JIAN[char] || '').includes(code))
+        : Array.from(commonPracticeChars);
+      const text = sample(chars.join(''), 5) || '一人口日';
+      const shape = strokeShapes[targetName] || '㇐';
+      return {
+        mode: 'stroke',
+        stage: '第 2 关：笔画热身',
+        title: `今天重点练“${targetName}”`,
+        subtitle: strokeTips[targetName] || '先听笔画名称，再顺着高亮轨迹写。',
+        text,
+        lessonTitle: `${shape} ${targetName}`,
+        lessonBody: strokeTips[targetName] || '核心方法：先看起点，再看方向，最后看收笔。',
+        chips: ['听名称', '看起点', '练方向'],
+        coach: `这关专门照顾“${targetName}”。每写对一次，孩子会听到它的名称。`
+      };
+    }
+
+    function missionStructure() {
+      const item = randomItem(structures);
+      return {
+        mode: 'structure',
+        stage: '第 3 关：结构拼字',
+        title: item.name,
+        subtitle: item.tip,
+        text: item.text,
+        lessonTitle: `结构口诀：${item.name}`,
+        lessonBody: item.tip,
+        chips: ['先外后内', '左右避让', '上下留白'],
+        coach: `${item.name} 是写得像不像的关键。先看大框架，再写笔画。`
+      };
+    }
+
+    function missionRadical() {
+      const item = randomItem(radicalFamilies);
+      return {
+        mode: 'radical',
+        stage: '专项练习：偏旁练习',
+        title: `${item.name} 家族`,
+        subtitle: item.tip,
+        text: item.text,
+        lessonTitle: `偏旁快写：${item.name}`,
+        lessonBody: `${item.tip} 先把这个偏旁写稳定，再换右边或下面，就能一口气学会一串字。`,
+        chips: ['同一偏旁', '批量记字', '猜字义'],
+        coach: `偏旁像字的零件。会写“${item.name}”，就能带出好几个新字。`
+      };
+    }
+
+    function missionHardCharacters() {
+      const item = randomItem(hardCharacterGroups);
+      return {
+        mode: 'hard',
+        stage: '专项练习：难字练习',
+        title: item.name,
+        subtitle: item.tip,
+        text: item.text,
+        lessonTitle: '难字打法：拆成小零件',
+        lessonBody: `${item.tip} 难字不是一次记整团，而是按“偏旁/部件 -> 主体结构 -> 笔顺方向”三步写。`,
+        chips: ['多笔画', '复杂结构', '慢速拆解'],
+        coach: `难字练习会专门出笔画多、结构复杂的字。今天挑战：“${item.text}”。`
+      };
+    }
+
+    function missionExam(levelKey = 'basic') {
+      const level = examLevels[levelKey] || examLevels.basic;
+      const text = sample(level.text, level.count);
+      return {
+        mode: 'exam',
+        difficulty: levelKey,
+        difficultyName: level.name,
+        leniency: level.leniency,
+        stage: `考试模式：${level.name}`,
+        title: `${level.name}考试`,
+        subtitle: `${level.tip} 写错时不显示正确笔画，最后统一纠正。`,
+        text,
+        lessonTitle: '考试规则',
+        lessonBody: '考试中不会播放笔顺，也不会在写错时用红色提示。每写完一个字会按完成情况给奖励，错笔画全部写完后再给纠正清单。',
+        chips: ['无即时提示', '按完成奖励', '最后纠正'],
+        coach: `${level.name}考试开始。题目是：“${text}”。写的时候专心看格子，最后再看纠正。`
+      };
+    }
+
+    function missionTangPoem(length = Math.random() > 0.35 ? 5 : 7) {
+      const exact = poemQuestions.filter(question => question.length === length);
+      const question = randomItem(exact.length ? exact : poemQuestions) || {
+        title: '登鹳雀楼',
+        author: '王之涣',
+        text: '白日依山尽',
+        line: '白日依山尽',
+        length: 5
+      };
+      return {
+        mode: 'poem',
+        stage: '第 5 关：唐诗闯关',
+        title: `${question.title} · ${question.author}`,
+        subtitle: `《唐诗三百首》：${question.line}`,
+        text: question.text,
+        lessonTitle: '把字放回诗句里',
+        lessonBody: '最后不用孤立练字，而是在真实诗句中跟写。孩子会把字形、声音和句子一起记住。',
+        chips: [`${question.length} 字题`, '唐诗三百首', '整句记忆'],
+        coach: `唐诗题：“${question.text}”。写完这一句，就把字放进诗里了。`
+      };
+    }
+
+    function missionManual(text) {
+      const clean = hanziOnly(text).join('');
+      return {
+        mode: 'manual',
+        stage: '手动题目',
+        title: clean || '等待输入',
+        subtitle: '手动输入可以临时练中文名、课本字或诗句。',
+        text: clean,
+        lessonTitle: '自定义练习',
+        lessonBody: '照样会有笔顺、语音笔画名和奖励反馈。',
+        chips: ['自定义', '笔顺跟写', '组词练习'],
+        coach: clean ? `手动题目：“${clean}”。` : '请输入至少一个汉字。'
+      };
+    }
+
+    function nextAdaptiveMission() {
+      if (!state.assessmentDone) return missionAssessment();
+      const weak = weakStrokeName();
+      if (weak) return missionStrokeWarmup(weak);
+      if (state.completedChars < 12) return missionStrokeWarmup();
+      if (state.completedChars < 28) return missionStructure();
+      if (state.completedChars < 48) return missionRadical();
+      if (state.completedChars < 60) return missionHardCharacters();
+      return missionTangPoem();
+    }
+
+    el.startAssessment.addEventListener('click', () => setMission(missionAssessment()));
+    el.nextAi.addEventListener('click', () => setMission(nextAdaptiveMission()));
+    el.strokeWarmup.addEventListener('click', () => setMission(missionStrokeWarmup()));
+    el.structureLesson.addEventListener('click', () => setMission(missionStructure()));
+    el.radicalLesson.addEventListener('click', () => setMission(missionRadical()));
+    el.hardLesson.addEventListener('click', () => setMission(missionHardCharacters()));
+    el.tangPoem.addEventListener('click', () => setMission(missionTangPoem()));
+    el.examButtons.forEach(button => {
+      button.addEventListener('click', () => setMission(missionExam(button.dataset.examLevel)));
+    });
+    el.manualApply.addEventListener('click', () => setMission(missionManual(el.manualInput.value)));
+
+    document.querySelectorAll('[data-sample]').forEach(button => {
+      button.addEventListener('click', () => {
+        el.manualInput.value = button.dataset.sample;
+        setMission(missionManual(button.dataset.sample));
+      });
+    });
+
+    el.voiceToggle.addEventListener('click', () => {
+      voiceEnabled = !voiceEnabled;
+      el.voiceToggle.textContent = voiceEnabled ? '语音：开' : '语音：关';
+      el.voiceToggle.setAttribute('aria-pressed', String(voiceEnabled));
+      updateStats(voiceEnabled ? '语音已打开。写对笔画会播报名称。' : '语音已关闭。');
+      if (voiceEnabled) speak('横');
+    });
+
+    el.voiceTest.addEventListener('click', () => {
+      voiceEnabled = true;
+      el.voiceToggle.textContent = '语音：开';
+      el.voiceToggle.setAttribute('aria-pressed', 'true');
+      speak('横');
+      updateStats('试听语音：横。');
+    });
+
+    el.followAll.addEventListener('click', () => {
+      if (writers[0]) startQuiz(writers[0], true);
+    });
+
+    el.animateAll.addEventListener('click', async () => {
+      for (const item of writers) {
+        item.writer.cancelQuiz();
+        item.writer.hideCharacter({ duration: 0 });
+        item.writer.showOutline({ duration: 0 });
+        setCardStatus(item.card, '正在播放笔顺。');
+        await item.writer.animateCharacter();
+      }
+    });
+
+    if ('speechSynthesis' in window) {
+      loadMandarinVoice();
+      window.speechSynthesis.addEventListener('voiceschanged', loadMandarinVoice);
+    }
+
+    poemQuestions = buildPoemQuestions();
+    setMission(missionAssessment());
+  </script>
+</body>
+</html>

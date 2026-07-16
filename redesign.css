@@ -15,6 +15,22 @@
   color-scheme: light;
 }
 
+.home-return {
+  position: fixed;
+  right: 18px;
+  top: 17px;
+  z-index: 20;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 253, 248, 0.9);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+
 * {
   scrollbar-color: rgba(164, 59, 42, 0.28) transparent;
   scrollbar-width: thin;
@@ -81,6 +97,14 @@ main {
   font-size: 24px;
   font-weight: 700;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.brand-seal img {
+  display: block;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: invert(1);
 }
 
 .brand-name {

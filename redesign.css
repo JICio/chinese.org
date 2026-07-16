@@ -99,6 +99,14 @@ main {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
 }
 
+.brand-seal img {
+  display: block;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: invert(1);
+}
+
 .brand-name {
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;

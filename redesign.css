@@ -1,0 +1,688 @@
+:root {
+  --ink: #23221e;
+  --muted: #716e65;
+  --line: rgba(46, 43, 35, 0.14);
+  --panel: #fffdf8;
+  --paper: #f8f3e9;
+  --bg: #eee8dc;
+  --accent: #a43b2a;
+  --accent-dark: #74281d;
+  --reward: #cc8b32;
+  --good: #47704f;
+  --warn: #b53127;
+  --guide: rgba(164, 59, 42, 0.18);
+  --shadow: 0 18px 50px rgba(57, 47, 30, 0.09);
+  color-scheme: light;
+}
+
+* {
+  scrollbar-color: rgba(164, 59, 42, 0.28) transparent;
+  scrollbar-width: thin;
+}
+
+body {
+  position: relative;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(255, 255, 255, 0.85), transparent 34%),
+    linear-gradient(135deg, #f4f0e8 0%, #ece5d8 100%);
+  font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  opacity: 0.24;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+}
+
+main {
+  width: min(100%, 1680px);
+  margin: 0 auto;
+  grid-template-columns: minmax(280px, 320px) minmax(420px, 1fr) minmax(260px, 310px);
+  grid-template-rows: 64px minmax(150px, auto) minmax(0, 1fr) auto;
+  grid-template-areas:
+    "header header header"
+    "menu mission lesson"
+    "menu characters lesson"
+    "menu characters note";
+  gap: 16px;
+  padding: 14px 18px 18px;
+}
+
+.site-header {
+  grid-area: header;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 4px 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 0 auto;
+}
+
+.brand-seal {
+  display: grid;
+  width: 38px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 9px 9px 9px 2px;
+  background: var(--accent);
+  color: #fffaf0;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.brand-name {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+
+.brand-name span {
+  color: var(--accent);
+}
+
+.brand-promise {
+  margin: 0;
+  color: var(--muted);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.header-meta i {
+  color: var(--accent);
+  font-style: normal;
+}
+
+aside,
+.mission-card,
+.lesson-panel,
+.character-card,
+.note,
+.empty {
+  border-color: var(--line);
+  background: rgba(255, 253, 248, 0.9);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+aside {
+  height: auto;
+  border-radius: 20px 20px 20px 5px;
+  padding: 22px;
+}
+
+.sidebar-intro {
+  padding: 2px 2px 15px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow,
+.mission-kicker {
+  margin: 0 0 9px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h1,
+.mission-card h2,
+.lesson-panel h3 {
+  font-family: "Songti SC", "STSong", "SimSun", serif;
+}
+
+h1 {
+  margin-bottom: 12px;
+  color: #26231d;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.32;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.coach-card,
+.route-card,
+.manual-card {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  margin-top: 18px;
+  padding: 18px 0 0;
+  background: transparent;
+}
+
+.coach-card {
+  border-top: 0;
+  margin-top: 3px;
+}
+
+.coach-title,
+.route-title,
+label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.section-mark {
+  display: inline-grid;
+  min-width: 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(164, 59, 42, 0.09);
+  color: var(--accent);
+  font-family: Georgia, serif;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.coach-message {
+  min-height: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.stats {
+  gap: 7px;
+}
+
+.stat {
+  border-color: var(--line);
+  border-radius: 12px 12px 12px 3px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.stat strong {
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+}
+
+.stat span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+button {
+  min-height: 38px;
+  border-color: var(--line);
+  border-radius: 10px 10px 10px 3px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+button:hover {
+  border-color: rgba(164, 59, 42, 0.42);
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 8px 18px rgba(164, 59, 42, 0.2);
+}
+
+button.primary:hover {
+  background: var(--accent-dark);
+}
+
+button[aria-pressed="true"] {
+  border-color: rgba(164, 59, 42, 0.45);
+  background: rgba(164, 59, 42, 0.07);
+  box-shadow: none;
+}
+
+.route-list {
+  gap: 7px;
+}
+
+.route-list li {
+  grid-template-columns: 63px 1fr;
+  font-size: 12px;
+}
+
+textarea {
+  min-height: 74px;
+  border-color: var(--line);
+  border-radius: 12px 12px 12px 3px;
+  background: rgba(255, 255, 255, 0.72);
+  font-family: "Songti SC", "STSong", serif;
+}
+
+textarea:focus,
+button:focus-visible {
+  outline-color: rgba(164, 59, 42, 0.2);
+}
+
+.mission-card {
+  position: relative;
+  border-radius: 20px 20px 6px 20px;
+  padding: 21px 22px;
+  overflow: hidden;
+}
+
+.mission-card::after {
+  position: absolute;
+  right: 18px;
+  bottom: -32px;
+  content: "永";
+  color: rgba(164, 59, 42, 0.055);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 142px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.mission-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.mission-card h2 {
+  max-width: 620px;
+  font-size: clamp(24px, 2.3vw, 36px);
+  font-weight: 650;
+  line-height: 1.22;
+}
+
+.mission-subtitle {
+  max-width: 660px;
+  font-size: 13px;
+}
+
+.mission-actions {
+  grid-template-columns: repeat(2, minmax(110px, 1fr));
+}
+
+.lesson-panel {
+  border-radius: 20px 20px 20px 6px;
+  padding: 22px;
+}
+
+.lesson-panel h3 {
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.lesson-copy {
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.focus-line {
+  min-height: 126px;
+  border: 0;
+  border-radius: 14px 14px 14px 4px;
+  background:
+    linear-gradient(90deg, transparent 49.7%, rgba(164, 59, 42, 0.13) 50%, transparent 50.3%),
+    linear-gradient(0deg, transparent 49.7%, rgba(164, 59, 42, 0.13) 50%, transparent 50.3%),
+    #faf3e7;
+  color: var(--accent-dark);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 23px;
+  font-weight: 650;
+}
+
+.chip {
+  min-height: 27px;
+  border-color: var(--line);
+  background: transparent;
+  font-size: 11px;
+}
+
+.characters {
+  gap: 18px;
+  padding: 4px max(14px, calc((100% - 448px) / 2));
+  scroll-padding-inline: max(14px, calc((100% - 448px) / 2));
+}
+
+.character-card {
+  flex-basis: min(100%, 448px);
+  border-radius: 22px 22px 22px 6px;
+  padding: 17px;
+}
+
+.char {
+  color: var(--accent);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 34px;
+  font-weight: 650;
+}
+
+.writer {
+  border: 0;
+  border-radius: 16px 16px 16px 4px;
+  background:
+    linear-gradient(45deg, transparent 49.7%, var(--guide) 50%, transparent 50.3%),
+    linear-gradient(-45deg, transparent 49.7%, var(--guide) 50%, transparent 50.3%),
+    linear-gradient(90deg, transparent 49.7%, var(--guide) 50%, transparent 50.3%),
+    linear-gradient(0deg, transparent 49.7%, var(--guide) 50%, transparent 50.3%),
+    #faf6ee;
+  box-shadow: inset 0 0 0 1px rgba(164, 59, 42, 0.12);
+}
+
+.progress {
+  background: rgba(113, 110, 101, 0.12);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--accent), var(--reward));
+}
+
+.word-panel {
+  border-color: rgba(164, 59, 42, 0.2);
+  border-radius: 12px 12px 12px 3px;
+  background: #fbf2e7;
+}
+
+.word-panel strong {
+  color: var(--accent-dark);
+}
+
+.word-pill {
+  border-color: rgba(164, 59, 42, 0.2);
+}
+
+.empty {
+  border-radius: 20px 20px 20px 6px;
+}
+
+.note {
+  border-radius: 14px 14px 14px 4px;
+  padding: 12px 15px;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  main {
+    grid-template-columns: minmax(270px, 300px) minmax(0, 1fr);
+    grid-template-rows: 62px minmax(148px, auto) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header"
+      "menu mission"
+      "menu characters"
+      "menu note";
+  }
+
+  .lesson-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 920px) {
+  body {
+    overflow: hidden;
+  }
+
+  main {
+    width: 100%;
+    height: 100svh;
+    min-height: 100svh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 52px 124px minmax(0, 1fr) 148px;
+    grid-template-areas:
+      "header"
+      "mission"
+      "characters"
+      "menu";
+    gap: 9px;
+    padding: 8px;
+  }
+
+  .site-header {
+    padding: 0 3px 8px;
+  }
+
+  .brand-seal {
+    width: 32px;
+    font-size: 20px;
+  }
+
+  .brand-name {
+    font-size: 15px;
+  }
+
+  .brand-promise {
+    display: none;
+  }
+
+  .header-meta {
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  aside {
+    grid-area: menu;
+    width: auto;
+    height: 148px;
+    display: grid;
+    grid-template-columns: 156px;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(205px, 1fr);
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 15px 15px 15px 4px;
+    padding: 9px;
+  }
+
+  .sidebar-intro {
+    display: flex;
+    height: 128px;
+    align-items: center;
+    border: 0;
+    padding: 9px;
+  }
+
+  .sidebar-intro .eyebrow,
+  .sidebar-intro .subtitle {
+    display: none;
+  }
+
+  h1 {
+    width: auto;
+    height: auto;
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .coach-card,
+  .route-card,
+  .manual-card {
+    height: 128px;
+    overflow-y: auto;
+    border: 0;
+    margin: 0;
+    padding: 9px;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 11px 11px 11px 3px;
+  }
+
+  .mission-card {
+    grid-area: mission;
+    max-height: none;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding: 14px 16px;
+    gap: 12px;
+    border-radius: 15px 15px 5px 15px;
+  }
+
+  .mission-card h2 {
+    font-size: 21px;
+  }
+
+  .mission-actions {
+    width: 210px;
+  }
+
+  .characters {
+    grid-area: characters;
+    height: 100%;
+    padding-inline: max(8px, calc((100% - 390px) / 2));
+    scroll-padding-inline: max(8px, calc((100% - 390px) / 2));
+  }
+
+  .character-card {
+    flex-basis: min(100%, 390px);
+    border-radius: 16px 16px 16px 5px;
+  }
+
+  .writer {
+    width: min(100%, 43svh, 370px);
+  }
+
+  .note,
+  .lesson-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 580px) {
+  main {
+    grid-template-rows: 48px 118px minmax(0, 1fr) 116px;
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .header-meta span:nth-of-type(2),
+  .header-meta span:nth-of-type(3),
+  .header-meta i {
+    display: none;
+  }
+
+  aside {
+    height: 116px;
+    grid-template-columns: 132px;
+    grid-auto-columns: 194px;
+    padding: 7px;
+  }
+
+  .sidebar-intro,
+  .coach-card,
+  .route-card,
+  .manual-card {
+    height: 100px;
+    padding: 7px;
+  }
+
+  .coach-title,
+  .route-title {
+    margin-bottom: 5px;
+  }
+
+  h1 {
+    font-size: 17px;
+  }
+
+  .mission-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    padding: 11px 12px;
+    gap: 6px;
+  }
+
+  .mission-card h2 {
+    font-size: 19px;
+  }
+
+  .mission-card::after {
+    font-size: 100px;
+  }
+
+  .mission-subtitle {
+    display: none;
+  }
+
+  .mission-actions {
+    width: 100%;
+  }
+
+  .mission-actions button {
+    min-height: 34px;
+    font-size: 12px;
+  }
+
+  .characters {
+    padding-inline: max(6px, calc((100% - 344px) / 2));
+    scroll-padding-inline: max(6px, calc((100% - 344px) / 2));
+  }
+
+  .character-card {
+    flex-basis: min(100%, 344px);
+    padding: 10px;
+  }
+
+  .writer {
+    width: min(100%, 39svh, 310px);
+  }
+
+  .char-top {
+    margin-bottom: 5px;
+  }
+
+  .char {
+    font-size: 28px;
+  }
+
+  .card-actions button {
+    min-height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

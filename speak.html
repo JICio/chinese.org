@@ -157,7 +157,7 @@
       left: 0;
       z-index: 2;
       white-space: nowrap;
-      font-size: clamp(60px, 18vmin, 170px);
+      font-size: clamp(68px, 24vmin, 190px);
       font-weight: 800;
       line-height: 1.15;
       cursor: pointer;
@@ -166,7 +166,9 @@
       will-change: transform;
     }
 
-    .ride:active { filter: brightness(1.25); }
+    .ride span { display: inline-block; }
+
+    .ride span:active { filter: brightness(1.25); }
 
     .ride.theme-lantern {
       color: var(--led-red);
@@ -593,16 +595,13 @@
       const el = document.createElement('div');
       el.className = `ride theme-${phrase.theme}`;
       el.style.top = LANE_TOPS[laneIndex];
-      if (phrase.theme === 'rainbow') {
-        [...phrase.text].forEach((char, i) => {
-          const span = document.createElement('span');
-          span.textContent = char;
-          span.style.color = RAINBOW[i % RAINBOW.length];
-          el.append(span);
-        });
-      } else {
-        el.textContent = phrase.text;
-      }
+      [...phrase.text].forEach((char, i) => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        if (phrase.theme === 'rainbow') span.style.color = RAINBOW[i % RAINBOW.length];
+        span.addEventListener('pointerdown', () => popChar(span, char, phrase, el));
+        el.append(span);
+      });
 
       const stageW = stage.clientWidth;
       el.style.transform = `translateX(${stageW}px)`;
@@ -623,13 +622,34 @@
 
       animation.onfinish = () => {
         el.remove();
-        if (state.loop && state.history.includes(phrase)) {
+        if (state.loop && phrase.text && state.history.includes(phrase)) {
           state.pending.push(phrase);
           processPending();
         }
       };
+    }
 
-      el.addEventListener('pointerdown', () => speakText(phrase.text));
+    /* 點一個字：讀出這個字，然後把它消掉 */
+    function popChar(span, char, phrase, el) {
+      if (span.dataset.popped) return;
+      span.dataset.popped = '1';
+      speakText(char);
+      phrase.text = phrase.text.replace(char, '');
+      if (!phrase.text) {
+        const index = state.history.indexOf(phrase);
+        if (index !== -1) state.history.splice(index, 1);
+      }
+      const pop = span.animate(
+        [
+          { transform: 'scale(1)', opacity: 1 },
+          { transform: 'scale(1.7)', opacity: 0 }
+        ],
+        { duration: 260, easing: 'ease-out' }
+      );
+      pop.onfinish = () => {
+        span.remove();
+        if (el.isConnected && !el.querySelector('span')) el.remove();
+      };
     }
 
     /* ---------- 點字朗讀 ---------- */

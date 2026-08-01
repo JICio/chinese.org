@@ -283,6 +283,42 @@
       letter-spacing: .06em;
     }
 
+    /* 偏旁拆解重組動畫 */
+    .part-tile {
+      position: absolute;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      width: var(--part);
+      height: var(--part);
+      font-size: calc(var(--part) * .68);
+      font-weight: 800;
+      color: var(--jade);
+      text-shadow: 0 0 14px rgba(127, 216, 184, .75);
+      border: 1px solid rgba(127, 216, 184, .55);
+      border-radius: 10px;
+      background: rgba(11, 11, 10, .88);
+      will-change: transform;
+      transition: transform 600ms cubic-bezier(.3, .9, .35, 1.1), opacity 250ms ease;
+    }
+
+    .swap-note {
+      position: absolute;
+      z-index: 9;
+      transform: translateX(-50%);
+      padding: 5px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 217, 138, .5);
+      background: rgba(11, 11, 10, .92);
+      color: var(--led-gold);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: card-in 250ms ease;
+    }
+
     /* 相遇詳解卡 */
     .clash-card {
       position: absolute;
@@ -824,6 +860,68 @@
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+    // 偏旁重組動畫：兩字裂成部件 → 右偏旁互換 → 合成新字
+    async function comboSwap(a, b, n1, n2, y, size, midX) {
+      const [l1, r1] = PARTS.d[a.char];
+      const [l2, r2] = PARTS.d[b.char];
+      const partSize = Math.round(size * 0.66);
+      const partY = y + (size - partSize) / 2;
+
+      const makePart = (ch, x) => {
+        const el = document.createElement('div');
+        el.className = 'part-tile';
+        el.style.setProperty('--part', `${partSize}px`);
+        el.textContent = ch;
+        el.style.transform = `translate(${x}px, ${partY}px)`;
+        field.append(el);
+        return el;
+      };
+
+      // 四個部件先出現在原字位置
+      const aX = midX - size * 0.56;
+      const bX = midX + size * 0.56;
+      burstTile(a);
+      burstTile(b);
+      const p1 = makePart(l1, aX);
+      const p2 = makePart(r1, aX);
+      const p3 = makePart(l2, bX);
+      const p4 = makePart(r2, bX);
+      await wait(60);
+
+      // 散開成兩組
+      const g1L = midX - size * 1.3;
+      const g1R = midX - size * 0.55;
+      const g2L = midX + size * 0.55;
+      const g2R = midX + size * 1.3;
+      p1.style.transform = `translate(${g1L}px, ${partY}px)`;
+      p2.style.transform = `translate(${g1R}px, ${partY}px)`;
+      p3.style.transform = `translate(${g2L}px, ${partY}px)`;
+      p4.style.transform = `translate(${g2R}px, ${partY}px)`;
+      await wait(650);
+
+      // 右偏旁互換（轉一圈飛過去）
+      const note = document.createElement('div');
+      note.className = 'swap-note';
+      note.textContent = `${l1}+${r2}=${n1} · ${l2}+${r1}=${n2}`;
+      note.style.left = `${midX + size / 2}px`;
+      note.style.top = `${y + size * 1.25}px`;
+      field.append(note);
+      p2.style.transform = `translate(${g2R}px, ${partY}px) rotate(360deg)`;
+      p4.style.transform = `translate(${g1R}px, ${partY}px) rotate(-360deg)`;
+      await wait(750);
+
+      // 各組合體成新字
+      p1.style.transform = `translate(${(g1L + g1R) / 2}px, ${partY}px)`;
+      p4.style.transform = `translate(${(g1L + g1R) / 2}px, ${partY}px) rotate(-360deg)`;
+      p3.style.transform = `translate(${(g2L + g2R) / 2}px, ${partY}px)`;
+      p2.style.transform = `translate(${(g2L + g2R) / 2}px, ${partY}px) rotate(360deg)`;
+      await wait(320);
+      [p1, p2, p3, p4].forEach(p => { p.style.opacity = '0'; });
+      await wait(180);
+      [p1, p2, p3, p4].forEach(p => p.remove());
+      setTimeout(() => note.remove(), 1600);
+    }
+
     // 相遇詳解卡：兩個字的五行由來 + 生剋判定 + 結果
     async function showClash(aTile, bTile, verdictText, resultText, holdMs = 4200) {
       const card = document.createElement('div');
@@ -920,39 +1018,36 @@
 
         const speakWhy = `${a.char}，${elementWhy(a.char).zhs}。${b.char}，${elementWhy(b.char).zhs}。`;
 
-        const friendly = async (verdictText, speakVerdict) => {
-          // 相生（或同氣）：先組詞，再拼新字，否則共生各得一分
-          if (word) {
-            speakText(`${speakWhy}${speakVerdict}组成新词，${word}！`);
-            await showClash(a, b, verdictText, pageStrings.resultWord[language](word));
-            burstTile(a);
-            burstTile(b);
-            spawnNewChar(word, 'L', y);
-            spawnNewChar(word, 'R', y);
-            game.points.L += 2;
-            game.points.R += 2;
-            game.newChars.push(word);
-            await wait(1400);
-            return true;
-          }
-          if (combo) {
-            const [n1, n2] = combo;
-            speakText(`${speakWhy}${speakVerdict}交换偏旁，变出${n1}和${n2}！`);
-            await showClash(a, b, verdictText, pageStrings.resultCombo[language](n1, n2));
-            burstTile(a);
-            burstTile(b);
-            spawnNewChar(n1, 'L', y);
-            spawnNewChar(n2, 'R', y);
-            game.points.L += 2;
-            game.points.R += 2;
-            game.newChars.push(n1, n2);
-            await wait(1400);
-            return true;
-          }
-          return false;
+        const wordAlly = async (verdictText, speakVerdict) => {
+          // 相生（或同氣）：組成新詞
+          if (!word) return false;
+          speakText(`${speakWhy}${speakVerdict}组成新词，${word}！`);
+          await showClash(a, b, verdictText, pageStrings.resultWord[language](word));
+          burstTile(a);
+          burstTile(b);
+          spawnNewChar(word, 'L', y);
+          spawnNewChar(word, 'R', y);
+          game.points.L += 2;
+          game.points.R += 2;
+          game.newChars.push(word);
+          await wait(1400);
+          return true;
         };
 
-        if (KE[elA] === elB || KE[elB] === elA) {
+        if (combo) {
+          // 偏旁能拼出新字：立刻拆解重組！
+          const [n1, n2] = combo;
+          const [l1, r1] = PARTS.d[a.char];
+          const [l2, r2] = PARTS.d[b.char];
+          speakText(`${a.char}，${l1}加${r1}。${b.char}，${l2}加${r2}。偏旁换一换！${n1}！${n2}！`);
+          await comboSwap(a, b, n1, n2, y, size, midX);
+          spawnNewChar(n1, 'L', y);
+          spawnNewChar(n2, 'R', y);
+          game.points.L += 2;
+          game.points.R += 2;
+          game.newChars.push(n1, n2);
+          await wait(1500);
+        } else if (KE[elA] === elB || KE[elB] === elA) {
           // 相剋：剋者勝，弱字碎裂，強字直衝對方
           const winner = KE[elA] === elB ? a : b;
           const loser = winner === a ? b : a;
@@ -965,7 +1060,7 @@
           // 相生：能組詞或拼新字；都不行就共生共榮
           const pairKey = SHENG[elA] === elB ? elA + elB : elB + elA;
           const story = SHENG_STORY[pairKey];
-          const done = await friendly(story[language], `${story.zhs}！`);
+          const done = await wordAlly(story[language], `${story.zhs}！`);
           if (!done) {
             speakText(`${speakWhy}${story.zhs}！共生共荣！`);
             await showClash(a, b, story[language], pageStrings.resultShengPeace[language]);
@@ -976,8 +1071,8 @@
             await wait(500);
           }
         } else {
-          // 同屬一行：同氣連枝也能組詞拼字，否則比筆畫
-          const done = await friendly(pageStrings.verdictSame[language](elA), `同属${elA}！`);
+          // 同屬一行：同氣連枝也能組詞，否則比筆畫
+          const done = await wordAlly(pageStrings.verdictSame[language](elA), `同属${elA}！`);
           if (!done) {
             if (ea !== eb) {
               const winner = ea > eb ? a : b;

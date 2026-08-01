@@ -408,6 +408,33 @@
       background: rgba(11, 11, 10, .82);
       backdrop-filter: blur(8px);
     }
+
+    /* 手機選單按鈕：只有故意點它才呼出控制列 */
+    .menu-fab { display: none; }
+
+    body.phone .menu-fab {
+      display: grid;
+      place-items: center;
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      z-index: 12;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(11, 11, 10, .55);
+      color: var(--paper);
+      font-size: 20px;
+      opacity: .6;
+    }
+
+    body.phone.ui-open .menu-fab {
+      opacity: 1;
+      border-color: var(--coral);
+    }
+
+    body.phone.ui-open .bar { padding-left: 62px; }
   </style>
 </head>
 <body>
@@ -430,6 +457,7 @@
   <main class="stage" id="stage" aria-label="跑馬燈舞台">
     <div class="stage-hint" id="stageHint" data-zht="按下面的麥克風，說一句話試試 ✨" data-zhs="按下面的麦克风，说一句话试试 ✨" data-en="Tap the mic below and say something ✨">按下面的麥克風，說一句話試試 ✨</div>
     <div class="star-pill" aria-live="polite">⭐ <span id="starCount">0</span></div>
+    <button class="menu-fab" id="menuFab" type="button" aria-label="選單">⋯</button>
   </main>
 
   <p class="live" id="liveLine" aria-live="polite"></p>
@@ -599,7 +627,8 @@
         const span = document.createElement('span');
         span.textContent = char;
         if (phrase.theme === 'rainbow') span.style.color = RAINBOW[i % RAINBOW.length];
-        span.addEventListener('pointerdown', () => popChar(span, char, phrase, el));
+        span.popRide = () => popChar(span, char, phrase, el);
+        span.addEventListener('pointerdown', span.popRide);
         el.append(span);
       });
 
@@ -862,11 +891,6 @@
 
     if (isPhone) {
       document.body.classList.add('phone');
-      stage.addEventListener('click', event => {
-        if (event.target.closest('.ride')) return;
-        if (document.body.classList.contains('ui-open')) closeUI();
-        else openUI();
-      });
       // 操作控制列時保持展開，停止互動幾秒後自動收起
       ['pointerdown', 'focusin', 'input'].forEach(type => {
         document.querySelectorAll('.controls, .bar').forEach(area => {
@@ -877,6 +901,33 @@
       });
       openUI();
     }
+
+    document.getElementById('menuFab').addEventListener('click', () => {
+      if (document.body.classList.contains('ui-open')) closeUI();
+      else openUI();
+    });
+
+    // 點空了不彈選單：就近吸附最近的字（36px 內也算點中）
+    stage.addEventListener('pointerdown', event => {
+      if (event.target.closest('.ride, .menu-fab, .star-pill')) return;
+      const REACH = 36;
+      let best = null;
+      let bestDistance = Infinity;
+      document.querySelectorAll('.ride span:not([data-popped])').forEach(span => {
+        const rect = span.getBoundingClientRect();
+        if (
+          event.clientX >= rect.left - REACH && event.clientX <= rect.right + REACH &&
+          event.clientY >= rect.top - REACH && event.clientY <= rect.bottom + REACH
+        ) {
+          const distance = Math.hypot(
+            event.clientX - (rect.left + rect.width / 2),
+            event.clientY - (rect.top + rect.height / 2)
+          );
+          if (distance < bestDistance) { bestDistance = distance; best = span; }
+        }
+      });
+      if (best) best.popRide();
+    });
 
     recogChips.querySelectorAll('[data-recog]').forEach(chip => {
       chip.addEventListener('click', () => {

@@ -323,6 +323,64 @@ button:focus-visible {
   outline-color: rgba(164, 59, 42, 0.2);
 }
 
+.coach-app-name {
+  margin: 0 auto 0 0;
+  color: var(--ink);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lang-toggle {
+  border-color: var(--line);
+  background: rgba(164, 59, 42, 0.06);
+}
+
+.lang-opt.active {
+  background: var(--accent);
+  color: #fffaf0;
+}
+
+.zc-btn.primary {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: #fffaf0 !important;
+  box-shadow: 0 8px 18px rgba(164, 59, 42, 0.18) !important;
+}
+
+.zc-btn.primary:hover {
+  background: var(--accent-dark) !important;
+}
+
+.zc-score {
+  border-color: rgba(164, 59, 42, 0.22) !important;
+  background: #faf3e7 !important;
+  color: var(--accent-dark) !important;
+}
+
+.source-line:hover,
+.source-line:focus-visible {
+  background: rgba(164, 59, 42, 0.06);
+}
+
+.source-line.is-current {
+  border-left-color: var(--accent);
+  background: rgba(164, 59, 42, 0.1);
+}
+
+body.classic-mode main {
+  grid-template-rows: 64px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "header header header"
+    "menu characters lesson"
+    "menu characters note";
+}
+
+body.classic-mode .source-panel {
+  border-color: var(--line);
+  background: rgba(255, 253, 248, 0.86);
+}
+
 .mission-card {
   position: relative;
   border-radius: 20px 20px 6px 20px;
@@ -605,6 +663,19 @@ button:focus-visible {
   .lesson-panel {
     display: none;
   }
+
+  body.classic-mode main {
+    grid-template-rows: 52px minmax(0, 1fr) 148px 148px;
+    grid-template-areas:
+      "header"
+      "characters"
+      "lesson"
+      "menu";
+  }
+
+  body.classic-mode .lesson-panel {
+    grid-area: lesson;
+  }
 }
 
 @media (max-width: 580px) {
@@ -697,6 +768,10 @@ button:focus-visible {
 
   .card-actions button {
     min-height: 36px;
+  }
+
+  body.classic-mode main {
+    grid-template-rows: 48px minmax(0, 1fr) 118px 116px;
   }
 }
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Chinese.org 小龙</title>
+  <desc id="desc">一条朱砂红色、盘旋向上的中国小龙</desc>
+  <circle cx="32" cy="32" r="30" fill="#fff8eb"/>
+  <path d="M19 45c5 6 17 5 21-2 4-7-3-10-8-8-6 2-9-2-7-7 2-4 8-6 13-3" fill="none" stroke="#a43b2a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 25c4-5 10-7 15-4l-3 4 5 2-6 3c-2 1-5 1-7-1z" fill="#a43b2a"/>
+  <path d="M40 22l-1-6m6 5 3-6" fill="none" stroke="#a43b2a" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M40 16l-4-2m12 1 4-2" fill="none" stroke="#a43b2a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="46" cy="24" r="1.35" fill="#fff8eb"/>
+  <path d="M50 28c5 0 8 2 10 5m-12-4c4 3 6 6 6 10" fill="none" stroke="#a43b2a" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M26 31l-7-5m14 11 7 6M23 42l-7 3" fill="none" stroke="#a43b2a" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M18 26l-1-4 4 2m20 19 4-1-2 4m-27-1-2 3 4-1" fill="none" stroke="#a43b2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 46c-4 0-7-2-9-5" fill="none" stroke="#cc8b32" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="8" cy="40" r="1.8" fill="#cc8b32"/>
+</svg>

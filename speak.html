@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>童聲跑馬燈 — Chinese.org</title>
+  <meta name="description" content="孩子對著手機說中文，說出的字會變成跑馬燈滾過螢幕。語音即時識別，不錄音、不上傳。">
+  <meta name="theme-color" content="#0b0b0a">
+  <meta property="og:title" content="童聲跑馬燈 — Chinese.org">
+  <meta property="og:description" content="孩子對著手機說中文，說出的字會變成跑馬燈滾過螢幕。">
+  <meta property="og:image" content="https://chinese.org/assets/og-premium.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chinese.org/speak.html">
+  <link rel="icon" href="assets/logo-hua.png" type="image/png">
+  <style>
+    :root {
+      --ink: #0b0b0a;
+      --ink-soft: #161714;
+      --paper: #f1eee6;
+      --coral: #e36a4c;
+      --gold: #c39a54;
+      --jade: #7fd8b8;
+      --led-red: #ff4b33;
+      --led-gold: #ffd98a;
+      --muted: rgba(241, 238, 230, .52);
+      --line: rgba(241, 238, 230, .14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "Avenir Next", "PingFang TC", "PingFang SC", "Hiragino Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+    /* ---------- top bar ---------- */
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      padding-top: calc(10px + env(safe-area-inset-top));
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 11, 10, .9);
+    }
+
+    .bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--paper);
+      text-decoration: none;
+    }
+
+    .bar-brand img { width: 26px; height: 26px; filter: invert(1); }
+
+    .bar-brand strong {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .18em;
+    }
+
+    .bar-title {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+    .bar-title b { color: var(--paper); font-weight: 700; margin-right: 8px; }
+
+    .language-switcher { display: flex; gap: 4px; }
+
+    .language-switcher button {
+      width: 30px;
+      height: 26px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .language-switcher button.is-active {
+      border-color: var(--coral);
+      color: var(--paper);
+      background: rgba(227, 106, 76, .16);
+    }
+
+    /* ---------- stage ---------- */
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 120%, rgba(227, 106, 76, .12), transparent 55%),
+        var(--ink);
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, .055) 1px, transparent 1.5px);
+      background-size: 13px 13px;
+    }
+
+    .stage-hint {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      color: rgba(241, 238, 230, .3);
+      font-size: clamp(20px, 4.5vmin, 34px);
+      font-weight: 700;
+      letter-spacing: .06em;
+      transition: opacity 400ms ease;
+    }
+
+    .stage-hint.is-hidden { opacity: 0; }
+
+    .star-pill {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      z-index: 4;
+      padding: 4px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(11, 11, 10, .6);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .ride {
+      position: absolute;
+      left: 0;
+      z-index: 2;
+      white-space: nowrap;
+      font-size: clamp(60px, 18vmin, 170px);
+      font-weight: 800;
+      line-height: 1.15;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      will-change: transform;
+    }
+
+    .ride:active { filter: brightness(1.25); }
+
+    .ride.theme-lantern {
+      color: var(--led-red);
+      text-shadow: 0 0 16px rgba(255, 75, 51, .75), 0 0 64px rgba(255, 75, 51, .4);
+    }
+
+    .ride.theme-gold {
+      color: var(--led-gold);
+      text-shadow: 0 0 16px rgba(255, 217, 138, .7), 0 0 64px rgba(195, 154, 84, .45);
+    }
+
+    .ride.theme-jade {
+      color: var(--jade);
+      text-shadow: 0 0 16px rgba(127, 216, 184, .7), 0 0 64px rgba(56, 108, 91, .55);
+    }
+
+    .ride.theme-rainbow span { text-shadow: 0 0 18px rgba(255, 255, 255, .35); }
+
+    /* ---------- live line ---------- */
+    .live {
+      min-height: 30px;
+      padding: 5px 16px;
+      text-align: center;
+      font-size: 15px;
+      color: var(--muted);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .live b { color: var(--led-gold); font-weight: 600; }
+
+    /* ---------- controls ---------- */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 8px 16px calc(12px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: var(--ink-soft);
+    }
+
+    .console {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .tool {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 19px;
+      color: var(--paper);
+      background: rgba(255, 255, 255, .04);
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    .tool.is-on {
+      border-color: var(--coral);
+      background: rgba(227, 106, 76, .2);
+    }
+
+    .mic {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      margin: 0 6px;
+      border-radius: 50%;
+      border: none;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      background: linear-gradient(160deg, #ff7a54, #a83a28);
+      box-shadow: 0 10px 34px rgba(227, 106, 76, .4);
+      transition: transform 150ms ease;
+    }
+
+    .mic:active { transform: scale(.94); }
+
+    .mic[disabled] { filter: grayscale(1) brightness(.6); cursor: not-allowed; }
+
+    .mic.is-listening::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border: 2px solid rgba(255, 122, 84, .8);
+      border-radius: 50%;
+      animation: pulse 1.4s ease-out infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(.92); opacity: 1; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mic.is-listening::after { animation: none; }
+    }
+
+    .subrow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .chips { display: flex; gap: 6px; }
+
+    .chips button {
+      padding: 6px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chips button.is-active {
+      border-color: var(--gold);
+      color: var(--led-gold);
+      background: rgba(195, 154, 84, .14);
+    }
+
+    .typebox {
+      display: flex;
+      flex: 1;
+      min-width: 190px;
+      max-width: 340px;
+      gap: 6px;
+    }
+
+    .typebox input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .05);
+      color: var(--paper);
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .typebox input:focus { border-color: var(--coral); }
+
+    .typebox button {
+      padding: 8px 15px;
+      border-radius: 999px;
+      background: rgba(227, 106, 76, .22);
+      border: 1px solid var(--coral);
+      font-size: 14px;
+    }
+
+    .privacy {
+      text-align: center;
+      font-size: 10.5px;
+      letter-spacing: .05em;
+      color: rgba(241, 238, 230, .34);
+    }
+
+    @media (max-width: 560px) {
+      .bar-title span { display: none; }
+      .console { gap: 8px; }
+      .tool { width: 42px; height: 42px; }
+      .mic { width: 72px; height: 72px; font-size: 30px; }
+      .subrow { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <a class="bar-brand" href="index.html" aria-label="回到 Chinese.org 首頁">
+      <img src="assets/logo-hua.png" alt="">
+      <strong>CHINESE.ORG</strong>
+    </a>
+    <p class="bar-title">
+      <b data-zht="童聲跑馬燈" data-zhs="童声跑马灯" data-en="Speak &amp; Scroll">童聲跑馬燈</b>
+      <span data-zht="對著手機說中文，字就跑起來" data-zhs="对着手机说中文，字就跑起来" data-en="Say it in Chinese — watch it fly">對著手機說中文，字就跑起來</span>
+    </p>
+    <div class="language-switcher" role="group" aria-label="選擇語言">
+      <button type="button" data-language-option="zht" aria-pressed="true" class="is-active">繁</button>
+      <button type="button" data-language-option="zhs" aria-pressed="false">简</button>
+      <button type="button" data-language-option="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage" aria-label="跑馬燈舞台">
+    <div class="stage-hint" id="stageHint" data-zht="按下面的麥克風，說一句話試試 ✨" data-zhs="按下面的麦克风，说一句话试试 ✨" data-en="Tap the mic below and say something ✨">按下面的麥克風，說一句話試試 ✨</div>
+    <div class="star-pill" aria-live="polite">⭐ <span id="starCount">0</span></div>
+  </main>
+
+  <p class="live" id="liveLine" aria-live="polite"></p>
+
+  <footer class="controls">
+    <div class="console">
+      <button class="tool" id="themeButton" type="button" data-title-zht="換顏色" data-title-zhs="换颜色" data-title-en="Change colors">🎨</button>
+      <button class="tool" id="speedButton" type="button" data-title-zht="換速度" data-title-zhs="换速度" data-title-en="Change speed">🚶</button>
+      <button class="mic" id="micButton" type="button" aria-pressed="false" data-title-zht="開始說話" data-title-zhs="开始说话" data-title-en="Start talking">🎤</button>
+      <button class="tool is-on" id="loopButton" type="button" aria-pressed="true" data-title-zht="循環播放" data-title-zhs="循环播放" data-title-en="Loop">🔁</button>
+      <button class="tool" id="clearButton" type="button" data-title-zht="清空螢幕" data-title-zhs="清空屏幕" data-title-en="Clear screen">🧹</button>
+      <button class="tool" id="fullscreenButton" type="button" data-title-zht="全螢幕" data-title-zhs="全屏" data-title-en="Fullscreen">⛶</button>
+    </div>
+
+    <div class="subrow">
+      <div class="chips" id="recogChips" role="group" aria-label="識別語言">
+        <button type="button" data-recog="zh-CN" class="is-active" data-zht="普通話" data-zhs="普通话" data-en="Mandarin">普通話</button>
+        <button type="button" data-recog="yue-Hant-HK" data-zht="粵語" data-zhs="粤语" data-en="Cantonese">粵語</button>
+        <button type="button" data-recog="en-US">English</button>
+      </div>
+      <form class="typebox" id="typeForm">
+        <input id="typeInput" type="text" maxlength="24" autocomplete="off" placeholder="或者打字試試">
+        <button type="submit" data-zht="跑！" data-zhs="跑！" data-en="Go!">跑！</button>
+      </form>
+    </div>
+
+    <p class="privacy" data-zht="語音由瀏覽器即時識別；本頁不錄音、不上傳、不儲存任何聲音。" data-zhs="语音由浏览器即时识别；本页不录音、不上传、不存储任何声音。" data-en="Speech is recognized live by your browser. This page never records, uploads or stores audio.">語音由瀏覽器即時識別；本頁不錄音、不上傳、不儲存任何聲音。</p>
+  </footer>
+
+  <script>
+    /* ---------- UI 語言 ---------- */
+    const translatable = document.querySelectorAll('[data-zht][data-zhs][data-en]');
+    const languageButtons = document.querySelectorAll('[data-language-option]');
+    let language = localStorage.getItem('chinese_language') || 'zht';
+
+    const pageStrings = {
+      title: { zht: '童聲跑馬燈 — Chinese.org', zhs: '童声跑马灯 — Chinese.org', en: 'Speak & Scroll — Chinese.org' },
+      typePlaceholder: { zht: '或者打字試試', zhs: '或者打字试试', en: 'Or type something' },
+      listening: { zht: '我在聽…再按一下麥克風就停止', zhs: '我在听…再按一下麦克风就停止', en: 'Listening… tap the mic again to stop' },
+      heard: { zht: '聽到：', zhs: '听到：', en: 'Heard: ' },
+      denied: {
+        zht: '需要麥克風權限才能聽到你說話，請在瀏覽器設定裡允許。',
+        zhs: '需要麦克风权限才能听到你说话，请在浏览器设置里允许。',
+        en: 'Microphone access is needed. Please allow it in your browser settings.'
+      },
+      unsupported: {
+        zht: '這個瀏覽器不支援語音識別，可以用下面的打字框，或改用 Chrome / Safari。',
+        zhs: '这个浏览器不支持语音识别，可以用下面的打字框，或改用 Chrome / Safari。',
+        en: 'Speech recognition is not supported here. Use the type box below, or try Chrome / Safari.'
+      }
+    };
+
+    function applyLanguage(next) {
+      language = next;
+      localStorage.setItem('chinese_language', language);
+      document.documentElement.lang = { zht: 'zh-Hant', zhs: 'zh-Hans', en: 'en' }[language];
+      translatable.forEach(el => { el.textContent = el.dataset[language]; });
+      document.querySelectorAll('[data-title-zht]').forEach(el => {
+        const title = el.dataset[{ zht: 'titleZht', zhs: 'titleZhs', en: 'titleEn' }[language]];
+        el.title = title;
+        el.setAttribute('aria-label', title);
+      });
+      languageButtons.forEach(button => {
+        const isActive = button.dataset.languageOption === language;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+      document.title = pageStrings.title[language];
+      typeInput.placeholder = pageStrings.typePlaceholder[language];
+      if (state.listening) setLive(pageStrings.listening[language]);
+    }
+
+    languageButtons.forEach(button => {
+      button.addEventListener('click', () => applyLanguage(button.dataset.languageOption));
+    });
+
+    /* ---------- 跑馬燈 ---------- */
+    const stage = document.getElementById('stage');
+    const stageHint = document.getElementById('stageHint');
+    const liveLine = document.getElementById('liveLine');
+    const starCount = document.getElementById('starCount');
+    const micButton = document.getElementById('micButton');
+    const themeButton = document.getElementById('themeButton');
+    const speedButton = document.getElementById('speedButton');
+    const loopButton = document.getElementById('loopButton');
+    const clearButton = document.getElementById('clearButton');
+    const fullscreenButton = document.getElementById('fullscreenButton');
+    const typeForm = document.getElementById('typeForm');
+    const typeInput = document.getElementById('typeInput');
+    const recogChips = document.getElementById('recogChips');
+
+    const THEMES = ['lantern', 'gold', 'jade', 'rainbow'];
+    const RAINBOW = ['#ff5a3c', '#ffd98a', '#7fd8b8', '#7ab8ff', '#d78bff', '#ff8ab8'];
+    const SPEEDS = [
+      { icon: '🐢', factor: 0.10 },
+      { icon: '🚶', factor: 0.18 },
+      { icon: '🚀', factor: 0.30 }
+    ];
+    const LANE_TOPS = ['6%', '38%', '68%'];
+    const HISTORY_MAX = 8;
+
+    const state = {
+      listening: false,
+      themeIndex: 0,
+      speedIndex: 1,
+      loop: true,
+      stars: 0,
+      history: [],   // phrase objects still allowed to loop
+      pending: [],   // phrase objects waiting for a free lane
+      recogLang: 'zh-CN'
+    };
+
+    const lanes = LANE_TOPS.map(() => ({ freeAt: 0 }));
+
+    function setLive(text, highlight) {
+      liveLine.innerHTML = '';
+      if (highlight) {
+        const b = document.createElement('b');
+        b.textContent = highlight;
+        liveLine.append(text, b);
+      } else {
+        liveLine.textContent = text;
+      }
+    }
+
+    function makePhrase(text) {
+      return { text, theme: THEMES[state.themeIndex] };
+    }
+
+    function enqueue(text, { fresh = true } = {}) {
+      const chunks = text
+        .split(/[，。！？；：,.!?;:\s]+/)
+        .map(part => part.trim())
+        .filter(Boolean);
+      chunks.forEach(chunk => {
+        const phrase = makePhrase(chunk.slice(0, 24));
+        state.pending.push(phrase);
+        if (fresh) {
+          state.history.push(phrase);
+          while (state.history.length > HISTORY_MAX) state.history.shift();
+          state.stars += 1;
+          starCount.textContent = state.stars;
+        }
+      });
+      if (chunks.length) {
+        stageHint.classList.add('is-hidden');
+        processPending();
+      }
+    }
+
+    function processPending() {
+      if (!state.pending.length) return;
+      const now = performance.now();
+      const lane = lanes.findIndex(l => l.freeAt <= now);
+      if (lane === -1) return;
+      launch(state.pending.shift(), lane);
+      if (state.pending.length) processPending();
+    }
+
+    setInterval(processPending, 220);
+
+    function launch(phrase, laneIndex) {
+      const el = document.createElement('div');
+      el.className = `ride theme-${phrase.theme}`;
+      el.style.top = LANE_TOPS[laneIndex];
+      if (phrase.theme === 'rainbow') {
+        [...phrase.text].forEach((char, i) => {
+          const span = document.createElement('span');
+          span.textContent = char;
+          span.style.color = RAINBOW[i % RAINBOW.length];
+          el.append(span);
+        });
+      } else {
+        el.textContent = phrase.text;
+      }
+
+      const stageW = stage.clientWidth;
+      el.style.transform = `translateX(${stageW}px)`;
+      stage.append(el);
+
+      const textW = el.offsetWidth;
+      const pxPerSec = Math.max(90, stageW * SPEEDS[state.speedIndex].factor);
+      const duration = ((stageW + textW + 80) / pxPerSec) * 1000;
+      lanes[laneIndex].freeAt = performance.now() + ((textW + 140) / pxPerSec) * 1000;
+
+      const animation = el.animate(
+        [
+          { transform: `translateX(${stageW}px)` },
+          { transform: `translateX(${-textW - 80}px)` }
+        ],
+        { duration, easing: 'linear' }
+      );
+
+      animation.onfinish = () => {
+        el.remove();
+        if (state.loop && state.history.includes(phrase)) {
+          state.pending.push(phrase);
+          processPending();
+        }
+      };
+
+      el.addEventListener('pointerdown', () => speakText(phrase.text));
+    }
+
+    /* ---------- 點字朗讀 ---------- */
+    let resumeAfterSpeech = false;
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = state.recogLang === 'en-US' ? 'en-US' : 'zh-CN';
+      utterance.rate = 0.9;
+      if (state.listening && recognition) {
+        resumeAfterSpeech = true;
+        recognition.abort();
+      }
+      utterance.onend = () => {
+        if (resumeAfterSpeech && state.listening) startRecognition();
+        resumeAfterSpeech = false;
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* ---------- 語音識別 ---------- */
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    function startRecognition() {
+      recognition = new SpeechRecognition();
+      recognition.lang = state.recogLang;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = event => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result[0].transcript.trim();
+          if (!text) continue;
+          if (result.isFinal) enqueue(text);
+          else interim = text;
+        }
+        if (interim) setLive(pageStrings.heard[language], interim);
+        else setLive(pageStrings.listening[language]);
+      };
+
+      recognition.onerror = event => {
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          stopListening();
+          setLive(pageStrings.denied[language]);
+        }
+      };
+
+      recognition.onend = () => {
+        if (state.listening && !resumeAfterSpeech) {
+          try { startRecognition(); } catch { stopListening(); }
+        }
+      };
+
+      recognition.start();
+    }
+
+    function stopListening() {
+      state.listening = false;
+      micButton.classList.remove('is-listening');
+      micButton.setAttribute('aria-pressed', 'false');
+      if (recognition) { recognition.onend = null; recognition.abort(); }
+      setLive('');
+    }
+
+    micButton.addEventListener('click', () => {
+      if (state.listening) { stopListening(); return; }
+      state.listening = true;
+      micButton.classList.add('is-listening');
+      micButton.setAttribute('aria-pressed', 'true');
+      setLive(pageStrings.listening[language]);
+      try { startRecognition(); } catch { stopListening(); }
+    });
+
+    if (!SpeechRecognition) {
+      micButton.disabled = true;
+      setLive(pageStrings.unsupported[language]);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && state.listening) stopListening();
+    });
+
+    /* ---------- 控制按鈕 ---------- */
+    themeButton.addEventListener('click', () => {
+      state.themeIndex = (state.themeIndex + 1) % THEMES.length;
+      const colors = { lantern: '#ff4b33', gold: '#ffd98a', jade: '#7fd8b8', rainbow: '#d78bff' };
+      themeButton.style.borderColor = colors[THEMES[state.themeIndex]];
+      state.history.forEach(phrase => { phrase.theme = THEMES[state.themeIndex]; });
+    });
+
+    speedButton.addEventListener('click', () => {
+      state.speedIndex = (state.speedIndex + 1) % SPEEDS.length;
+      speedButton.textContent = SPEEDS[state.speedIndex].icon;
+    });
+
+    loopButton.addEventListener('click', () => {
+      state.loop = !state.loop;
+      loopButton.classList.toggle('is-on', state.loop);
+      loopButton.setAttribute('aria-pressed', String(state.loop));
+    });
+
+    clearButton.addEventListener('click', () => {
+      state.history = [];
+      state.pending = [];
+      lanes.forEach(lane => { lane.freeAt = 0; });
+      stage.querySelectorAll('.ride').forEach(el => el.remove());
+      stageHint.classList.remove('is-hidden');
+    });
+
+    fullscreenButton.addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      else document.documentElement.requestFullscreen?.();
+    });
+
+    typeForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const text = typeInput.value.trim();
+      if (text) enqueue(text);
+      typeInput.value = '';
+    });
+
+    recogChips.querySelectorAll('[data-recog]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        state.recogLang = chip.dataset.recog;
+        recogChips.querySelectorAll('button').forEach(other => {
+          other.classList.toggle('is-active', other === chip);
+        });
+        if (state.listening && recognition) {
+          recognition.onend = null;
+          recognition.abort();
+          startRecognition();
+        }
+      });
+    });
+
+    applyLanguage(language);
+  </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+.jic-account {
+  flex: 0 0 auto;
+}
+
+.jic-account-button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line, rgba(23, 23, 21, 0.16));
+  border-radius: 999px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--ink, #23221e);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.jic-account-button:hover,
+.jic-account-button:focus-visible {
+  border-color: var(--accent, var(--red, #a43b2a));
+  background: var(--accent, var(--red, #a43b2a));
+  color: #fffaf0;
+}
+
+.jic-account-dot {
+  width: 7px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #9b978f;
+  box-shadow: 0 0 0 3px rgba(155, 151, 143, 0.13);
+}
+
+.jic-account-button.is-authenticated .jic-account-dot {
+  background: #47704f;
+  box-shadow: 0 0 0 3px rgba(71, 112, 79, 0.14);
+}
+
+.jic-account-short {
+  display: none;
+}
+
+#jic-w .alien,
+#jic-w .alien.show {
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(164, 59, 42, 0.34) !important;
+  border-radius: 50% !important;
+  padding: 3px !important;
+  background: rgba(255, 253, 248, 0.94) !important;
+  box-shadow: 0 10px 30px rgba(57, 47, 30, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.7) !important;
+  animation: chinese-dragon-float 3.6s ease-in-out infinite !important;
+  backdrop-filter: blur(10px);
+}
+
+#jic-w .alien:hover {
+  border-color: var(--accent, var(--red, #a43b2a)) !important;
+  box-shadow: 0 14px 34px rgba(164, 59, 42, 0.24) !important;
+}
+
+#jic-w .alien img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  pointer-events: none;
+}
+
+@keyframes chinese-dragon-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+@media (max-width: 1080px) {
+  .jic-account-button {
+    width: 34px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .jic-account-copy {
+    display: none;
+  }
+
+  .jic-account-short {
+    display: inline;
+    font-size: 8px;
+  }
+
+  .jic-account-dot {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .site-header .jic-account {
+    position: absolute;
+    top: -27px;
+    left: 4vw;
+    z-index: 3;
+  }
+
+  .site-header .jic-account-button {
+    width: auto;
+    min-width: 38px;
+    min-height: 22px;
+    height: 22px;
+    border-color: rgba(255, 255, 255, 0.22);
+    padding: 0 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.78);
+    letter-spacing: 0.08em;
+  }
+
+  .site-header .jic-account-button:hover,
+  .site-header .jic-account-button:focus-visible {
+    border-color: var(--coral, #e57358);
+    background: var(--coral, #e57358);
+    color: #171715;
+  }
+}
+
+@media (max-width: 560px) {
+  #jic-w {
+    right: 10px !important;
+    bottom: 10px !important;
+  }
+
+  #jic-w .alien,
+  #jic-w .alien.show {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  #jic-w .alien img {
+    width: 37px;
+    height: 37px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #jic-w .alien,
+  #jic-w .alien.show {
+    animation: none !important;
+  }
+}

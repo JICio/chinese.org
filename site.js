@@ -16,7 +16,7 @@ nav?.querySelectorAll('a').forEach(link => {
   });
 });
 
-let language = 'zht';
+let language = localStorage.getItem('chinese_language') || 'zht';
 
 const agentExamples = {
   festival: {
@@ -102,6 +102,7 @@ const pageMetadata = {
 
 function applyLanguage(nextLanguage) {
   language = nextLanguage;
+  localStorage.setItem('chinese_language', language);
   const languageCodes = { zht: 'zh-Hant', zhs: 'zh-Hans', en: 'en' };
   document.documentElement.lang = languageCodes[language];
   document.body.classList.toggle('is-english', language === 'en');
@@ -115,6 +116,7 @@ function applyLanguage(nextLanguage) {
   });
   document.title = pageMetadata[language].title;
   document.querySelector('meta[name="description"]')?.setAttribute('content', pageMetadata[language].description);
+  window.dispatchEvent(new Event('chinese:language'));
 }
 
 languageButtons.forEach(button => {
@@ -137,3 +139,33 @@ document.querySelectorAll('.section, .origin-note').forEach(section => {
   if (revealObserver) revealObserver.observe(section);
   else section.classList.add('is-visible');
 });
+
+document.querySelectorAll('[data-jic-launch]').forEach(button => {
+  button.addEventListener('click', () => {
+    if (window.JIC?.loggedIn?.()) {
+      window.location.href = 'https://u.jic.io/u';
+      return;
+    }
+    window.ChineseJIC?.login?.();
+  });
+});
+
+const header = document.querySelector('.site-header');
+window.addEventListener('scroll', () => {
+  header?.classList.toggle('is-scrolled', window.scrollY > 24);
+}, { passive: true });
+
+const hero = document.querySelector('.hero');
+if (hero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  hero.addEventListener('pointermove', event => {
+    const bounds = hero.getBoundingClientRect();
+    hero.style.setProperty('--pointer-x', `${((event.clientX - bounds.left) / bounds.width - 0.5) * 10}px`);
+    hero.style.setProperty('--pointer-y', `${((event.clientY - bounds.top) / bounds.height - 0.5) * 8}px`);
+  });
+  hero.addEventListener('pointerleave', () => {
+    hero.style.setProperty('--pointer-x', '0px');
+    hero.style.setProperty('--pointer-y', '0px');
+  });
+}
+
+applyLanguage(language);

@@ -117,25 +117,31 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 6;
-      max-width: 92%;
-      padding: 7px 18px;
-      border: 1px solid rgba(195, 154, 84, .5);
-      border-radius: 999px;
-      background: rgba(11, 11, 10, .82);
+      max-width: 94%;
+      padding: 12px 26px;
+      border: 1px solid rgba(195, 154, 84, .55);
+      border-radius: 18px;
+      background: rgba(11, 11, 10, .88);
       text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 15px;
-      letter-spacing: .12em;
+      font-size: clamp(22px, 5vmin, 34px);
+      font-weight: 700;
+      letter-spacing: .14em;
       color: var(--led-gold);
+      text-shadow: 0 0 18px rgba(255, 217, 138, .4);
       opacity: 0;
       transition: opacity 300ms ease;
     }
 
     .line-banner.is-visible { opacity: 1; }
 
-    .line-banner small { color: var(--muted); letter-spacing: .05em; margin-left: 8px; }
+    .line-banner small {
+      display: block;
+      margin-top: 4px;
+      font-size: clamp(13px, 2.6vmin, 17px);
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
 
     .limit-line {
       position: absolute;
@@ -603,7 +609,7 @@
       small.textContent = `${line.author}《${line.title}》`;
       lineBanner.append(small);
       lineBanner.classList.add('is-visible');
-      setTimeout(() => lineBanner.classList.remove('is-visible'), 3200);
+      setTimeout(() => lineBanner.classList.remove('is-visible'), 6500);
       // 每兩句加一點速度
       if (game.linesPlayed % 2 === 0) {
         game.fallSpeed = Math.min(120, game.fallSpeed * 1.07);

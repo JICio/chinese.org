@@ -353,6 +353,59 @@
         transform-origin: top left;
       }
     }
+
+    /* 手機沉浸模式：預設只留跑馬燈與半透明麥克風，點螢幕呼出控制列 */
+    body.phone .bar,
+    body.phone .subrow,
+    body.phone .privacy { display: none; }
+
+    body.phone .live {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(100px + env(safe-area-inset-bottom));
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    body.phone .controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      border-top: none;
+      background: none;
+      transition: background 240ms ease;
+    }
+
+    body.phone:not(.ui-open) .console { gap: 0; }
+    body.phone:not(.ui-open) .console .tool { display: none; }
+    body.phone:not(.ui-open) .mic {
+      width: 62px;
+      height: 62px;
+      font-size: 26px;
+      opacity: .5;
+      box-shadow: none;
+    }
+
+    body.phone.ui-open .bar {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background: rgba(11, 11, 10, .82);
+    }
+
+    body.phone.ui-open .subrow { display: flex; }
+    body.phone.ui-open .privacy { display: block; }
+
+    body.phone.ui-open .controls {
+      background: rgba(11, 11, 10, .82);
+      backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body>
@@ -704,6 +757,40 @@
       if (text) enqueue(text);
       typeInput.value = '';
     });
+
+    /* ---------- 手機沉浸模式 ---------- */
+    const isPhone = matchMedia('(hover: none) and (pointer: coarse)').matches
+      && Math.min(screen.width, screen.height) < 800;
+    let uiTimer = null;
+
+    function closeUI() {
+      document.body.classList.remove('ui-open');
+      clearTimeout(uiTimer);
+    }
+
+    function openUI() {
+      document.body.classList.add('ui-open');
+      clearTimeout(uiTimer);
+      uiTimer = setTimeout(closeUI, 6000);
+    }
+
+    if (isPhone) {
+      document.body.classList.add('phone');
+      stage.addEventListener('click', event => {
+        if (event.target.closest('.ride')) return;
+        if (document.body.classList.contains('ui-open')) closeUI();
+        else openUI();
+      });
+      // 操作控制列時保持展開，停止互動幾秒後自動收起
+      ['pointerdown', 'focusin', 'input'].forEach(type => {
+        document.querySelectorAll('.controls, .bar').forEach(area => {
+          area.addEventListener(type, () => {
+            if (document.body.classList.contains('ui-open')) openUI();
+          }, true);
+        });
+      });
+      openUI();
+    }
 
     recogChips.querySelectorAll('[data-recog]').forEach(chip => {
       chip.addEventListener('click', () => {

@@ -259,6 +259,106 @@
       white-space: nowrap;
     }
 
+    .tile i {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      width: 17px;
+      height: 17px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(11, 11, 10, .92);
+      border: 1px solid currentColor;
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 700;
+      text-shadow: none;
+    }
+
+    .tile.wordborn {
+      width: auto;
+      min-width: var(--tile);
+      padding: 0 12px;
+      letter-spacing: .06em;
+    }
+
+    /* 相遇詳解卡 */
+    .clash-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: min(420px, 86%);
+      max-width: 92%;
+      padding: 14px 22px;
+      border: 1px solid rgba(127, 216, 184, .5);
+      border-radius: 18px;
+      background: rgba(11, 11, 10, .94);
+      backdrop-filter: blur(6px);
+      animation: card-in 320ms ease;
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translate(-50%, -46%) scale(.92); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .cc-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .cc-fighter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 110px;
+    }
+
+    .cc-fighter b {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .cc-fighter small {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .cc-vs {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: .1em;
+    }
+
+    .cc-verdict {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      color: var(--jade);
+      text-align: center;
+    }
+
+    .cc-result {
+      font-size: 14px;
+      color: var(--led-gold);
+      letter-spacing: .06em;
+      text-align: center;
+    }
+
+    .shelf button { width: auto; min-width: 28px; padding: 0 5px; }
+
     /* ---------- 遮罩 ---------- */
     .overlay {
       position: absolute;
@@ -433,8 +533,8 @@
 
       <div class="overlay is-visible" id="startOverlay">
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
-        <p data-zht="兩個人面對面，輪流說一句話。說出的字會飛向對方，在空中相撞：旗鼓相當的字交換偏旁、變出新字，各自收進戰利品；強的字撞碎弱的字、直衝對方掉一顆心；勢均力敵又拼不出新字，就同歸於盡。心先掉光的一方輸！" data-zhs="两个人面对面，轮流说一句话。说出的字会飞向对方，在空中相撞：旗鼓相当的字交换偏旁、变出新字，各自收进战利品；强的字撞碎弱的字、直冲对方掉一颗心；势均力敌又拼不出新字，就同归于尽。心先掉光的一方输！" data-en="Two players take turns speaking a sentence. The characters fly at each other and collide mid-air: evenly matched characters swap radicals into brand-new characters; a stronger character smashes a weaker one and costs the opponent a heart; equal characters that can't recombine destroy each other. Lose all hearts and you lose!">兩個人面對面，輪流說一句話。說出的字會飛向對方，在空中相撞：旗鼓相當的字交換偏旁、變出新字，各自收進戰利品；強的字撞碎弱的字、直衝對方掉一顆心；勢均力敵又拼不出新字，就同歸於盡。心先掉光的一方輸！</p>
-        <div class="demo">打 + 江 → <b>扛</b> + <b>汀</b></div>
+        <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；同属一行就比笔画。每次相遇都会讲解两个字的五行由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; same-element characters compare strokes. Every clash explains each character's element and why. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！</p>
+        <div class="demo">江(水) + 灯(火) → 水剋火！　·　江(水) + 树(木) → <b>相生</b>結盟</div>
         <button class="cta" id="startButton" type="button" data-zht="開戰！" data-zhs="开战！" data-en="Fight!">開戰！</button>
       </div>
 
@@ -468,6 +568,7 @@
 
   <script src="stroke-order-jian.js"></script>
   <script src="hanzi-parts.js"></script>
+  <script src="wuxing-ciyu.js"></script>
   <script>
     /* ---------- UI 語言 ---------- */
     const translatable = document.querySelectorAll('[data-zht][data-zhs][data-en]');
@@ -475,11 +576,11 @@
 
     const pageStrings = {
       title: { zht: '漢字龍虎鬥 — Chinese.org', zhs: '汉字龙虎斗 — Chinese.org', en: 'Hanzi Battle — Chinese.org' },
-      typePlaceholder: { zht: '打字也可以出招', zhs: '打字也可以出招', en: 'Type your move too' },
-      turnLeft: { zht: '🐲 紅龍隊說一句話！', zhs: '🐲 红龙队说一句话！', en: '🐲 Red Dragon, say a sentence!' },
-      turnRight: { zht: '🐯 金虎隊說一句話！', zhs: '🐯 金虎队说一句话！', en: '🐯 Gold Tiger, say a sentence!' },
+      typePlaceholder: { zht: '打一個字也可以出招', zhs: '打一个字也可以出招', en: 'Type one character' },
+      turnLeft: { zht: '🐲 紅龍隊，說一個字！', zhs: '🐲 红龙队，说一个字！', en: '🐲 Red Dragon, say one character!' },
+      turnRight: { zht: '🐯 金虎隊，說一個字！', zhs: '🐯 金虎队，说一个字！', en: '🐯 Gold Tiger, say one character!' },
       battle: { zht: '⚔️ 漢字對撞！', zhs: '⚔️ 汉字对撞！', en: '⚔️ Characters clash!' },
-      listening: { zht: '我在聽……說完一句會自動出招', zhs: '我在听……说完一句会自动出招', en: 'Listening… your sentence launches when you finish' },
+      listening: { zht: '我在聽……說出你的字！', zhs: '我在听……说出你的字！', en: 'Listening… say your character!' },
       heard: { zht: '聽到：', zhs: '听到：', en: 'Heard: ' },
       noSpeech: { zht: '沒聽清，再按一次麥克風試試', zhs: '没听清，再按一次麦克风试试', en: 'Didn\'t catch that—tap the mic again' },
       denied: { zht: '需要麥克風權限，也可以用打字出招。', zhs: '需要麦克风权限，也可以用打字出招。', en: 'Mic access needed—typing works too.' },
@@ -487,9 +588,30 @@
       winLeft: { zht: '🐲 紅龍隊獲勝！', zhs: '🐲 红龙队获胜！', en: '🐲 Red Dragon wins!' },
       winRight: { zht: '🐯 金虎隊獲勝！', zhs: '🐯 金虎队获胜！', en: '🐯 Gold Tiger wins!' },
       statsTemplate: {
-        zht: n => `打了 ${n.rounds} 個回合 · 一共變出 ${n.newChars} 個新字`,
-        zhs: n => `打了 ${n.rounds} 个回合 · 一共变出 ${n.newChars} 个新字`,
-        en: n => `${n.rounds} rounds · ${n.newChars} brand-new characters forged`
+        zht: n => `打了 ${n.rounds} 個回合 · 一共變出 ${n.newChars} 個新字新詞`,
+        zhs: n => `打了 ${n.rounds} 个回合 · 一共变出 ${n.newChars} 个新字新词`,
+        en: n => `${n.rounds} rounds · ${n.newChars} new characters & words forged`
+      },
+      resultWord: {
+        zht: w => `相生結盟，組成新詞「${w}」！`, zhs: w => `相生结盟，组成新词“${w}”！`, en: w => `They join into the word "${w}"!`
+      },
+      resultCombo: {
+        zht: (a, b) => `交換偏旁，變出新字：${a} · ${b}！`, zhs: (a, b) => `交换偏旁，变出新字：${a} · ${b}！`, en: (a, b) => `Radicals swap into ${a} and ${b}!`
+      },
+      resultKe: {
+        zht: c => `「${c}」勝出，直衝對方！`, zhs: c => `“${c}”胜出，直冲对方！`, en: c => `"${c}" wins and charges ahead!`
+      },
+      resultShengPeace: {
+        zht: '相生共榮，兩隊各得一分', zhs: '相生共荣，两队各得一分', en: 'They nourish each other—one point each'
+      },
+      verdictSame: {
+        zht: el => `同屬${el}，比筆畫定勝負！`, zhs: el => `同属${el}，比笔画定胜负！`, en: el => `Both ${EL_EN[el]}—stroke count decides!`
+      },
+      resultStroke: {
+        zht: (c, n, m) => `「${c}」${n} 畫勝 ${m} 畫！`, zhs: (c, n, m) => `“${c}”${n} 画胜 ${m} 画！`, en: (c, n, m) => `"${c}" wins, ${n} vs ${m} strokes!`
+      },
+      resultTie: {
+        zht: '勢均力敵，同歸於盡！', zhs: '势均力敌，同归于尽！', en: 'Evenly matched—both shatter!'
       }
     };
 
@@ -509,6 +631,73 @@
     function energyOf(char) {
       const code = STROKES[char];
       return code ? code.length : 8;
+    }
+
+    /* ---------- 五行與詞語 ---------- */
+    const ELEMENT_OF = {};
+    const RADICAL_OF = {};
+    Object.entries(window.HANZI_WUXING || {}).forEach(([char, value]) => {
+      ELEMENT_OF[char] = value[0];
+      RADICAL_OF[char] = value.slice(1);
+    });
+
+    const WORD_SET = new Set();
+    {
+      const s = window.CIYU2 || '';
+      for (let i = 0; i + 1 < s.length; i += 2) WORD_SET.add(s.slice(i, i + 2));
+    }
+
+    // 部首未覆蓋時按筆畫尾數定五行（五格數理慣例）
+    const NUMEROLOGY = ['水', '木', '木', '火', '火', '土', '土', '金', '金', '水'];
+    const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+    const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+    const EL_COLOR = { 金: '#ffd98a', 木: '#7fd8b8', 水: '#7ab8ff', 火: '#ff6b52', 土: '#c39a54' };
+    const EL_EN = { 金: 'Metal', 木: 'Wood', 水: 'Water', 火: 'Fire', 土: 'Earth' };
+
+    function elementOf(char) {
+      return ELEMENT_OF[char] || NUMEROLOGY[energyOf(char) % 10];
+    }
+
+    // 每個字五行的「由來」說明
+    function elementWhy(char) {
+      const element = elementOf(char);
+      if (RADICAL_OF[char]) {
+        const r = RADICAL_OF[char];
+        return {
+          zht: `「${r}」部，五行屬${element}`,
+          zhs: `“${r}”部，五行属${element}`,
+          en: `radical ${r} → ${EL_EN[element]}`
+        };
+      }
+      const n = energyOf(char);
+      return {
+        zht: `${n} 畫，數理屬${element}`,
+        zhs: `${n} 画，数理属${element}`,
+        en: `${n} strokes → ${EL_EN[element]}`
+      };
+    }
+
+    // 相生相剋的典故背景
+    const SHENG_STORY = {
+      '木火': { zht: '鑽木取火，木能生火', zhs: '钻木取火，木能生火', en: 'Wood feeds Fire' },
+      '火土': { zht: '火燒成灰，灰歸於土', zhs: '火烧成灰，灰归于土', en: 'Fire makes Earth' },
+      '土金': { zht: '礦藏於土，土能生金', zhs: '矿藏于土，土能生金', en: 'Earth bears Metal' },
+      '金水': { zht: '金遇寒凝露，金能生水', zhs: '金遇寒凝露，金能生水', en: 'Metal collects Water' },
+      '水木': { zht: '水潤草木，水能生木', zhs: '水润草木，水能生木', en: 'Water grows Wood' }
+    };
+
+    const KE_STORY = {
+      '木土': { zht: '樹根破土，木能剋土', zhs: '树根破土，木能克土', en: 'Wood breaks Earth' },
+      '土水': { zht: '水來土掩，土能剋水', zhs: '水来土掩，土能克水', en: 'Earth dams Water' },
+      '水火': { zht: '水能滅火，水剋火', zhs: '水能灭火，水克火', en: 'Water quenches Fire' },
+      '火金': { zht: '烈火熔金，火剋金', zhs: '烈火熔金，火克金', en: 'Fire melts Metal' },
+      '金木': { zht: '利刃伐木，金剋木', zhs: '利刃伐木，金克木', en: 'Metal cuts Wood' }
+    };
+
+    function wordOf(a, b) {
+      if (WORD_SET.has(a + b)) return a + b;
+      if (WORD_SET.has(b + a)) return b + a;
+      return null;
     }
 
     // 交換偏旁：打(扌丁) + 江(氵工) -> 扛(扌工) + 汀(氵丁)
@@ -547,7 +736,7 @@
       listening: false
     };
 
-    const MAX_CHARS = 6;
+    const MAX_CHARS = 1;
 
     function tileSize() {
       return Math.max(40, Math.min(60, Math.floor(field.clientWidth / 12)));
@@ -596,16 +785,21 @@
       el.className = `tile from-${sideKey === 'L' ? 'left' : 'right'}`;
       el.style.setProperty('--tile', `${size}px`);
       el.textContent = char;
-      const y = rowY(index, total);
+      const element = elementOf(char);
+      const badge = document.createElement('i');
+      badge.textContent = element;
+      badge.style.color = EL_COLOR[element];
+      el.append(badge);
       const startX = sideKey === 'L' ? -size : field.clientWidth;
-      el.style.transform = `translate(${startX}px, ${y}px)`;
+      el.style.transform = `translate(${startX}px, ${rowY(index, total)}px)`;
       field.append(el);
       el.addEventListener('pointerdown', () => speakText(char));
-      const tile = { char, el, y, side: sideKey };
-      // 進場：懸停在本方三分之一處
+      const tile = { char, el, side: sideKey, index, total, launched: false };
+      // 進場：懸停在本方三分之一處（已出戰的字不再回頭）
       requestAnimationFrame(() => {
+        if (tile.launched) return;
         const hoverX = sideKey === 'L' ? field.clientWidth * 0.24 : field.clientWidth * 0.76 - size;
-        el.style.transform = `translate(${hoverX}px, ${y}px)`;
+        el.style.transform = `translate(${hoverX}px, ${rowY(index, total)}px)`;
       });
       return tile;
     }
@@ -629,6 +823,41 @@
     }
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    // 相遇詳解卡：兩個字的五行由來 + 生剋判定 + 結果
+    async function showClash(aTile, bTile, verdictText, resultText, holdMs = 4200) {
+      const card = document.createElement('div');
+      card.className = 'clash-card';
+      const row = document.createElement('div');
+      row.className = 'cc-row';
+      [aTile, bTile].forEach((tile, i) => {
+        if (i === 1) {
+          const vs = document.createElement('div');
+          vs.className = 'cc-vs';
+          vs.textContent = 'VS';
+          row.append(vs);
+        }
+        const fighter = document.createElement('div');
+        fighter.className = 'cc-fighter';
+        const big = document.createElement('b');
+        big.textContent = tile.char;
+        big.style.color = EL_COLOR[elementOf(tile.char)];
+        const why = document.createElement('small');
+        why.textContent = elementWhy(tile.char)[language];
+        fighter.append(big, why);
+        row.append(fighter);
+      });
+      const verdict = document.createElement('div');
+      verdict.className = 'cc-verdict';
+      verdict.textContent = verdictText;
+      const result = document.createElement('div');
+      result.className = 'cc-result';
+      result.textContent = resultText;
+      card.append(row, verdict, result);
+      field.append(card);
+      await wait(holdMs);
+      card.remove();
+    }
 
     /* ---------- 回合流程 ---------- */
     function beginTurn(sideKey) {
@@ -665,32 +894,21 @@
         if (game.phase !== 'battle') return;
         const a = L[i];
         const b = R[i];
-        const y = (a.y + b.y) / 2;
+        const y = rowY(i, pairCount);
+        a.launched = true;
+        b.launched = true;
         moveTile(a, midX - size * 0.56, y, 650);
         moveTile(b, midX + size * 0.56, y, 650);
         await wait(700);
 
+        const word = wordOf(a.char, b.char);
         const combo = recombine(a.char, b.char);
         const ea = energyOf(a.char);
         const eb = energyOf(b.char);
+        const elA = elementOf(a.char);
+        const elB = elementOf(b.char);
 
-        if (combo && Math.abs(ea - eb) <= 2) {
-          // 旗鼓相當：交換偏旁，變出新字
-          burstTile(a);
-          burstTile(b);
-          const [n1, n2] = combo;
-          spawnNewChar(n1, 'L', y);
-          spawnNewChar(n2, 'R', y);
-          game.points.L += 2;
-          game.points.R += 2;
-          game.newChars.push(n1, n2);
-          speakText(`${a.char}，${b.char}，變！${n1}，${n2}！`);
-          await wait(1400);
-        } else if (ea !== eb) {
-          // 強者獲勝：弱字碎裂，強字直衝對方
-          const winner = ea > eb ? a : b;
-          const loser = ea > eb ? b : a;
-          burstTile(loser);
+        const smash = async winner => {
           const targetX = winner.side === 'L' ? field.clientWidth - size * 0.3 : -size * 0.7;
           moveTile(winner, targetX, y, 500);
           await wait(520);
@@ -698,11 +916,85 @@
           hitPlayer(winner.side === 'L' ? 'R' : 'L');
           game.points[winner.side] += 1;
           await wait(400);
+        };
+
+        const speakWhy = `${a.char}，${elementWhy(a.char).zhs}。${b.char}，${elementWhy(b.char).zhs}。`;
+
+        const friendly = async (verdictText, speakVerdict) => {
+          // 相生（或同氣）：先組詞，再拼新字，否則共生各得一分
+          if (word) {
+            speakText(`${speakWhy}${speakVerdict}组成新词，${word}！`);
+            await showClash(a, b, verdictText, pageStrings.resultWord[language](word));
+            burstTile(a);
+            burstTile(b);
+            spawnNewChar(word, 'L', y);
+            spawnNewChar(word, 'R', y);
+            game.points.L += 2;
+            game.points.R += 2;
+            game.newChars.push(word);
+            await wait(1400);
+            return true;
+          }
+          if (combo) {
+            const [n1, n2] = combo;
+            speakText(`${speakWhy}${speakVerdict}交换偏旁，变出${n1}和${n2}！`);
+            await showClash(a, b, verdictText, pageStrings.resultCombo[language](n1, n2));
+            burstTile(a);
+            burstTile(b);
+            spawnNewChar(n1, 'L', y);
+            spawnNewChar(n2, 'R', y);
+            game.points.L += 2;
+            game.points.R += 2;
+            game.newChars.push(n1, n2);
+            await wait(1400);
+            return true;
+          }
+          return false;
+        };
+
+        if (KE[elA] === elB || KE[elB] === elA) {
+          // 相剋：剋者勝，弱字碎裂，強字直衝對方
+          const winner = KE[elA] === elB ? a : b;
+          const loser = winner === a ? b : a;
+          const story = KE_STORY[elementOf(winner.char) + elementOf(loser.char)];
+          speakText(`${speakWhy}${story.zhs}！${winner.char}获胜！`);
+          await showClash(a, b, story[language], pageStrings.resultKe[language](winner.char));
+          burstTile(loser);
+          await smash(winner);
+        } else if (SHENG[elA] === elB || SHENG[elB] === elA) {
+          // 相生：能組詞或拼新字；都不行就共生共榮
+          const pairKey = SHENG[elA] === elB ? elA + elB : elB + elA;
+          const story = SHENG_STORY[pairKey];
+          const done = await friendly(story[language], `${story.zhs}！`);
+          if (!done) {
+            speakText(`${speakWhy}${story.zhs}！共生共荣！`);
+            await showClash(a, b, story[language], pageStrings.resultShengPeace[language]);
+            burstTile(a);
+            burstTile(b);
+            game.points.L += 1;
+            game.points.R += 1;
+            await wait(500);
+          }
         } else {
-          // 勢均力敵又拼不出新字：同歸於盡
-          burstTile(a);
-          burstTile(b);
-          await wait(400);
+          // 同屬一行：同氣連枝也能組詞拼字，否則比筆畫
+          const done = await friendly(pageStrings.verdictSame[language](elA), `同属${elA}！`);
+          if (!done) {
+            if (ea !== eb) {
+              const winner = ea > eb ? a : b;
+              const loser = ea > eb ? b : a;
+              speakText(`${speakWhy}同属${elA}，比笔画！${winner.char}获胜！`);
+              await showClash(a, b, pageStrings.verdictSame[language](elA),
+                pageStrings.resultStroke[language](winner.char, Math.max(ea, eb), Math.min(ea, eb)));
+              burstTile(loser);
+              await smash(winner);
+            } else {
+              speakText(`${speakWhy}势均力敌，同归于尽！`);
+              await showClash(a, b, pageStrings.verdictSame[language](elA), pageStrings.resultTie[language]);
+              burstTile(a);
+              burstTile(b);
+              await wait(500);
+            }
+          }
         }
         if (game.phase === 'over') return;
       }
@@ -711,8 +1003,9 @@
       const extras = L.length > R.length ? L.slice(pairCount) : R.slice(pairCount);
       for (const tile of extras) {
         if (game.phase !== 'battle') return;
+        tile.launched = true;
         const targetX = tile.side === 'L' ? field.clientWidth - size * 0.3 : -size * 0.7;
-        moveTile(tile, targetX, tile.y, 500);
+        moveTile(tile, targetX, rowY(tile.index, tile.total), 500);
         await wait(520);
         burstTile(tile);
         hitPlayer(tile.side === 'L' ? 'R' : 'L');
@@ -733,9 +1026,12 @@
       const size = tileSize();
       const el = document.createElement('div');
       el.className = 'tile newborn';
+      if (char.length > 1) el.classList.add('wordborn');
       el.style.setProperty('--tile', `${size}px`);
       el.textContent = char;
-      const pinyin = PARTS.p[char];
+      const pinyin = char.length > 1
+        ? [...char].map(c => PARTS.p[c] || '').join(' ').trim()
+        : PARTS.p[char];
       if (pinyin) {
         const small = document.createElement('small');
         small.textContent = pinyin;

@@ -672,13 +672,26 @@
         || null;
     }
 
+    let ttsUnlocked = false;
+
+    // iOS 要求首次發聲發生在用戶手勢內，之後才允許延遲播放
+    function unlockTTS() {
+      if (ttsUnlocked || !('speechSynthesis' in window)) return;
+      ttsUnlocked = true;
+      const utterance = new SpeechSynthesisUtterance(' ');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+    }
+
     function speakText(text) {
       if (!('speechSynthesis' in window) || !text) return;
       const synth = window.speechSynthesis;
 
       // 朗讀期間暫停識別，避免自己聽到自己
+      let justAborted = false;
       if (state.listening && recognition && !resumeAfterSpeech) {
         resumeAfterSpeech = true;
+        justAborted = true;
         recognition.abort();
       }
 
@@ -712,7 +725,10 @@
       if (synth.speaking || synth.pending) {
         // Chrome 在 cancel() 後立刻 speak() 會把語音靜默吞掉，稍等一拍
         synth.cancel();
-        speakTimer = setTimeout(go, 80);
+        speakTimer = setTimeout(go, 100);
+      } else if (justAborted) {
+        // 剛中斷識別時，錄音通道還沒釋放，立即發聲會被吞掉
+        speakTimer = setTimeout(go, 180);
       } else {
         go();
       }
@@ -768,6 +784,7 @@
     }
 
     micButton.addEventListener('click', () => {
+      unlockTTS();
       if (state.listening) { stopListening(); return; }
       state.listening = true;
       micButton.classList.add('is-listening');
@@ -821,6 +838,7 @@
 
     typeForm.addEventListener('submit', event => {
       event.preventDefault();
+      unlockTTS();
       const text = typeInput.value.trim();
       if (text) enqueue(text);
       typeInput.value = '';

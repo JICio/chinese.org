@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>唐詩掉落挑戰 — Chinese.org</title>
+  <meta name="description" content="唐詩三百首的字從天而降，讀出它就能消掉；沒讀出的字堆在底部，堆到頂就挑戰失敗。點方塊聽發音和組詞，再讀對就能救回來。">
+  <meta name="theme-color" content="#0b0b0a">
+  <meta property="og:title" content="唐詩掉落挑戰 — Chinese.org">
+  <meta property="og:description" content="唐詩的字從天而降，開口讀對就能消掉！">
+  <meta property="og:image" content="https://chinese.org/assets/og-premium.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chinese.org/poem.html">
+  <link rel="icon" href="assets/logo-hua.png" type="image/png">
+  <style>
+    :root {
+      --ink: #0b0b0a;
+      --ink-soft: #161714;
+      --paper: #f1eee6;
+      --coral: #e36a4c;
+      --gold: #c39a54;
+      --led-gold: #ffd98a;
+      --led-red: #ff4b33;
+      --jade: #7fd8b8;
+      --muted: rgba(241, 238, 230, .52);
+      --line: rgba(241, 238, 230, .14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "Avenir Next", "PingFang SC", "PingFang TC", "Hiragino Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+    /* ---------- top bar ---------- */
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      padding-top: calc(8px + env(safe-area-inset-top));
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 11, 10, .92);
+      z-index: 20;
+    }
+
+    .bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--paper);
+      text-decoration: none;
+    }
+
+    .bar-brand img { width: 24px; height: 24px; filter: invert(1); }
+
+    .bar-brand strong { font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+
+    .bar-title {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-pill {
+      display: flex;
+      gap: 10px;
+      padding: 4px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .score-pill b { color: var(--led-gold); }
+
+    /* ---------- stage ---------- */
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 130%, rgba(227, 106, 76, .14), transparent 55%),
+        var(--ink);
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, .05) 1px, transparent 1.5px);
+      background-size: 13px 13px;
+    }
+
+    .line-banner {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+      max-width: 92%;
+      padding: 7px 18px;
+      border: 1px solid rgba(195, 154, 84, .5);
+      border-radius: 999px;
+      background: rgba(11, 11, 10, .82);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 15px;
+      letter-spacing: .12em;
+      color: var(--led-gold);
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    .line-banner.is-visible { opacity: 1; }
+
+    .line-banner small { color: var(--muted); letter-spacing: .05em; margin-left: 8px; }
+
+    .limit-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      border-top: 2px dashed rgba(255, 75, 51, .35);
+      transition: border-color 300ms ease;
+    }
+
+    .limit-line.is-danger {
+      border-top-color: rgba(255, 75, 51, .95);
+      animation: danger-blink 700ms ease-in-out infinite alternate;
+    }
+
+    @keyframes danger-blink {
+      from { opacity: .5; }
+      to { opacity: 1; }
+    }
+
+    .drop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--led-gold);
+      text-shadow: 0 0 14px rgba(255, 217, 138, .65), 0 0 44px rgba(195, 154, 84, .4);
+      will-change: transform;
+    }
+
+    .block {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--led-red);
+      text-shadow: 0 0 10px rgba(255, 75, 51, .55);
+      background: rgba(255, 75, 51, .1);
+      border: 1px solid rgba(255, 75, 51, .45);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 180ms ease, top 180ms ease;
+    }
+
+    .block.is-primed {
+      color: var(--led-gold);
+      border-color: var(--gold);
+      background: rgba(195, 154, 84, .18);
+      animation: primed-pulse 900ms ease-in-out infinite alternate;
+    }
+
+    @keyframes primed-pulse {
+      from { box-shadow: 0 0 0 0 rgba(255, 217, 138, .0); }
+      to { box-shadow: 0 0 18px 2px rgba(255, 217, 138, .45); }
+    }
+
+    /* ---------- 學習卡 ---------- */
+    .info-card {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      z-index: 8;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      max-width: 94%;
+      padding: 12px 18px;
+      border: 1px solid rgba(195, 154, 84, .55);
+      border-radius: 16px;
+      background: rgba(11, 11, 10, .92);
+      backdrop-filter: blur(6px);
+    }
+
+    .info-card.is-visible { display: flex; }
+
+    .info-card .big {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--led-gold);
+      text-shadow: 0 0 16px rgba(255, 217, 138, .5);
+      line-height: 1;
+    }
+
+    .info-card .detail { min-width: 0; }
+
+    .info-card .pinyin {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--jade);
+      letter-spacing: .06em;
+    }
+
+    .info-card .words { font-size: 15px; margin-top: 2px; color: var(--paper); }
+
+    .info-card .source {
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-card .cue {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--coral);
+      letter-spacing: .08em;
+    }
+
+    /* ---------- 遮罩（開始 / 結束） ---------- */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 15;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      text-align: center;
+      background: rgba(11, 11, 10, .88);
+      backdrop-filter: blur(6px);
+    }
+
+    .overlay.is-visible { display: flex; }
+
+    .overlay h2 {
+      font-size: clamp(24px, 6vmin, 40px);
+      letter-spacing: .1em;
+      color: var(--led-gold);
+      text-shadow: 0 0 24px rgba(255, 217, 138, .4);
+    }
+
+    .overlay p { max-width: 480px; font-size: 14px; line-height: 1.9; color: var(--muted); }
+
+    .overlay .stats { font-size: 17px; color: var(--paper); line-height: 1.9; }
+
+    .overlay .stats b { color: var(--led-gold); font-size: 24px; }
+
+    .review-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-width: 520px;
+    }
+
+    .review-chips button {
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 75, 51, .5);
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--led-red);
+      background: rgba(255, 75, 51, .08);
+    }
+
+    .cta {
+      padding: 13px 38px;
+      border-radius: 999px;
+      background: linear-gradient(160deg, #ff7a54, #a83a28);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      color: #fff;
+      box-shadow: 0 10px 34px rgba(227, 106, 76, .4);
+    }
+
+    .cta:active { transform: scale(.96); }
+
+    /* ---------- live + controls ---------- */
+    .live {
+      min-height: 26px;
+      padding: 4px 14px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .live b { color: var(--led-gold); font-weight: 600; }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: var(--ink-soft);
+    }
+
+    .mic {
+      position: relative;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      background: linear-gradient(160deg, #ff7a54, #a83a28);
+      box-shadow: 0 8px 26px rgba(227, 106, 76, .4);
+      transition: transform 150ms ease;
+    }
+
+    .mic:active { transform: scale(.94); }
+
+    .mic[disabled] { filter: grayscale(1) brightness(.6); cursor: not-allowed; }
+
+    .mic.is-listening::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border: 2px solid rgba(255, 122, 84, .8);
+      border-radius: 50%;
+      animation: pulse 1.4s ease-out infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(.92); opacity: 1; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    .typebox {
+      display: flex;
+      flex: 1;
+      max-width: 300px;
+      gap: 6px;
+    }
+
+    .typebox input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .05);
+      color: var(--paper);
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .typebox input:focus { border-color: var(--coral); }
+
+    .typebox button {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(227, 106, 76, .22);
+      border: 1px solid var(--coral);
+      font-size: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .bar-brand strong { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <a class="bar-brand" href="index.html" aria-label="回到 Chinese.org 首頁">
+      <img src="assets/logo-hua.png" alt="">
+      <strong>CHINESE.ORG</strong>
+    </a>
+    <p class="bar-title" data-zht="唐詩掉落挑戰" data-zhs="唐诗掉落挑战" data-en="Tang Poem Drop">唐詩掉落挑戰</p>
+    <div class="score-pill" aria-live="polite">
+      <span>⭐ <b id="scoreCount">0</b></span>
+      <span><span data-zht="句" data-zhs="句" data-en="Lines">句</span> <b id="lineCount">0</b></span>
+    </div>
+  </header>
+
+  <main class="stage" id="stage" aria-label="遊戲舞台">
+    <div class="line-banner" id="lineBanner"></div>
+    <div class="limit-line" id="limitLine"></div>
+
+    <div class="info-card" id="infoCard">
+      <div class="big" id="cardChar"></div>
+      <div class="detail">
+        <div class="pinyin" id="cardPinyin"></div>
+        <div class="words" id="cardWords"></div>
+        <div class="source" id="cardSource"></div>
+        <div class="cue" data-zht="跟著讀出它，就能消掉！" data-zhs="跟着读出它，就能消掉！" data-en="Read it aloud to clear it!">跟著讀出它，就能消掉！</div>
+      </div>
+    </div>
+
+    <div class="overlay is-visible" id="startOverlay">
+      <h2 data-zht="唐詩掉落挑戰" data-zhs="唐诗掉落挑战" data-en="Tang Poem Drop">唐詩掉落挑戰</h2>
+      <p data-zht="唐詩三百首的字會從天上掉下來——認出它，大聲讀出來，它就消失。沒讀出的字會堆在底部，堆到紅線就挑戰失敗。點一點堆起來的字，可以聽發音和組詞，再讀對就能救回來！" data-zhs="唐诗三百首的字会从天上掉下来——认出它，大声读出来，它就消失。没读出的字会堆在底部，堆到红线就挑战失败。点一点堆起来的字，可以听发音和组词，再读对就能救回来！" data-en="Characters from 300 Tang poems fall from the sky. Say a character aloud to clear it. Missed characters pile up—if the pile hits the red line, the game ends. Tap a piled block to hear its sound and words, then read it to rescue it!">唐詩三百首的字會從天上掉下來——認出它，大聲讀出來，它就消失。沒讀出的字會堆在底部，堆到紅線就挑戰失敗。點一點堆起來的字，可以聽發音和組詞，再讀對就能救回來！</p>
+      <button class="cta" id="startButton" type="button" data-zht="開始挑戰" data-zhs="开始挑战" data-en="Start">開始挑戰</button>
+    </div>
+
+    <div class="overlay" id="endOverlay">
+      <h2 data-zht="挑戰結束！" data-zhs="挑战结束！" data-en="Challenge over!">挑戰結束！</h2>
+      <div class="stats" id="endStats"></div>
+      <p data-zht="這些字還沒讀出來，點一點聽聽看：" data-zhs="这些字还没读出来，点一点听听看：" data-en="These characters got away—tap to hear them:">這些字還沒讀出來，點一點聽聽看：</p>
+      <div class="review-chips" id="reviewChips"></div>
+      <button class="cta" id="retryButton" type="button" data-zht="再來一次" data-zhs="再来一次" data-en="Play again">再來一次</button>
+    </div>
+  </main>
+
+  <p class="live" id="liveLine" aria-live="polite"></p>
+
+  <footer class="controls">
+    <button class="mic" id="micButton" type="button" aria-pressed="false" aria-label="麥克風">🎤</button>
+    <form class="typebox" id="typeForm">
+      <input id="typeInput" type="text" maxlength="12" autocomplete="off" placeholder="打字也可以消字">
+      <button type="submit" data-zht="消！" data-zhs="消！" data-en="Go!">消！</button>
+    </form>
+  </footer>
+
+  <script src="opencc-t2cn.js"></script>
+  <script src="tangshi300.js"></script>
+  <script src="tangshi-info.js"></script>
+  <script>
+    /* ---------- UI 語言 ---------- */
+    const translatable = document.querySelectorAll('[data-zht][data-zhs][data-en]');
+    let language = localStorage.getItem('chinese_language') || 'zht';
+
+    const pageStrings = {
+      title: { zht: '唐詩掉落挑戰 — Chinese.org', zhs: '唐诗掉落挑战 — Chinese.org', en: 'Tang Poem Drop — Chinese.org' },
+      typePlaceholder: { zht: '打字也可以消字', zhs: '打字也可以消字', en: 'Type to clear too' },
+      listening: { zht: '我在聽，大聲讀出掉下來的字！', zhs: '我在听，大声读出掉下来的字！', en: 'Listening—read the falling characters aloud!' },
+      heard: { zht: '聽到：', zhs: '听到：', en: 'Heard: ' },
+      denied: {
+        zht: '需要麥克風權限才能玩語音模式，也可以用打字。',
+        zhs: '需要麦克风权限才能玩语音模式，也可以用打字。',
+        en: 'Microphone access is needed for voice play. Typing works too.'
+      },
+      unsupported: {
+        zht: '這個瀏覽器不支援語音識別，用打字框也能玩，或改用 Chrome / Safari。',
+        zhs: '这个浏览器不支持语音识别，用打字框也能玩，或改用 Chrome / Safari。',
+        en: 'No speech recognition here—play by typing, or use Chrome / Safari.'
+      },
+      statsTemplate: {
+        zht: n => `消掉 <b>${n.cleared}</b> 個字 · 挑戰了 <b>${n.lines}</b> 句詩`,
+        zhs: n => `消掉 <b>${n.cleared}</b> 个字 · 挑战了 <b>${n.lines}</b> 句诗`,
+        en: n => `Cleared <b>${n.cleared}</b> characters · <b>${n.lines}</b> poem lines`
+      }
+    };
+
+    function applyLanguage(next) {
+      language = next;
+      localStorage.setItem('chinese_language', language);
+      translatable.forEach(el => { el.textContent = el.dataset[language]; });
+      document.title = pageStrings.title[language];
+      typeInput.placeholder = pageStrings.typePlaceholder[language];
+    }
+
+    /* ---------- 資料準備 ---------- */
+    const toSimplified = window.OpenCC ? window.OpenCC.Converter({ from: 't', to: 'cn' }) : (t => t);
+    const CHAR_INFO = window.TANGSHI_INFO || {};
+    const HAN = /[㐀-鿿]/;
+
+    // 把所有詩拆成 3-9 字的短句
+    const LINES = [];
+    (window.TANGSHI_300 || []).forEach(poem => {
+      const title = toSimplified(poem.title || '');
+      const author = toSimplified(poem.author || '');
+      poem.paragraphs.forEach(paragraph => {
+        toSimplified(paragraph).split(/[，。！？；：、\s]+/).forEach(clause => {
+          const clean = [...clause].filter(c => HAN.test(c)).join('');
+          if (clean.length >= 3 && clean.length <= 9) LINES.push({ text: clean, title, author });
+        });
+      });
+    });
+
+    function tonelessSet(char) {
+      const info = CHAR_INFO[char];
+      if (!info) return null;
+      return info.p.map(p => p.normalize('NFD').replace(/[̀-ͯ]/g, ''));
+    }
+
+    function sameSound(a, b) {
+      if (a === b) return true;
+      const pa = tonelessSet(a);
+      const pb = tonelessSet(b);
+      if (!pa || !pb) return false;
+      return pa.some(p => pb.includes(p));
+    }
+
+    /* ---------- DOM ---------- */
+    const stage = document.getElementById('stage');
+    const lineBanner = document.getElementById('lineBanner');
+    const limitLine = document.getElementById('limitLine');
+    const infoCard = document.getElementById('infoCard');
+    const startOverlay = document.getElementById('startOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const liveLine = document.getElementById('liveLine');
+    const micButton = document.getElementById('micButton');
+    const typeForm = document.getElementById('typeForm');
+    const typeInput = document.getElementById('typeInput');
+
+    /* ---------- 遊戲狀態 ---------- */
+    const game = {
+      running: false,
+      listening: false,
+      score: 0,
+      cleared: 0,
+      linesPlayed: 0,
+      drops: [],            // 掉落中 {char, col, y, speed, el, line}
+      pile: [],             // 每欄的方塊堆 [{char, el, line}]
+      queue: [],            // 當前句待掉的字
+      lineOrder: [],
+      lineIndex: 0,
+      currentLine: null,
+      fallSpeed: 46,        // px/s
+      spawnGap: 2000,       // ms
+      nextSpawnAt: 0,
+      blockSize: 52,
+      columns: 8,
+      originX: 0,
+      limitRatio: 0.42      // 紅線距頂比例
+    };
+
+    function shuffle(list) {
+      for (let i = list.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+      return list;
+    }
+
+    function layoutStage() {
+      const width = stage.clientWidth;
+      game.blockSize = Math.max(42, Math.min(64, Math.floor(width / 8)));
+      game.columns = Math.floor(width / game.blockSize);
+      game.originX = Math.floor((width - game.columns * game.blockSize) / 2);
+      while (game.pile.length < game.columns) game.pile.push([]);
+      limitLine.style.top = `${Math.round(stage.clientHeight * game.limitRatio)}px`;
+    }
+
+    function colX(col) { return game.originX + col * game.blockSize; }
+
+    function pileTopY(col) {
+      return stage.clientHeight - game.pile[col].length * game.blockSize;
+    }
+
+    function updateScore() {
+      document.getElementById('scoreCount').textContent = game.score;
+      document.getElementById('lineCount').textContent = game.linesPlayed;
+    }
+
+    /* ---------- 句子與掉落 ---------- */
+    function nextLine() {
+      if (!game.lineOrder.length) game.lineOrder = shuffle([...LINES.keys()]);
+      const line = LINES[game.lineOrder[game.lineIndex % game.lineOrder.length]];
+      game.lineIndex += 1;
+      game.linesPlayed += 1;
+      game.currentLine = line;
+      game.queue = [...line.text];
+      lineBanner.innerHTML = '';
+      lineBanner.append(line.text);
+      const small = document.createElement('small');
+      small.textContent = `${line.author}《${line.title}》`;
+      lineBanner.append(small);
+      lineBanner.classList.add('is-visible');
+      setTimeout(() => lineBanner.classList.remove('is-visible'), 3200);
+      // 每兩句加一點速度
+      if (game.linesPlayed % 2 === 0) {
+        game.fallSpeed = Math.min(120, game.fallSpeed * 1.07);
+        game.spawnGap = Math.max(1150, game.spawnGap - 90);
+      }
+      updateScore();
+    }
+
+    function spawnDrop(now) {
+      if (!game.queue.length) return;
+      const char = game.queue.shift();
+      const col = Math.floor(Math.random() * game.columns);
+      const el = document.createElement('div');
+      el.className = 'drop';
+      el.textContent = char;
+      el.style.width = `${game.blockSize}px`;
+      el.style.height = `${game.blockSize}px`;
+      el.style.fontSize = `${Math.round(game.blockSize * 0.78)}px`;
+      stage.append(el);
+      game.drops.push({ char, col, y: -game.blockSize, speed: game.fallSpeed, el, line: game.currentLine });
+      game.nextSpawnAt = now + game.spawnGap;
+      if (!game.queue.length) game.nextSpawnAt = now + game.spawnGap + 1600; // 句間停頓
+    }
+
+    /* ---------- 主迴圈 ---------- */
+    let lastTick = 0;
+
+    function tick(now) {
+      if (!game.running) return;
+      const dt = Math.min(50, now - lastTick) / 1000;
+      lastTick = now;
+
+      if (now >= game.nextSpawnAt) {
+        if (game.queue.length) spawnDrop(now);
+        else nextLine();
+      }
+
+      for (let i = game.drops.length - 1; i >= 0; i -= 1) {
+        const drop = game.drops[i];
+        drop.y += drop.speed * dt;
+        const floor = pileTopY(drop.col) - game.blockSize;
+        if (drop.y >= floor) {
+          game.drops.splice(i, 1);
+          landDrop(drop);
+        } else {
+          drop.el.style.transform = `translate(${colX(drop.col)}px, ${Math.round(drop.y)}px)`;
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function landDrop(drop) {
+      const column = game.pile[drop.col];
+      drop.el.classList.remove('drop');
+      drop.el.classList.add('block');
+      column.push({ char: drop.char, el: drop.el, line: drop.line });
+      restackColumn(drop.col);
+      drop.el.addEventListener('pointerdown', event => {
+        event.stopPropagation();
+        primeBlock(drop.char, drop.el, drop.line);
+      });
+      checkDanger();
+    }
+
+    function restackColumn(col) {
+      game.pile[col].forEach((block, index) => {
+        block.el.style.width = `${game.blockSize}px`;
+        block.el.style.height = `${game.blockSize}px`;
+        block.el.style.fontSize = `${Math.round(game.blockSize * 0.72)}px`;
+        block.el.style.transform = 'none';
+        block.el.style.left = `${colX(col)}px`;
+        block.el.style.top = `${stage.clientHeight - (index + 1) * game.blockSize}px`;
+      });
+    }
+
+    function checkDanger() {
+      const limitY = stage.clientHeight * game.limitRatio;
+      let danger = false;
+      for (let col = 0; col < game.columns; col += 1) {
+        const top = pileTopY(col);
+        if (top <= limitY) { endGame(); return; }
+        if (top <= limitY + game.blockSize * 1.5) danger = true;
+      }
+      limitLine.classList.toggle('is-danger', danger);
+    }
+
+    /* ---------- 消字判定 ---------- */
+    function burst(el) {
+      const anim = el.animate(
+        [
+          { transform: `${getComputedStyle(el).transform === 'none' ? '' : getComputedStyle(el).transform} scale(1)`, opacity: 1 },
+          { transform: `${getComputedStyle(el).transform === 'none' ? '' : getComputedStyle(el).transform} scale(1.6)`, opacity: 0 }
+        ],
+        { duration: 240, easing: 'ease-out' }
+      );
+      anim.onfinish = () => el.remove();
+    }
+
+    function matchChar(char) {
+      // 先消掉落中的（最低的優先）
+      let bestIndex = -1;
+      let bestY = -Infinity;
+      game.drops.forEach((drop, index) => {
+        if (sameSound(drop.char, char) && drop.y > bestY) { bestY = drop.y; bestIndex = index; }
+      });
+      if (bestIndex !== -1) {
+        const [drop] = game.drops.splice(bestIndex, 1);
+        burst(drop.el);
+        game.score += 2;
+        game.cleared += 1;
+        updateScore();
+        return true;
+      }
+      // 再救底部堆積的（從最高的欄頂開始）
+      for (let col = 0; col < game.columns; col += 1) {
+        const column = game.pile[col];
+        for (let index = column.length - 1; index >= 0; index -= 1) {
+          if (sameSound(column[index].char, char)) {
+            const [block] = column.splice(index, 1);
+            burst(block.el);
+            restackColumn(col);
+            game.score += 1;
+            game.cleared += 1;
+            updateScore();
+            hideCard();
+            checkDanger();
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function processText(text) {
+      if (!game.running) return;
+      [...text].filter(c => HAN.test(c)).forEach(matchChar);
+    }
+
+    /* ---------- 學習卡 ---------- */
+    let cardTimer = null;
+    let primedEl = null;
+
+    function primeBlock(char, el, line) {
+      if (primedEl) primedEl.classList.remove('is-primed');
+      primedEl = el;
+      el.classList.add('is-primed');
+      const info = CHAR_INFO[char] || { p: [], w: [] };
+      document.getElementById('cardChar').textContent = char;
+      document.getElementById('cardPinyin').textContent = info.p[0] || '';
+      document.getElementById('cardWords').textContent = info.w.join(' · ');
+      document.getElementById('cardSource').textContent = line ? `${line.text} — ${line.author}《${line.title}》` : '';
+      infoCard.classList.add('is-visible');
+      clearTimeout(cardTimer);
+      cardTimer = setTimeout(hideCard, 8000);
+      speakText([char, ...(info.w.length ? [info.w.join('，')] : [])].join('。'));
+    }
+
+    function hideCard() {
+      infoCard.classList.remove('is-visible');
+      if (primedEl) { primedEl.classList.remove('is-primed'); primedEl = null; }
+    }
+
+    /* ---------- 朗讀（與 speak.html 相同的穩定版） ---------- */
+    let resumeAfterSpeech = false;
+    let speakTimer = null;
+    let resumeTimer = null;
+    let currentUtterance = null;
+    let ttsVoices = [];
+    let ttsUnlocked = false;
+
+    if ('speechSynthesis' in window) {
+      const loadVoices = () => { ttsVoices = window.speechSynthesis.getVoices(); };
+      loadVoices();
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+    function unlockTTS() {
+      if (ttsUnlocked || !('speechSynthesis' in window)) return;
+      ttsUnlocked = true;
+      const utterance = new SpeechSynthesisUtterance(' ');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window) || !text) return;
+      const synth = window.speechSynthesis;
+      let justAborted = false;
+      if (game.listening && recognition && !resumeAfterSpeech) {
+        resumeAfterSpeech = true;
+        justAborted = true;
+        recognition.abort();
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      const voice = ttsVoices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith('zh-cn'))
+        || ttsVoices.find(v => v.lang.toLowerCase().startsWith('zh'));
+      if (voice) utterance.voice = voice;
+      utterance.rate = 0.8;
+      utterance.volume = 1;
+      currentUtterance = utterance;
+      const finish = () => {
+        clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => {
+          if (resumeAfterSpeech && game.listening && !synth.speaking && !synth.pending) {
+            resumeAfterSpeech = false;
+            try { startRecognition(); } catch { stopListening(); }
+          }
+        }, 300);
+      };
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      const go = () => { synth.resume(); synth.speak(utterance); };
+      clearTimeout(speakTimer);
+      if (synth.speaking || synth.pending) {
+        synth.cancel();
+        speakTimer = setTimeout(go, 100);
+      } else if (justAborted) {
+        speakTimer = setTimeout(go, 180);
+      } else {
+        go();
+      }
+      finish();
+    }
+
+    /* ---------- 語音識別 ---------- */
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let prevInterim = '';
+
+    function setLive(text, highlight) {
+      liveLine.innerHTML = '';
+      if (highlight) {
+        const b = document.createElement('b');
+        b.textContent = highlight;
+        liveLine.append(text, b);
+      } else {
+        liveLine.textContent = text;
+      }
+    }
+
+    function startRecognition() {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'zh-CN';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      prevInterim = '';
+
+      recognition.onresult = event => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          const text = result[0].transcript.trim();
+          if (!text) continue;
+          if (result.isFinal) {
+            const fresh = text.startsWith(prevInterim) ? text.slice(prevInterim.length) : text;
+            processText(fresh || text);
+            prevInterim = '';
+          } else {
+            interim = text;
+          }
+        }
+        if (interim) {
+          const fresh = interim.startsWith(prevInterim) ? interim.slice(prevInterim.length) : interim;
+          processText(fresh);
+          prevInterim = interim;
+          setLive(pageStrings.heard[language], interim);
+        }
+      };
+
+      recognition.onerror = event => {
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          stopListening();
+          setLive(pageStrings.denied[language]);
+        }
+      };
+
+      recognition.onend = () => {
+        if (game.listening && !resumeAfterSpeech) {
+          try { startRecognition(); } catch { stopListening(); }
+        }
+      };
+
+      recognition.start();
+    }
+
+    function startListening() {
+      if (!SpeechRecognition || game.listening) return;
+      game.listening = true;
+      micButton.classList.add('is-listening');
+      micButton.setAttribute('aria-pressed', 'true');
+      setLive(pageStrings.listening[language]);
+      try { startRecognition(); } catch { stopListening(); }
+    }
+
+    function stopListening() {
+      game.listening = false;
+      micButton.classList.remove('is-listening');
+      micButton.setAttribute('aria-pressed', 'false');
+      if (recognition) { recognition.onend = null; recognition.abort(); }
+      setLive('');
+    }
+
+    micButton.addEventListener('click', () => {
+      unlockTTS();
+      if (game.listening) stopListening();
+      else startListening();
+    });
+
+    if (!SpeechRecognition) {
+      micButton.disabled = true;
+      setLive(pageStrings.unsupported[language]);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && game.listening) stopListening();
+    });
+
+    /* ---------- 開始 / 結束 ---------- */
+    function resetGame() {
+      game.drops.forEach(drop => drop.el.remove());
+      game.pile.forEach(column => column.forEach(block => block.el.remove()));
+      game.drops = [];
+      game.pile = [];
+      game.queue = [];
+      game.score = 0;
+      game.cleared = 0;
+      game.linesPlayed = 0;
+      game.fallSpeed = 46;
+      game.spawnGap = 2000;
+      game.currentLine = null;
+      hideCard();
+      limitLine.classList.remove('is-danger');
+      layoutStage();
+      updateScore();
+    }
+
+    function startGame() {
+      resetGame();
+      startOverlay.classList.remove('is-visible');
+      endOverlay.classList.remove('is-visible');
+      game.running = true;
+      lastTick = performance.now();
+      game.nextSpawnAt = lastTick + 600;
+      nextLine();
+      requestAnimationFrame(tick);
+    }
+
+    function endGame() {
+      if (!game.running) return;
+      game.running = false;
+      const leftovers = [...new Set(game.pile.flatMap(column => column.map(block => block.char)))];
+      document.getElementById('endStats').innerHTML =
+        pageStrings.statsTemplate[language]({ cleared: game.cleared, lines: game.linesPlayed });
+      const chips = document.getElementById('reviewChips');
+      chips.innerHTML = '';
+      leftovers.slice(0, 24).forEach(char => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        const info = CHAR_INFO[char] || { p: [], w: [] };
+        chip.textContent = char;
+        chip.addEventListener('click', () => {
+          speakText([char, ...(info.w.length ? [info.w.join('，')] : [])].join('。'));
+        });
+        chips.append(chip);
+      });
+      endOverlay.classList.add('is-visible');
+    }
+
+    document.getElementById('startButton').addEventListener('click', () => {
+      unlockTTS();
+      startGame();
+      startListening();
+    });
+
+    document.getElementById('retryButton').addEventListener('click', () => {
+      unlockTTS();
+      startGame();
+      if (!game.listening) startListening();
+    });
+
+    typeForm.addEventListener('submit', event => {
+      event.preventDefault();
+      unlockTTS();
+      const text = typeInput.value.trim();
+      if (text) processText(text);
+      typeInput.value = '';
+    });
+
+    window.addEventListener('resize', () => {
+      layoutStage();
+      for (let col = 0; col < game.columns; col += 1) restackColumn(col);
+    });
+
+    layoutStage();
+    applyLanguage(language);
+  </script>
+</body>
+</html>

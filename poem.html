@@ -609,7 +609,6 @@
       small.textContent = `${line.author}《${line.title}》`;
       lineBanner.append(small);
       lineBanner.classList.add('is-visible');
-      setTimeout(() => lineBanner.classList.remove('is-visible'), 6500);
       // 每兩句加一點速度
       if (game.linesPlayed % 2 === 0) {
         game.fallSpeed = Math.min(120, game.fallSpeed * 1.07);

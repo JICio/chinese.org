@@ -299,7 +299,80 @@
       border-radius: 10px;
       background: rgba(11, 11, 10, .88);
       will-change: transform;
-      transition: transform 600ms cubic-bezier(.3, .9, .35, 1.1), opacity 250ms ease;
+      transition: transform 1150ms cubic-bezier(.3, .9, .35, 1.1), opacity 350ms ease;
+    }
+
+    /* 新字講解卡 */
+    .newchar-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: min(620px, 94%);
+      padding: 16px 20px;
+      border: 1px solid rgba(127, 216, 184, .55);
+      border-radius: 18px;
+      background: rgba(11, 11, 10, .95);
+      backdrop-filter: blur(6px);
+      animation: card-in 320ms ease;
+    }
+
+    .newchar-card .nc-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      color: var(--led-gold);
+    }
+
+    .nc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 18px;
+      width: 100%;
+    }
+
+    .nc-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 10px 8px;
+      border: 1px solid rgba(241, 238, 230, .12);
+      border-radius: 14px;
+    }
+
+    .nc-head { display: flex; align-items: baseline; gap: 10px; }
+
+    .nc-head b {
+      font-size: 50px;
+      font-weight: 800;
+      color: var(--jade);
+      text-shadow: 0 0 18px rgba(127, 216, 184, .6);
+      line-height: 1.05;
+    }
+
+    .nc-head span { font-size: 19px; font-weight: 700; color: var(--led-gold); }
+
+    .nc-words { font-size: 14px; color: var(--paper); letter-spacing: .04em; }
+
+    .nc-sent {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .nc-sent small { display: block; font-size: 11px; color: rgba(241, 238, 230, .38); }
+
+    @media (max-width: 700px) {
+      .nc-grid { grid-template-columns: 1fr; }
+      .nc-head b { font-size: 40px; }
     }
 
     .swap-note {
@@ -570,8 +643,9 @@
       <div class="overlay is-visible" id="startOverlay">
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
         <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；同属一行就比笔画。每次相遇都会讲解两个字的五行由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; same-element characters compare strokes. Every clash explains each character's element and why. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！</p>
-        <div class="demo">江(水) + 灯(火) → 水剋火！　·　江(水) + 树(木) → <b>相生</b>結盟</div>
-        <button class="cta" id="startButton" type="button" data-zht="開戰！" data-zhs="开战！" data-en="Fight!">開戰！</button>
+        <div class="demo">江(水) + 灯(火) → 水剋火！　·　打 + 江 → <b>扛</b> + <b>汀</b></div>
+        <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
+        <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
       </div>
 
       <div class="overlay" id="endOverlay">
@@ -604,7 +678,9 @@
 
   <script src="stroke-order-jian.js"></script>
   <script src="hanzi-parts.js"></script>
-  <script src="wuxing-ciyu.js"></script>
+  <script src="wuxing-ciyu.js?v=2"></script>
+  <script src="opencc-t2cn.js"></script>
+  <script src="tangshi300.js"></script>
   <script>
     /* ---------- UI 語言 ---------- */
     const translatable = document.querySelectorAll('[data-zht][data-zhs][data-en]');
@@ -612,11 +688,17 @@
 
     const pageStrings = {
       title: { zht: '漢字龍虎鬥 — Chinese.org', zhs: '汉字龙虎斗 — Chinese.org', en: 'Hanzi Battle — Chinese.org' },
-      typePlaceholder: { zht: '打一個字也可以出招', zhs: '打一个字也可以出招', en: 'Type one character' },
-      turnLeft: { zht: '🐲 紅龍隊，說一個字！', zhs: '🐲 红龙队，说一个字！', en: '🐲 Red Dragon, say one character!' },
-      turnRight: { zht: '🐯 金虎隊，說一個字！', zhs: '🐯 金虎队，说一个字！', en: '🐯 Gold Tiger, say one character!' },
+      typePlaceholder1: { zht: '打一個字也可以出招', zhs: '打一个字也可以出招', en: 'Type one character' },
+      typePlaceholder2: { zht: '打一句話也可以出招', zhs: '打一句话也可以出招', en: 'Type a sentence' },
+      turnLeft1: { zht: '🐲 紅龍隊，說一個字！', zhs: '🐲 红龙队，说一个字！', en: '🐲 Red Dragon, say one character!' },
+      turnRight1: { zht: '🐯 金虎隊，說一個字！', zhs: '🐯 金虎队，说一个字！', en: '🐯 Gold Tiger, say one character!' },
+      turnLeft2: { zht: '🐲 紅龍隊，說一句話！', zhs: '🐲 红龙队，说一句话！', en: '🐲 Red Dragon, say a sentence!' },
+      turnRight2: { zht: '🐯 金虎隊，說一句話！', zhs: '🐯 金虎队，说一句话！', en: '🐯 Gold Tiger, say a sentence!' },
       battle: { zht: '⚔️ 漢字對撞！', zhs: '⚔️ 汉字对撞！', en: '⚔️ Characters clash!' },
-      listening: { zht: '我在聽……說出你的字！', zhs: '我在听……说出你的字！', en: 'Listening… say your character!' },
+      listening1: { zht: '我在聽……說出你的字！', zhs: '我在听……说出你的字！', en: 'Listening… say your character!' },
+      listening2: { zht: '我在聽……說完一句自動上擂臺！', zhs: '我在听……说完一句自动上擂台！', en: 'Listening… your sentence enters the arena!' },
+      nextLevel: { zht: '下一關：句子擂臺 →', zhs: '下一关：句子擂台 →', en: 'Next: Sentence Arena →' },
+      again: { zht: '再戰一場', zhs: '再战一场', en: 'Rematch' },
       heard: { zht: '聽到：', zhs: '听到：', en: 'Heard: ' },
       noSpeech: { zht: '沒聽清，再按一次麥克風試試', zhs: '没听清，再按一次麦克风试试', en: 'Didn\'t catch that—tap the mic again' },
       denied: { zht: '需要麥克風權限，也可以用打字出招。', zhs: '需要麦克风权限，也可以用打字出招。', en: 'Mic access needed—typing works too.' },
@@ -656,7 +738,7 @@
       localStorage.setItem('chinese_language', language);
       translatable.forEach(el => { el.textContent = el.dataset[language]; });
       document.title = pageStrings.title[language];
-      typeInput.placeholder = pageStrings.typePlaceholder[language];
+      typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
     }
 
     /* ---------- 資料 ---------- */
@@ -736,6 +818,41 @@
       return null;
     }
 
+    // 每個字最常用的組詞（離線從全詞庫預計算）
+    const WORDS_OF = window.CIYU_BY_CHAR || {};
+
+    // 唐詩例句索引（懶載入：第一次用到才轉換）
+    let POEM_LINES = null;
+
+    function findPoemLine(char) {
+      if (!POEM_LINES) {
+        POEM_LINES = [];
+        const convert = window.OpenCC ? window.OpenCC.Converter({ from: 't', to: 'cn' }) : (t => t);
+        (window.TANGSHI_300 || []).forEach(poem => {
+          const title = convert(poem.title || '');
+          const author = convert(poem.author || '');
+          poem.paragraphs.forEach(paragraph => {
+            const simplified = convert(paragraph);
+            paragraph.split(/[，。！？；：、\s]+/).forEach((clauseT, i) => {
+              const clauseS = simplified.split(/[，。！？；：、\s]+/)[i] || '';
+              if (clauseS.length >= 3 && clauseS.length <= 9) {
+                POEM_LINES.push({ text: clauseS, textT: clauseT, title, author });
+              }
+            });
+          });
+        });
+      }
+      return POEM_LINES.find(line => line.text.includes(char)) || null;
+    }
+
+    // 新字講解：拼音 + 組詞 + 例句（唐詩優先，否則引導造句）
+    function explainChar(char) {
+      const pinyin = PARTS.p[char] || '';
+      const words = (WORDS_OF[char] || []).slice(0, 2);
+      const line = findPoemLine(char);
+      return { char, pinyin, words, line };
+    }
+
     // 交換偏旁：打(扌丁) + 江(氵工) -> 扛(扌工) + 汀(氵丁)
     function recombine(a, b) {
       const da = PARTS.d[a];
@@ -762,6 +879,7 @@
     /* ---------- 遊戲狀態 ---------- */
     const game = {
       phase: 'idle',        // idle | listen | battle | over
+      level: 1,             // 1 = 單字對決, 2 = 句子擂臺
       turn: 'L',
       starter: 'L',
       round: 1,
@@ -772,7 +890,7 @@
       listening: false
     };
 
-    const MAX_CHARS = 1;
+    function maxChars() { return game.level === 1 ? 1 : 6; }
 
     function tileSize() {
       return Math.max(40, Math.min(60, Math.floor(field.clientWidth / 12)));
@@ -780,8 +898,8 @@
 
     function setBanner(kind) {
       turnBanner.className = 'turn-banner';
-      if (kind === 'L') { turnBanner.classList.add('for-left'); turnBanner.textContent = pageStrings.turnLeft[language]; }
-      else if (kind === 'R') { turnBanner.classList.add('for-right'); turnBanner.textContent = pageStrings.turnRight[language]; }
+      if (kind === 'L') { turnBanner.classList.add('for-left'); turnBanner.textContent = pageStrings[`turnLeft${game.level}`][language]; }
+      else if (kind === 'R') { turnBanner.classList.add('for-right'); turnBanner.textContent = pageStrings[`turnRight${game.level}`][language]; }
       else { turnBanner.classList.add('for-battle'); turnBanner.textContent = pageStrings.battle[language]; }
       micButton.classList.toggle('for-right', kind === 'R');
     }
@@ -886,7 +1004,7 @@
       const p2 = makePart(r1, aX);
       const p3 = makePart(l2, bX);
       const p4 = makePart(r2, bX);
-      await wait(60);
+      await wait(80);
 
       // 散開成兩組
       const g1L = midX - size * 1.3;
@@ -897,9 +1015,9 @@
       p2.style.transform = `translate(${g1R}px, ${partY}px)`;
       p3.style.transform = `translate(${g2L}px, ${partY}px)`;
       p4.style.transform = `translate(${g2R}px, ${partY}px)`;
-      await wait(650);
+      await wait(1400);
 
-      // 右偏旁互換（轉一圈飛過去）
+      // 右偏旁互換（轉一圈慢慢飛過去）
       const note = document.createElement('div');
       note.className = 'swap-note';
       note.textContent = `${l1}+${r2}=${n1} · ${l2}+${r1}=${n2}`;
@@ -908,18 +1026,79 @@
       field.append(note);
       p2.style.transform = `translate(${g2R}px, ${partY}px) rotate(360deg)`;
       p4.style.transform = `translate(${g1R}px, ${partY}px) rotate(-360deg)`;
-      await wait(750);
+      await wait(1600);
 
       // 各組合體成新字
       p1.style.transform = `translate(${(g1L + g1R) / 2}px, ${partY}px)`;
       p4.style.transform = `translate(${(g1L + g1R) / 2}px, ${partY}px) rotate(-360deg)`;
       p3.style.transform = `translate(${(g2L + g2R) / 2}px, ${partY}px)`;
       p2.style.transform = `translate(${(g2L + g2R) / 2}px, ${partY}px) rotate(360deg)`;
-      await wait(320);
+      await wait(700);
       [p1, p2, p3, p4].forEach(p => { p.style.opacity = '0'; });
-      await wait(180);
+      await wait(300);
       [p1, p2, p3, p4].forEach(p => p.remove());
-      setTimeout(() => note.remove(), 1600);
+      setTimeout(() => note.remove(), 2200);
+    }
+
+    // 新字講解卡：拼音 + 組詞 + 例句
+    async function showNewCharCard(n1, n2, holdMs = 9000) {
+      const card = document.createElement('div');
+      card.className = 'newchar-card';
+      const title = document.createElement('div');
+      title.className = 'nc-title';
+      title.textContent = { zht: '✨ 變出新字！', zhs: '✨ 变出新字！', en: '✨ New characters!' }[language];
+      const grid = document.createElement('div');
+      grid.className = 'nc-grid';
+
+      const speakParts = [];
+      [n1, n2].forEach(char => {
+        const info = explainChar(char);
+        const item = document.createElement('div');
+        item.className = 'nc-item';
+        const head = document.createElement('div');
+        head.className = 'nc-head';
+        const big = document.createElement('b');
+        big.textContent = char;
+        const py = document.createElement('span');
+        py.textContent = info.pinyin;
+        head.append(big, py);
+        item.append(head);
+        if (info.words.length) {
+          const words = document.createElement('div');
+          words.className = 'nc-words';
+          words.textContent = { zht: '組詞：', zhs: '组词：', en: 'Words: ' }[language] + info.words.join(' · ');
+          item.append(words);
+        }
+        const sent = document.createElement('div');
+        sent.className = 'nc-sent';
+        if (info.line) {
+          sent.textContent = language === 'zht' ? info.line.textT : info.line.text;
+          const source = document.createElement('small');
+          source.textContent = `${info.line.author}《${info.line.title}》`;
+          sent.append(source);
+        } else if (info.words.length) {
+          sent.textContent = {
+            zht: `試著用「${info.words[0]}」說一句話吧！`,
+            zhs: `试着用“${info.words[0]}”说一句话吧！`,
+            en: `Try saying a sentence with "${info.words[0]}"!`
+          }[language];
+        }
+        item.append(sent);
+        item.addEventListener('pointerdown', () => speakText(char));
+        grid.append(item);
+
+        let part = `${char}`;
+        if (info.words.length) part += `。组词：${info.words.join('，')}`;
+        if (info.line) part += `。诗句：${info.line.text}`;
+        else if (info.words.length) part += `。试着用${info.words[0]}说一句话吧`;
+        speakParts.push(part);
+      });
+
+      card.append(title, grid);
+      field.append(card);
+      speakText(`变出新字！${speakParts.join('。')}！`);
+      await wait(holdMs);
+      card.remove();
     }
 
     // 相遇詳解卡：兩個字的五行由來 + 生剋判定 + 結果
@@ -967,7 +1146,7 @@
 
     function acceptSentence(text) {
       if (game.phase !== 'listen') return;
-      const chars = [...text].filter(c => HAN.test(c)).slice(0, MAX_CHARS);
+      const chars = [...text].filter(c => HAN.test(c)).slice(0, maxChars());
       if (!chars.length) return;
       const sideKey = game.turn;
       game.squads[sideKey] = chars.map((char, i) => makeTile(char, sideKey, i, chars.length));
@@ -1030,6 +1209,7 @@
           game.points.L += 2;
           game.points.R += 2;
           game.newChars.push(word);
+          updateHud();
           await wait(1400);
           return true;
         };
@@ -1041,11 +1221,13 @@
           const [l2, r2] = PARTS.d[b.char];
           speakText(`${a.char}，${l1}加${r1}。${b.char}，${l2}加${r2}。偏旁换一换！${n1}！${n2}！`);
           await comboSwap(a, b, n1, n2, y, size, midX);
+          await showNewCharCard(n1, n2, game.level === 1 ? 9000 : 5200);
           spawnNewChar(n1, 'L', y);
           spawnNewChar(n2, 'R', y);
           game.points.L += 2;
           game.points.R += 2;
           game.newChars.push(n1, n2);
+          updateHud();
           await wait(1500);
         } else if (KE[elA] === elB || KE[elB] === elA) {
           // 相剋：剋者勝，弱字碎裂，強字直衝對方
@@ -1068,6 +1250,7 @@
             burstTile(b);
             game.points.L += 1;
             game.points.R += 1;
+            updateHud();
             await wait(500);
           }
         } else {
@@ -1183,6 +1366,7 @@
 
     function startGame() {
       resetGame();
+      typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
       startOverlay.classList.remove('is-visible');
       endOverlay.classList.remove('is-visible');
       beginTurn(game.starter);
@@ -1204,11 +1388,18 @@
         chip.addEventListener('click', () => speakText(char));
         box.append(chip);
       });
+      document.getElementById('retryButton').textContent =
+        (game.level === 1 ? pageStrings.nextLevel : pageStrings.again)[language];
       endOverlay.classList.add('is-visible');
     }
 
-    document.getElementById('startButton').addEventListener('click', () => { unlockTTS(); startGame(); });
-    document.getElementById('retryButton').addEventListener('click', () => { unlockTTS(); startGame(); });
+    document.getElementById('startL1').addEventListener('click', () => { unlockTTS(); game.level = 1; startGame(); });
+    document.getElementById('startL2').addEventListener('click', () => { unlockTTS(); game.level = 2; startGame(); });
+    document.getElementById('retryButton').addEventListener('click', () => {
+      unlockTTS();
+      if (game.level === 1) game.level = 2;
+      startGame();
+    });
 
     /* ---------- 朗讀（穩定版） ---------- */
     let resumeAfterSpeech = false;
@@ -1328,7 +1519,7 @@
       if (game.phase !== 'listen') return;
       game.listening = true;
       micButton.classList.add('is-listening');
-      setLive(pageStrings.listening[language]);
+      setLive(pageStrings[`listening${game.level}`][language]);
       try { startRecognition(); } catch { stopListening(); }
     });
 

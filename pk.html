@@ -642,7 +642,7 @@
 
       <div class="overlay is-visible" id="startOverlay">
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
-        <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；同属一行就比笔画。每次相遇都会讲解两个字的五行由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; same-element characters compare strokes. Every clash explains each character's element and why. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；同屬一行就比筆畫。每次相遇都會講解兩個字的五行由來。心先掉光的一方輸！</p>
+        <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；拼不出新字就比组字力——能和场上任何字拼出新字的胜出。每次相遇都会讲解两个字的五行与部件由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; otherwise it's a forging contest—the character that can forge a new character with anything on screen wins. Every clash explains each character's element and components. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
         <div class="demo">江(水) + 灯(火) → 水剋火！　·　打 + 江 → <b>扛</b> + <b>汀</b></div>
         <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
@@ -676,7 +676,6 @@
     </form>
   </footer>
 
-  <script src="stroke-order-jian.js"></script>
   <script src="hanzi-parts.js"></script>
   <script src="wuxing-ciyu.js?v=2"></script>
   <script src="opencc-t2cn.js"></script>
@@ -728,6 +727,17 @@
       verdictSameAlly: {
         zht: el => `同屬${el}，同氣連枝！`, zhs: el => `同属${el}，同气连枝！`, en: el => `Both ${EL_EN[el]}—kindred spirits!`
       },
+      verdictForge: {
+        zht: '比組字力！誰能拼出新字？', zhs: '比组字力！谁能拼出新字？', en: 'Forging contest! Who can make a new character?'
+      },
+      resultForge: {
+        zht: (c, p, m) => `「${c}」能與「${p}」拼成「${m}」，勝出！`,
+        zhs: (c, p, m) => `“${c}”能与“${p}”拼成“${m}”，胜出！`,
+        en: (c, p, m) => `"${c}" can forge "${m}" with "${p}"—it wins!`
+      },
+      verdictAlly: {
+        zht: '字字有緣，結盟！', zhs: '字字有缘，结盟！', en: 'A perfect match!'
+      },
       resultStroke: {
         zht: (c, n, m) => `「${c}」${n} 畫勝 ${m} 畫！`, zhs: (c, n, m) => `“${c}”${n} 画胜 ${m} 画！`, en: (c, n, m) => `"${c}" wins, ${n} vs ${m} strokes!`
       },
@@ -746,13 +756,8 @@
 
     /* ---------- 資料 ---------- */
     const PARTS = window.HANZI_PARTS || { d: {}, c: {}, p: {} };
-    const STROKES = window.STROKE_ORDER_JIAN || {};
     const HAN = /[㐀-鿿]/;
 
-    function energyOf(char) {
-      const code = STROKES[char];
-      return code ? code.length : 8;
-    }
 
     /* ---------- 五行與詞語 ---------- */
     const ELEMENT_OF = {};
@@ -768,15 +773,28 @@
       for (let i = 0; i + 1 < s.length; i += 2) WORD_SET.add(s.slice(i, i + 2));
     }
 
-    // 部首未覆蓋時按筆畫尾數定五行（五格數理慣例）
-    const NUMEROLOGY = ['水', '木', '木', '火', '火', '土', '土', '金', '金', '水'];
     const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
     const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
     const EL_COLOR = { 金: '#ffd98a', 木: '#7fd8b8', 水: '#7ab8ff', 火: '#ff6b52', 土: '#c39a54' };
     const EL_EN = { 金: 'Metal', 木: 'Wood', 水: 'Water', 火: 'Fire', 土: 'Earth' };
 
     function elementOf(char) {
-      return ELEMENT_OF[char] || NUMEROLOGY[energyOf(char) % 10];
+      return ELEMENT_OF[char] || null;
+    }
+
+    // 組字力：這個字能和「場上任何字」拼出新字嗎？
+    function forgePower(char, allChars) {
+      let count = 0;
+      let sample = null;
+      for (const other of allChars) {
+        if (other === char || other.length !== 1) continue;
+        const made = recombine(char, other);
+        if (made) {
+          count += 1;
+          if (!sample) sample = { partner: other, made: made[0] };
+        }
+      }
+      return { count, sample };
     }
 
     // 每個字五行的「由來」說明
@@ -790,12 +808,15 @@
           en: `radical ${r} → ${EL_EN[element]}`
         };
       }
-      const n = energyOf(char);
-      return {
-        zht: `${n} 畫，數理屬${element}`,
-        zhs: `${n} 画，数理属${element}`,
-        en: `${n} strokes → ${EL_EN[element]}`
-      };
+      if (PARTS.d[char]) {
+        const [l, r] = PARTS.d[char];
+        return {
+          zht: `部件：${l} ＋ ${r}`,
+          zhs: `部件：${l} ＋ ${r}`,
+          en: `parts: ${l} + ${r}`
+        };
+      }
+      return { zht: '獨體字', zhs: '独体字', en: 'single-component' };
     }
 
     // 相生相剋的典故背景
@@ -943,10 +964,12 @@
       el.style.setProperty('--tile', `${size}px`);
       el.textContent = char;
       const element = elementOf(char);
-      const badge = document.createElement('i');
-      badge.textContent = element;
-      badge.style.color = EL_COLOR[element];
-      el.append(badge);
+      if (element || PARTS.d[char]) {
+        const badge = document.createElement('i');
+        badge.textContent = element || PARTS.d[char][0];
+        badge.style.color = element ? EL_COLOR[element] : 'var(--jade)';
+        el.append(badge);
+      }
       const startX = sideKey === 'L' ? -size : field.clientWidth;
       el.style.transform = `translate(${startX}px, ${rowY(index, total)}px)`;
       field.append(el);
@@ -1208,8 +1231,6 @@
 
         const word = wordOf(a.char, b.char);
         const combo = recombine(a.char, b.char);
-        const ea = energyOf(a.char);
-        const eb = energyOf(b.char);
         const elA = elementOf(a.char);
         const elB = elementOf(b.char);
 
@@ -1257,7 +1278,7 @@
           game.newChars.push(n1, n2);
           updateHud();
           await wait(1500);
-        } else if (KE[elA] === elB || KE[elB] === elA) {
+        } else if (elA && elB && (KE[elA] === elB || KE[elB] === elA)) {
           // 相剋：剋者勝，弱字碎裂，強字直衝對方
           const winner = KE[elA] === elB ? a : b;
           const loser = winner === a ? b : a;
@@ -1266,7 +1287,7 @@
           await showClash(a, b, story[language], pageStrings.resultKe[language](winner.char));
           burstTile(loser);
           await smash(winner);
-        } else if (SHENG[elA] === elB || SHENG[elB] === elA) {
+        } else if (elA && elB && (SHENG[elA] === elB || SHENG[elB] === elA)) {
           // 相生：能組詞或拼新字；都不行就共生共榮
           const pairKey = SHENG[elA] === elB ? elA + elB : elB + elA;
           const story = SHENG_STORY[pairKey];
@@ -1282,20 +1303,30 @@
             await wait(500);
           }
         } else {
-          // 同屬一行：同氣連枝也能組詞，否則比筆畫
-          const done = await wordAlly(pageStrings.verdictSameAlly[language](elA), `同属${elA}，同气连枝！`);
+          // 同屬一行或無五行：先組詞，再比組字力——
+          // 能和場上任何字（含雙方句子與戰利品）拼出新字的勝出
+          const sameElement = elA && elA === elB;
+          const done = await wordAlly(
+            sameElement ? pageStrings.verdictSameAlly[language](elA) : pageStrings.verdictAlly[language],
+            sameElement ? `同属${elA}，同气连枝！` : '字字有缘！');
           if (!done) {
-            if (ea !== eb) {
-              const winner = ea > eb ? a : b;
-              const loser = ea > eb ? b : a;
-              speakText(`${speakWhy}同属${elA}，比笔画！${winner.char}获胜！`);
-              await showClash(a, b, pageStrings.verdictSame[language](elA),
-                pageStrings.resultStroke[language](winner.char, Math.max(ea, eb), Math.min(ea, eb)));
+            const onScreen = [...L, ...R].map(tile => tile.char)
+              .concat([...document.getElementById('shelfL').children].map(chip => chip.textContent))
+              .concat([...document.getElementById('shelfR').children].map(chip => chip.textContent));
+            const fa = forgePower(a.char, onScreen);
+            const fb = forgePower(b.char, onScreen);
+            if (fa.count !== fb.count) {
+              const winner = fa.count > fb.count ? a : b;
+              const loser = winner === a ? b : a;
+              const power = fa.count > fb.count ? fa : fb;
+              speakText(`${speakWhy}${winner.char}能和${power.sample.partner}拼成${power.sample.made}，组字力胜出！`);
+              await showClash(a, b, pageStrings.verdictForge[language],
+                pageStrings.resultForge[language](winner.char, power.sample.partner, power.sample.made));
               burstTile(loser);
               await smash(winner);
             } else {
               speakText(`${speakWhy}势均力敌，同归于尽！`);
-              await showClash(a, b, pageStrings.verdictSame[language](elA), pageStrings.resultTie[language]);
+              await showClash(a, b, pageStrings.verdictForge[language], pageStrings.resultTie[language]);
               burstTile(a);
               burstTile(b);
               await wait(500);

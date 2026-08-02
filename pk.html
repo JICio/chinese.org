@@ -444,6 +444,32 @@
       white-space: nowrap;
     }
 
+    .evo-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 5px;
+    }
+
+    .evo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .evo-item b {
+      font-size: 30px;
+      font-weight: 400;
+      color: var(--led-gold);
+      line-height: 1.15;
+    }
+
+    .evo-item small {
+      font-size: 9px;
+      color: rgba(241, 238, 230, .42);
+      letter-spacing: .12em;
+    }
+
     .cc-vs {
       font-size: 15px;
       font-weight: 800;
@@ -644,6 +670,7 @@
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
         <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；拼不出新字就比组字力——能和场上任何字拼出新字的胜出。每次相遇都会讲解两个字的五行与部件由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; otherwise it's a forging contest—the character that can forge a new character with anything on screen wins. Every clash explains each character's element and components. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
         <div class="demo">江(水) + 灯(火) → 水剋火！　·　打 + 江 → <b>扛</b> + <b>汀</b></div>
+        <p style="font-size:10px; color:rgba(241,238,230,.32); letter-spacing:.05em;" data-zht="篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND" data-zhs="篆体字形：崇羲篆体（中研院小学堂）· CC BY-ND" data-en="Seal glyphs: ChongXi Seal (Academia Sinica) · CC BY-ND">篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND</p>
         <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
       </div>
@@ -1088,7 +1115,7 @@
         const py = document.createElement('span');
         py.textContent = info.pinyin;
         head.append(big, py);
-        item.append(head);
+        item.append(head, evoRow(char));
         if (info.words.length) {
           const words = document.createElement('div');
           words.className = 'nc-words';
@@ -1127,6 +1154,41 @@
       card.remove();
     }
 
+    /* 篆體字體（崇羲篆體，中研院小學堂，CC BY-ND，原樣轉發）背景載入 */
+    let sealReady = false;
+    if (window.FontFace && document.fonts) {
+      const sealFont = new FontFace('ChongXi Seal', "url('assets/chongxi_seal.otf')", { display: 'swap' });
+      sealFont.load().then(loaded => {
+        document.fonts.add(loaded);
+        sealReady = true;
+      }).catch(() => {});
+    }
+
+    const EVO_STAGES = [
+      { key: 'seal', label: { zht: '小篆', zhs: '小篆', en: 'SEAL' }, family: "'ChongXi Seal', serif" },
+      { key: 'kai', label: { zht: '楷書', zhs: '楷书', en: 'KAI' }, family: "'Kaiti SC', 'Kaiti TC', 'STKaiti', 'DFKai-SB', 'BiauKai', serif" },
+      { key: 'xing', label: { zht: '行草', zhs: '行草', en: 'CURSIVE' }, family: "'Xingkai SC', 'Xingkai TC', 'STXingkai', 'Kaiti SC', cursive" }
+    ];
+
+    // 字形演變列：小篆 → 楷書 → 行草
+    function evoRow(char) {
+      const row = document.createElement('div');
+      row.className = 'evo-row';
+      EVO_STAGES.forEach(stage => {
+        if (stage.key === 'seal' && !sealReady) return;
+        const item = document.createElement('div');
+        item.className = 'evo-item';
+        const glyph = document.createElement('b');
+        glyph.textContent = char;
+        glyph.style.fontFamily = stage.family;
+        const label = document.createElement('small');
+        label.textContent = stage.label[language];
+        item.append(glyph, label);
+        row.append(item);
+      });
+      return row;
+    }
+
     // 相遇詳解卡：兩個字的五行由來 + 生剋判定 + 結果
     async function showClash(aTile, bTile, verdictText, resultText, holdMs = 4200) {
       const card = document.createElement('div');
@@ -1147,7 +1209,7 @@
         big.style.color = EL_COLOR[elementOf(tile.char)];
         const why = document.createElement('small');
         why.textContent = elementWhy(tile.char)[language];
-        fighter.append(big, why);
+        fighter.append(big, why, evoRow(tile.char));
         row.append(fighter);
       });
       const verdict = document.createElement('div');

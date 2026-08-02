@@ -307,6 +307,7 @@
   <script src="tangshi300.js"></script>
   <script src="hanzi-parts.js"></script>
   <script src="wuxing-ciyu.js?v=2"></script>
+  <script src="neural-tts.js"></script>
   <script src="shuowen-data.js"></script>
   <script>
     /* ---------- 語言 ---------- */
@@ -465,6 +466,7 @@
     }
 
     function unlockTTS() {
+      window.NeuralTTS?.unlock();
       if (ttsUnlocked || !('speechSynthesis' in window)) return;
       ttsUnlocked = true;
       const utterance = new SpeechSynthesisUtterance(' ');
@@ -482,6 +484,17 @@
     }
 
     function speakOne(text) {
+      if (window.NeuralTTS && window.NeuralTTS.enabled) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        return window.NeuralTTS.speak(text).catch(() => {
+          window.NeuralTTS.markFailure();
+          return browserSpeakOne(text);
+        });
+      }
+      return browserSpeakOne(text);
+    }
+
+    function browserSpeakOne(text) {
       return new Promise(resolve => {
         if (!('speechSynthesis' in window) || !text) { resolve(); return; }
         const synth = window.speechSynthesis;

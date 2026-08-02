@@ -12,6 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chinese.org/speak.html">
   <link rel="icon" href="assets/logo-hua.png" type="image/png">
+  <script src="neural-tts.js" defer></script>
   <style>
     :root {
       --ink: #0b0b0a;
@@ -742,6 +743,7 @@
 
     // iOS 要求首次發聲發生在用戶手勢內，之後才允許延遲播放
     function unlockTTS() {
+      window.NeuralTTS?.unlock();
       if (ttsUnlocked || !('speechSynthesis' in window)) return;
       ttsUnlocked = true;
       const utterance = new SpeechSynthesisUtterance(' ');
@@ -750,6 +752,35 @@
     }
 
     function speakText(text) {
+      if (!text) return;
+      // 神經語音優先，按識別語言選聲音
+      if (window.NeuralTTS && window.NeuralTTS.enabled) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (state.listening && recognition && !resumeAfterSpeech) {
+          resumeAfterSpeech = true;
+          recognition.abort();
+        }
+        const finish = () => {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(() => {
+            if (resumeAfterSpeech && state.listening) {
+              resumeAfterSpeech = false;
+              try { startRecognition(); } catch { stopListening(); }
+            }
+          }, 300);
+        };
+        const voice = { 'en-US': 'en-US-AnaNeural', 'yue-Hant-HK': 'zh-HK-HiuMaanNeural' }[state.recogLang]
+          || 'zh-CN-XiaoxiaoNeural';
+        window.NeuralTTS.speak(text, { voice }).then(finish).catch(() => {
+          window.NeuralTTS.markFailure();
+          browserSpeak(text);
+        });
+        return;
+      }
+      browserSpeak(text);
+    }
+
+    function browserSpeak(text) {
       if (!('speechSynthesis' in window) || !text) return;
       const synth = window.speechSynthesis;
 

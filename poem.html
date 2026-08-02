@@ -466,6 +466,7 @@
 
   <script src="opencc-t2cn.js"></script>
   <script src="tangshi300.js"></script>
+  <script src="neural-tts.js"></script>
   <script src="tangshi-info.js"></script>
   <script>
     /* ---------- UI 語言 ---------- */
@@ -830,6 +831,7 @@
     }
 
     function unlockTTS() {
+      window.NeuralTTS?.unlock();
       if (ttsUnlocked || !('speechSynthesis' in window)) return;
       ttsUnlocked = true;
       const utterance = new SpeechSynthesisUtterance(' ');
@@ -838,6 +840,33 @@
     }
 
     function speakText(text) {
+      if (!text) return;
+      // 神經語音（曉曉）優先，失敗自動回退瀏覽器語音
+      if (window.NeuralTTS && window.NeuralTTS.enabled) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (game.listening && recognition && !resumeAfterSpeech) {
+          resumeAfterSpeech = true;
+          recognition.abort();
+        }
+        const finish = () => {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(() => {
+            if (resumeAfterSpeech && game.listening) {
+              resumeAfterSpeech = false;
+              try { startRecognition(); } catch { stopListening(); }
+            }
+          }, 300);
+        };
+        window.NeuralTTS.speak(text).then(finish).catch(() => {
+          window.NeuralTTS.markFailure();
+          browserSpeak(text);
+        });
+        return;
+      }
+      browserSpeak(text);
+    }
+
+    function browserSpeak(text) {
       if (!('speechSynthesis' in window) || !text) return;
       const synth = window.speechSynthesis;
       let justAborted = false;

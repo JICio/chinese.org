@@ -808,6 +808,7 @@
     </form>
   </footer>
 
+  <script src="neural-tts.js"></script>
   <script src="hanzi-parts.js"></script>
   <script src="wuxing-ciyu.js?v=2"></script>
   <script src="opencc-t2cn.js"></script>
@@ -1170,11 +1171,11 @@
       field.append(note);
 
       if (parts.length === 2) {
-        speakText(`${char}，拆开是${parts[0]}和${parts[1]}。`
+        speakText(`${char}：${parts[0]}、${parts[1]}。`
           + (meanings[0] ? `${parts[0]}，${meanings[0]}。` : '')
           + (meanings[1] ? `${parts[1]}，${meanings[1]}。` : ''));
       } else {
-        speakText(`${char}，独体字，本身就是一个部件！`);
+        speakText(`${char}，独体字。`);
       }
 
       const pieces = [];
@@ -1273,7 +1274,7 @@
       let speech;
       if (parts) {
         const exclude = new Set([char]);
-        speech = `${char}，拆开是${parts[0]}和${parts[1]}。`;
+        speech = `${char}：${parts[0]}、${parts[1]}。`;
         parts.forEach((p, i) => {
           const wrap = document.createElement('div');
           wrap.className = 'ex-part';
@@ -1300,14 +1301,14 @@
             wrap.style.transform = `translate(-50%, -50%) translateX(${i === 0 ? -135 : 135}px)`;
           }));
           if (meaning) speech += `${p}，${meaning}。`;
-          if (examples.length) speech += `用${p}的字还有，${examples.join('，')}。`;
+          if (examples.length) speech += `例字：${examples.join('，')}。`;
         });
       } else {
         const solo = document.createElement('div');
         solo.className = 'ex-solo';
         solo.textContent = { zht: '獨體字，拆不開啦！它自己就是部件。', zhs: '独体字，拆不开啦！它自己就是部件。', en: 'A single-component character—nothing to split!' }[language];
         modal.append(solo);
-        speech = `${char}，独体字，拆不开啦！它自己就是部件。`;
+        speech = `${char}，独体字。`;
       }
 
       const close = document.createElement('button');
@@ -1434,16 +1435,13 @@
         item.addEventListener('pointerdown', () => explodeView(char));
         grid.append(item);
 
-        let part = `${char}`;
-        if (info.words.length) part += `。组词：${info.words.join('，')}`;
-        if (info.line) part += `。诗句：${info.line.text}`;
-        else if (info.words.length) part += `。试着用${info.words[0]}说一句话吧`;
-        speakParts.push(part);
+        const d = PARTS.d[char];
+        speakParts.push(d ? `${char}：${d[0]}加${d[1]}` : char);
       });
 
       card.append(title, grid);
       field.append(card);
-      speakText(`变出新字！${speakParts.join('。')}！`);
+      speakText(`${speakParts.join('。')}。`);
       await wait(holdMs);
       card.remove();
     }
@@ -1614,7 +1612,7 @@
             if (game.phase !== 'battle') return;
             const pieceL = allPieces.find(p => p.part === forged.l) || piecesA[0];
             const pieceR = allPieces.find(p => p.part === forged.r && p !== pieceL) || piecesB[0];
-            speakText(`${forged.l}，加${forged.r}，变成新字，${forged.char}！`);
+            speakText(`${forged.l}，加${forged.r}：${forged.char}！`);
             await forgeMerge(pieceL, pieceR, forged.char, y, size, midX);
             const owner = piecesA.some(p => p.part === forged.l) ? a.side : b.side;
             spawnNewChar(forged.char, owner, y);
@@ -1627,7 +1625,7 @@
           await showNewCharCard(news.map(n => n.char), game.level === 1 ? 9000 : 5200);
         } else if (word) {
           // ② 拼不出新字，但正好組成詞語：結盟
-          speakText(`${a.char}和${b.char}，正好组成新词，${word}！`);
+          speakText(`组词：${word}！`);
           await showClash(a, b, pageStrings.verdictAlly[language], pageStrings.resultWord[language](word));
           clearPieces();
           spawnNewChar(word, 'L', y);
@@ -1639,7 +1637,6 @@
           await wait(1400);
         } else {
           // ② 什麼也拼不出：同歸於盡
-          speakText('拼不出新字，势均力敌，同归于尽！');
           await showClash(a, b, pageStrings.verdictForge[language], pageStrings.resultTie[language]);
           clearPieces();
           await wait(500);
@@ -1828,6 +1825,7 @@
     }
 
     function unlockTTS() {
+      window.NeuralTTS?.unlock();
       if (ttsUnlocked || !('speechSynthesis' in window)) return;
       ttsUnlocked = true;
       const utterance = new SpeechSynthesisUtterance(' ');
@@ -1836,6 +1834,33 @@
     }
 
     function speakText(text) {
+      if (!text) return;
+      // 神經語音（曉曉）優先，失敗自動回退瀏覽器語音
+      if (window.NeuralTTS && window.NeuralTTS.enabled) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (game.listening && recognition && !resumeAfterSpeech) {
+          resumeAfterSpeech = true;
+          recognition.abort();
+        }
+        const finish = () => {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(() => {
+            if (resumeAfterSpeech && game.listening) {
+              resumeAfterSpeech = false;
+              try { startRecognition(); } catch { stopListening(); }
+            }
+          }, 300);
+        };
+        window.NeuralTTS.speak(text).then(finish).catch(() => {
+          window.NeuralTTS.markFailure();
+          browserSpeak(text);
+        });
+        return;
+      }
+      browserSpeak(text);
+    }
+
+    function browserSpeak(text) {
       if (!('speechSynthesis' in window) || !text) return;
       const synth = window.speechSynthesis;
       let justAborted = false;

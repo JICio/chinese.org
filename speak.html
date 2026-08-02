@@ -447,6 +447,7 @@
       <b data-zht="童聲跑馬燈" data-zhs="童声跑马灯" data-en="Speak &amp; Scroll">童聲跑馬燈</b>
       <span data-zht="對著手機說中文，字就跑起來" data-zhs="对着手机说中文，字就跑起来" data-en="Say it in Chinese — watch it fly">對著手機說中文，字就跑起來</span>
     </p>
+    <a href="tts.html" style="font-size:17px;text-decoration:none" aria-label="選擇聲音">🔊</a>
     <div class="language-switcher" role="group" aria-label="選擇語言">
       <button type="button" data-language-option="zht" aria-pressed="true" class="is-active">繁</button>
       <button type="button" data-language-option="zhs" aria-pressed="false">简</button>
@@ -691,7 +692,22 @@
     if ('speechSynthesis' in window) {
       const loadVoices = () => { ttsVoices = window.speechSynthesis.getVoices(); };
       loadVoices();
+      window.speechSynthesis.cancel(); // 清掉可能卡死的舊隊列
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+
+    // 使用者在 tts.html 親自選定的聲音優先（僅中文）；'default' 表示強制瀏覽器預設
+    function resolveVoice(lang) {
+      const stored = localStorage.getItem('chinese_tts_voice');
+      if (lang.startsWith('zh')) {
+        if (stored === 'default') return null;
+        if (stored) {
+          const match = ttsVoices.find(v => v.name === stored);
+          if (match) return match;
+        }
+      }
+      return pickVoice(lang);
     }
 
     const BAD_VOICES = new Set();
@@ -748,7 +764,7 @@
       const speakLang = { 'en-US': 'en-US', 'yue-Hant-HK': 'zh-HK' }[state.recogLang] || 'zh-CN';
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = speakLang;
-      const voice = pickVoice(speakLang);
+      const voice = resolveVoice(speakLang);
       if (voice) utterance.voice = voice;
       utterance.rate = 0.95;
       utterance.volume = 1;

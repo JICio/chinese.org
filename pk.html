@@ -662,6 +662,7 @@
       <strong>CHINESE.ORG</strong>
     </a>
     <p class="bar-title" data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</p>
+    <a href="tts.html" style="font-size:17px;text-decoration:none" aria-label="選擇聲音">🔊</a>
     <span class="round-pill"><span data-zht="回合" data-zhs="回合" data-en="Round">回合</span> <b id="roundCount">1</b></span>
   </header>
 
@@ -1556,11 +1557,24 @@
     if ('speechSynthesis' in window) {
       const loadVoices = () => { ttsVoices = window.speechSynthesis.getVoices(); };
       loadVoices();
+      window.speechSynthesis.cancel(); // 清掉可能卡死的舊隊列
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
     // 按瀏覽器挑可靠又自然的中文語音：
     // Chrome 只信 Google 語音（系統增強版在 Chrome 裡會靜音）；Edge 用 Neural；Safari 用增強版/Siri
+
+    // 使用者在 tts.html 親自選定的聲音優先；'default' 表示強制瀏覽器預設
+    function resolveVoice() {
+      const stored = localStorage.getItem('chinese_tts_voice');
+      if (stored === 'default') return null;
+      if (stored) {
+        const match = ttsVoices.find(v => v.name === stored);
+        if (match) return match;
+      }
+      return bestZhVoice();
+    }
+
     const BAD_VOICES = new Set();
 
     function bestZhVoice() {
@@ -1607,7 +1621,7 @@
       }
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-CN';
-      const voice = bestZhVoice();
+      const voice = resolveVoice();
       if (voice) utterance.voice = voice;
       utterance.rate = 0.95;
       utterance.volume = 1;

@@ -418,6 +418,7 @@
       <strong>CHINESE.ORG</strong>
     </a>
     <p class="bar-title" data-zht="唐詩掉落挑戰" data-zhs="唐诗掉落挑战" data-en="Tang Poem Drop">唐詩掉落挑戰</p>
+    <a href="tts.html" style="font-size:17px;text-decoration:none" aria-label="選擇聲音">🔊</a>
     <div class="score-pill" aria-live="polite">
       <span>⭐ <b id="scoreCount">0</b></span>
       <span><span data-zht="句" data-zhs="句" data-en="Lines">句</span> <b id="lineCount">0</b></span>
@@ -783,11 +784,24 @@
     if ('speechSynthesis' in window) {
       const loadVoices = () => { ttsVoices = window.speechSynthesis.getVoices(); };
       loadVoices();
+      window.speechSynthesis.cancel(); // 清掉可能卡死的舊隊列
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
     // 按瀏覽器挑可靠又自然的中文語音：
     // Chrome 只信 Google 語音（系統增強版在 Chrome 裡會靜音）；Edge 用 Neural；Safari 用增強版/Siri
+
+    // 使用者在 tts.html 親自選定的聲音優先；'default' 表示強制瀏覽器預設
+    function resolveVoice() {
+      const stored = localStorage.getItem('chinese_tts_voice');
+      if (stored === 'default') return null;
+      if (stored) {
+        const match = ttsVoices.find(v => v.name === stored);
+        if (match) return match;
+      }
+      return bestZhVoice();
+    }
+
     const BAD_VOICES = new Set();
 
     function bestZhVoice() {
@@ -834,7 +848,7 @@
       }
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-CN';
-      const voice = bestZhVoice();
+      const voice = resolveVoice();
       if (voice) utterance.voice = voice;
       utterance.rate = 0.95;
       utterance.volume = 1;

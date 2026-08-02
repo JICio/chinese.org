@@ -286,7 +286,7 @@
       <strong>CHINESE.ORG</strong>
     </a>
     <p class="bar-title" data-zht="小道士說文解字" data-zhs="小道士说文解字" data-en="Little Taoist's Shuowen">小道士說文解字</p>
-    <span class="bar-spacer">☯️</span>
+    <a class="bar-spacer" href="tts.html" style="text-decoration:none" aria-label="選擇聲音">🔊</a>
   </header>
 
   <main class="story" id="story"></main>
@@ -419,11 +419,24 @@
     if ('speechSynthesis' in window) {
       const loadVoices = () => { ttsVoices = window.speechSynthesis.getVoices(); };
       loadVoices();
+      window.speechSynthesis.cancel(); // 清掉可能卡死的舊隊列
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
     // 按瀏覽器挑可靠又自然的中文語音：
     // Chrome 只信 Google 語音（系統增強版在 Chrome 裡會靜音）；Edge 用 Neural；Safari 用增強版/Siri
+
+    // 使用者在 tts.html 親自選定的聲音優先；'default' 表示強制瀏覽器預設
+    function resolveVoice() {
+      const stored = localStorage.getItem('chinese_tts_voice');
+      if (stored === 'default') return null;
+      if (stored) {
+        const match = ttsVoices.find(v => v.name === stored);
+        if (match) return match;
+      }
+      return bestZhVoice();
+    }
+
     const BAD_VOICES = new Set();
 
     function bestZhVoice() {
@@ -474,7 +487,7 @@
         const synth = window.speechSynthesis;
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-CN';
-        const voice = bestZhVoice();
+        const voice = resolveVoice();
         if (voice) utterance.voice = voice;
         utterance.rate = 0.95;
         utterance.volume = 1;

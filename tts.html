@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>選一個聲音 — Chinese.org</title>
+  <meta name="theme-color" content="#0b0b0a">
+  <link rel="icon" href="assets/logo-hua.png" type="image/png">
+  <style>
+    :root {
+      --ink: #0b0b0a;
+      --paper: #f1eee6;
+      --coral: #e36a4c;
+      --led-gold: #ffd98a;
+      --jade: #7fd8b8;
+      --muted: rgba(241, 238, 230, .52);
+      --line: rgba(241, 238, 230, .14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "Avenir Next", "PingFang SC", "PingFang TC", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      padding-top: calc(10px + env(safe-area-inset-top));
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      background: rgba(11, 11, 10, .95);
+      z-index: 5;
+    }
+
+    .bar a { color: var(--paper); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+
+    .bar img { width: 24px; height: 24px; filter: invert(1); }
+
+    .bar h1 { flex: 1; text-align: center; font-size: 15px; letter-spacing: .1em; color: var(--led-gold); }
+
+    main { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(30px + env(safe-area-inset-bottom)); }
+
+    .tip {
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .voice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 8px;
+      transition: border-color 200ms ease, background 200ms ease;
+    }
+
+    .voice.is-playing { border-color: var(--led-gold); background: rgba(255, 217, 138, .07); }
+    .voice.is-chosen { border-color: var(--jade); background: rgba(127, 216, 184, .08); }
+
+    .voice .info { flex: 1; min-width: 0; }
+
+    .voice .name { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .voice .meta { font-size: 11px; color: var(--muted); }
+
+    .voice .status { font-size: 13px; min-width: 40px; text-align: center; }
+
+    .voice .play {
+      padding: 8px 14px;
+      border: 1px solid var(--coral);
+      border-radius: 999px;
+      background: rgba(227, 106, 76, .18);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .voice .choose {
+      padding: 8px 14px;
+      border: 1px solid var(--jade);
+      border-radius: 999px;
+      background: rgba(127, 216, 184, .12);
+      font-size: 14px;
+      color: var(--jade);
+      white-space: nowrap;
+    }
+
+    .voice.is-chosen .choose { background: var(--jade); color: #0b0b0a; font-weight: 700; }
+
+    .empty { text-align: center; color: var(--muted); padding: 40px 0; line-height: 2; }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <a href="index.html"><img src="assets/logo-hua.png" alt="">CHINESE.ORG</a>
+    <h1>選一個最好聽的聲音</h1>
+    <span style="width:90px"></span>
+  </header>
+
+  <main>
+    <p class="tip">
+      每台裝置、每個瀏覽器能用的聲音都不一樣。逐個點「試聽」，聽到<b style="color:var(--led-gold)">有聲音而且自然</b>的，就點「用它」——
+      跑馬燈、唐詩、龍虎鬥、小道士四個頁面都會改用你選的聲音。試聽沒有聲音的，說明這個聲音在當前瀏覽器裡是壞的，換下一個。
+    </p>
+    <div id="list"><div class="empty">正在載入聲音列表……<br>（部分瀏覽器需要等一兩秒）</div></div>
+  </main>
+
+  <script>
+    const SAMPLE = '你好呀！床前明月光，疑是地上霜。我是這個聲音，好聽嗎？';
+    const list = document.getElementById('list');
+    let voices = [];
+    let chosen = localStorage.getItem('chinese_tts_voice') || '';
+
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+
+    function render() {
+      voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('zh'));
+      if (!voices.length) return;
+      list.innerHTML = '';
+
+      const rows = [{ name: '', label: '瀏覽器預設（自動）', meta: 'default' }]
+        .concat(voices.map(v => ({ name: v.name, label: v.name, meta: `${v.lang} · ${v.localService ? '本機' : '網路'}`, voice: v })));
+
+      rows.forEach(row => {
+        const el = document.createElement('div');
+        el.className = 'voice' + ((chosen || '') === row.name ? ' is-chosen' : '');
+        const info = document.createElement('div');
+        info.className = 'info';
+        info.innerHTML = `<div class="name">${row.label}</div><div class="meta">${row.meta}</div>`;
+        const status = document.createElement('div');
+        status.className = 'status';
+        const play = document.createElement('button');
+        play.className = 'play';
+        play.textContent = '▶ 試聽';
+        play.addEventListener('click', () => {
+          speechSynthesis.cancel();
+          document.querySelectorAll('.voice').forEach(x => x.classList.remove('is-playing'));
+          const u = new SpeechSynthesisUtterance(SAMPLE);
+          u.lang = 'zh-CN';
+          if (row.voice) u.voice = row.voice;
+          u.rate = 0.95;
+          u.volume = 1;
+          let started = false;
+          status.textContent = '…';
+          u.onstart = () => { started = true; el.classList.add('is-playing'); status.textContent = '🔉'; };
+          u.onend = () => { el.classList.remove('is-playing'); if (started) status.textContent = '✓'; };
+          u.onerror = () => { el.classList.remove('is-playing'); status.textContent = '⚠️'; };
+          setTimeout(() => { if (!started) status.textContent = '⚠️ 沒聲音'; }, 2500);
+          setTimeout(() => { speechSynthesis.resume(); speechSynthesis.speak(u); }, 120);
+        });
+        const choose = document.createElement('button');
+        choose.className = 'choose';
+        choose.textContent = (chosen || '') === row.name ? '✓ 正在用' : '用它';
+        choose.addEventListener('click', () => {
+          chosen = row.name;
+          if (row.name) localStorage.setItem('chinese_tts_voice', row.name);
+          else localStorage.setItem('chinese_tts_voice', 'default');
+          if (!row.name) chosen = '';
+          localStorage.setItem('chinese_tts_voice', row.name || 'default');
+          render();
+        });
+        el.append(info, status, play, choose);
+        list.append(el);
+      });
+
+      // 標記目前選擇（default 存的是 'default'）
+      const stored = localStorage.getItem('chinese_tts_voice');
+      document.querySelectorAll('.voice').forEach((el, i) => {
+        const isDefault = i === 0 && stored === 'default';
+        const isNamed = rows[i].name && rows[i].name === stored;
+        el.classList.toggle('is-chosen', isDefault || isNamed);
+        el.querySelector('.choose').textContent = (isDefault || isNamed) ? '✓ 正在用' : '用它';
+      });
+    }
+
+    if ('speechSynthesis' in window) {
+      render();
+      speechSynthesis.addEventListener('voiceschanged', render);
+      setTimeout(render, 800);
+    } else {
+      list.innerHTML = '<div class="empty">這個瀏覽器不支援語音合成。</div>';
+    }
+  </script>
+</body>
+</html>

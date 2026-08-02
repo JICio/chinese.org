@@ -1559,6 +1559,24 @@
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
+    // 按質量打分挑選最自然的中文語音（Edge Neural > 增強版 > Siri 系 > 其他）
+    function bestZhVoice() {
+      const score = v => {
+        const n = v.name.toLowerCase();
+        let s = 0;
+        if (/natural|neural/.test(n)) s += 100;
+        if (/xiaoxiao|xiaoyi|yunxi|yunyang|yunjian/.test(n)) s += 40;
+        if (/enhanced|premium/.test(n)) s += 30;
+        if (/siri/.test(n)) s += 25;
+        if (/tingting|婷婷|meijia|美嘉|lili|sinji/.test(n)) s += 10;
+        if (/^zh[-_]cn/i.test(v.lang)) s += 8;
+        return s;
+      };
+      return ttsVoices
+        .filter(v => v.lang.toLowerCase().startsWith('zh'))
+        .sort((a, b) => score(b) - score(a))[0] || null;
+    }
+
     function unlockTTS() {
       if (ttsUnlocked || !('speechSynthesis' in window)) return;
       ttsUnlocked = true;
@@ -1578,10 +1596,9 @@
       }
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-CN';
-      const voice = ttsVoices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith('zh-cn'))
-        || ttsVoices.find(v => v.lang.toLowerCase().startsWith('zh'));
+      const voice = bestZhVoice();
       if (voice) utterance.voice = voice;
-      utterance.rate = 0.85;
+      utterance.rate = 0.95;
       utterance.volume = 1;
       currentUtterance = utterance;
       const finish = () => {

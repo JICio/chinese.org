@@ -694,17 +694,27 @@
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     }
 
+    const BAD_VOICES = new Set();
+
     function pickVoice(lang) {
       const normalized = voice => voice.lang.toLowerCase().replace('_', '-');
+      const ua = navigator.userAgent;
+      const isEdge = /Edg\//.test(ua);
+      const isChrome = /Chrome\//.test(ua) && !isEdge;
       const candidates = ttsVoices.filter(voice =>
-        normalized(voice).startsWith(lang.split('-')[0].toLowerCase()));
+        normalized(voice).startsWith(lang.split('-')[0].toLowerCase()) && !BAD_VOICES.has(voice.name));
       const score = v => {
         const n = v.name.toLowerCase();
         let s = 0;
-        if (/natural|neural/.test(n)) s += 100;
-        if (/xiaoxiao|xiaoyi|yunxi|yunyang|yunjian/.test(n)) s += 40;
-        if (/enhanced|premium/.test(n)) s += 30;
-        if (/siri/.test(n)) s += 25;
+        if (isEdge && /natural|neural|online/.test(n)) s += 100;
+        if (isChrome) {
+          if (/google/.test(n)) s += 100;
+          if (/enhanced|premium|natural|neural|siri/.test(n)) s -= 60;
+        } else {
+          if (/enhanced|premium/.test(n)) s += 30;
+          if (/siri/.test(n)) s += 25;
+        }
+        if (/xiaoxiao|xiaoyi|yunxi|yunyang|yunjian/.test(n)) s += 20;
         if (/tingting|婷婷|meijia|美嘉|sinji/.test(n)) s += 10;
         if (normalized(v) === lang.toLowerCase()) s += 8;
         return s;
@@ -758,7 +768,23 @@
 
       const go = () => {
         synth.resume();
+        let started = false;
+        utterance.onstart = () => { started = true; };
         synth.speak(utterance);
+        // 所選語音靜音時（Chrome + 系統增強版），2 秒自動拉黑並換預設語音重讀
+        setTimeout(() => {
+          if (started) return;
+          if (utterance.voice) BAD_VOICES.add(utterance.voice.name);
+          synth.cancel();
+          const retry = new SpeechSynthesisUtterance(text);
+          retry.lang = utterance.lang;
+          retry.rate = utterance.rate;
+          retry.volume = 1;
+          retry.onend = finish;
+          retry.onerror = finish;
+          currentUtterance = retry;
+          synth.speak(retry);
+        }, 2000);
       };
 
       clearTimeout(speakTimer);

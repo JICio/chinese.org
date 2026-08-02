@@ -725,6 +725,9 @@
       verdictSame: {
         zht: el => `同屬${el}，比筆畫定勝負！`, zhs: el => `同属${el}，比笔画定胜负！`, en: el => `Both ${EL_EN[el]}—stroke count decides!`
       },
+      verdictSameAlly: {
+        zht: el => `同屬${el}，同氣連枝！`, zhs: el => `同属${el}，同气连枝！`, en: el => `Both ${EL_EN[el]}—kindred spirits!`
+      },
       resultStroke: {
         zht: (c, n, m) => `「${c}」${n} 畫勝 ${m} 畫！`, zhs: (c, n, m) => `“${c}”${n} 画胜 ${m} 画！`, en: (c, n, m) => `"${c}" wins, ${n} vs ${m} strokes!`
       },
@@ -1165,12 +1168,37 @@
       const midX = field.clientWidth / 2 - size / 2;
       const L = game.squads.L;
       const R = game.squads.R;
-      const pairCount = Math.min(L.length, R.length);
+
+      // 智能配對：先把能拼新字的字配到一起，其次能組詞的，剩下按順序
+      const usedL = new Set();
+      const usedR = new Set();
+      const pairs = [];
+      [
+        (x, z) => recombine(x, z),
+        (x, z) => wordOf(x, z)
+      ].forEach(match => {
+        L.forEach((tileL, i) => {
+          if (usedL.has(i)) return;
+          for (let j = 0; j < R.length; j += 1) {
+            if (usedR.has(j)) continue;
+            if (match(tileL.char, R[j].char)) {
+              pairs.push([tileL, R[j]]);
+              usedL.add(i);
+              usedR.add(j);
+              return;
+            }
+          }
+        });
+      });
+      const restL = L.filter((_, i) => !usedL.has(i));
+      const restR = R.filter((_, j) => !usedR.has(j));
+      const restCount = Math.min(restL.length, restR.length);
+      for (let k = 0; k < restCount; k += 1) pairs.push([restL[k], restR[k]]);
+      const pairCount = pairs.length;
 
       for (let i = 0; i < pairCount; i += 1) {
         if (game.phase !== 'battle') return;
-        const a = L[i];
-        const b = R[i];
+        const [a, b] = pairs[i];
         const y = rowY(i, pairCount);
         a.launched = true;
         b.launched = true;
@@ -1255,7 +1283,7 @@
           }
         } else {
           // 同屬一行：同氣連枝也能組詞，否則比筆畫
-          const done = await wordAlly(pageStrings.verdictSame[language](elA), `同属${elA}！`);
+          const done = await wordAlly(pageStrings.verdictSameAlly[language](elA), `同属${elA}，同气连枝！`);
           if (!done) {
             if (ea !== eb) {
               const winner = ea > eb ? a : b;
@@ -1278,7 +1306,7 @@
       }
 
       // 多出來的字直衝對方
-      const extras = L.length > R.length ? L.slice(pairCount) : R.slice(pairCount);
+      const extras = restL.length > restR.length ? restL.slice(restCount) : restR.slice(restCount);
       for (const tile of extras) {
         if (game.phase !== 'battle') return;
         tile.launched = true;

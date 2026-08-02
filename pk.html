@@ -392,6 +392,99 @@
       animation: card-in 250ms ease;
     }
 
+    /* 部件爆炸視圖 */
+    .explode-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 20px;
+      background: rgba(11, 11, 10, .94);
+      backdrop-filter: blur(8px);
+      animation: card-in 250ms ease;
+    }
+
+    .ex-stage {
+      position: relative;
+      width: min(560px, 94vw);
+      height: 250px;
+      flex: none;
+    }
+
+    .ex-char {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 112px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--led-gold);
+      text-shadow: 0 0 30px rgba(255, 217, 138, .5);
+      transition: opacity 800ms ease, transform 800ms ease;
+    }
+
+    .ex-char.is-ghost { opacity: .14; transform: translate(-50%, -50%) scale(1.2); }
+
+    .ex-part {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: transform 950ms cubic-bezier(.3, .9, .35, 1.12), opacity 450ms ease 250ms;
+    }
+
+    .ex-part b {
+      font-size: 66px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--jade);
+      text-shadow: 0 0 24px rgba(127, 216, 184, .6);
+    }
+
+    .ex-part small {
+      max-width: 160px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.55;
+    }
+
+    .ex-eg { display: flex; gap: 6px; }
+
+    .ex-eg button {
+      padding: 3px 10px;
+      border: 1px solid rgba(255, 217, 138, .45);
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--led-gold);
+    }
+
+    .ex-solo { font-size: 15px; color: var(--muted); letter-spacing: .06em; }
+
+    .ex-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    .ex-meta .py { font-size: 21px; font-weight: 700; color: var(--jade); }
+
+    .ex-close {
+      padding: 10px 32px;
+      border: 1px solid var(--coral);
+      border-radius: 999px;
+      background: rgba(227, 106, 76, .2);
+      font-size: 15px;
+      letter-spacing: .08em;
+    }
+
     /* 相遇詳解卡 */
     .clash-card {
       position: absolute;
@@ -680,8 +773,8 @@
 
       <div class="overlay is-visible" id="startOverlay">
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
-        <p data-zht="兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！" data-zhs="两个人面对面，每回合各说一个字。两个字在空中相遇时，会按五行判定：相生的字可以结盟——组成新词或交换偏旁变出新字；相克的字就开战——克者获胜、直冲对方掉一颗心；拼不出新字就比组字力——能和场上任何字拼出新字的胜出。每次相遇都会讲解两个字的五行与部件由来。心先掉光的一方输！" data-en="Each player says one character per round. When the two meet, the Five Elements decide: mutually generating characters ally—forming a word or swapping radicals into new characters; opposing characters fight—the conquering element wins and costs the opponent a heart; otherwise it's a forging contest—the character that can forge a new character with anything on screen wins. Every clash explains each character's element and components. Lose all hearts and you lose!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
-        <div class="demo">江(水) + 灯(火) → 水剋火！　·　打 + 江 → <b>扛</b> + <b>汀</b></div>
+        <p data-zht="兩個人面對面，輪流開口出字。兩個字相遇時，先一個一個拆開講解——它的偏旁部首是什麼、什麼意思；然後雙方的部件交叉搭配，能拼出的新字全都當場鍛造出來，誰的偏旁當了新字的「意思旁」，新字就歸誰，得 2 分。拼不出新字但能組成詞語就結盟。先攢到 20 分的一方獲勝！點場上任何一個字，都能看它的部件爆炸拆解圖！" data-zhs="两个人面对面，轮流开口出字。两个字相遇时，先一个一个拆开讲解——它的偏旁部首是什么、什么意思；然后双方的部件交叉搭配，能拼出的新字全都当场锻造出来，谁的偏旁当了新字的“意思旁”，新字就归谁，得 2 分。拼不出新字但能组成词语就结盟。先攒到 20 分的一方获胜！点场上任何一个字，都能看它的部件爆炸拆解图！" data-en="Take turns saying a character. When the two meet, each is exploded into its components with a kid-friendly explanation, then the components cross-combine and every new character they can form is forged on the spot—whoever's component serves as the meaning-radical claims it for 2 points. If nothing forges but the two make a word, they ally. First to 20 points wins! Tap any character to see its component explosion view!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
+        <div class="demo">打(扌+丁) ⚡ 江(氵+工) → <b>扛</b> ＋ <b>汀</b></div>
         <p style="font-size:10px; color:rgba(241,238,230,.32); letter-spacing:.05em;" data-zht="篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND" data-zhs="篆体字形：崇羲篆体（中研院小学堂）· CC BY-ND" data-en="Seal glyphs: ChongXi Seal (Academia Sinica) · CC BY-ND">篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND</p>
         <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
@@ -798,55 +891,47 @@
     const HAN = /[㐀-鿿]/;
 
 
-    /* ---------- 五行與詞語 ---------- */
-    const ELEMENT_OF = {};
-    const RADICAL_OF = {};
-    Object.entries(window.HANZI_WUXING || {}).forEach(([char, value]) => {
-      ELEMENT_OF[char] = value[0];
-      RADICAL_OF[char] = value.slice(1);
-    });
-
+    /* ---------- 部件知識 ---------- */
     const WORD_SET = new Set();
     {
       const s = window.CIYU2 || '';
       for (let i = 0; i + 1 < s.length; i += 2) WORD_SET.add(s.slice(i, i + 2));
     }
 
-    const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
-    const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
-    const EL_COLOR = { 金: '#ffd98a', 木: '#7fd8b8', 水: '#7ab8ff', 火: '#ff6b52', 土: '#c39a54' };
-    const EL_EN = { 金: 'Metal', 木: 'Wood', 水: 'Water', 火: 'Fire', 土: 'Earth' };
+    // 部件的含義（講給孩子聽的「用法」）
+    const PART_MEANING = {
+      '氵': '三點水，跟水有關', '水': '跟水有關', '冫': '兩點水，跟冰有關',
+      '扌': '提手旁，用手做的動作', '手': '用手做的動作',
+      '木': '跟樹木有關', '艹': '草字頭，跟花草有關', '口': '跟嘴巴有關',
+      '心': '跟心情有關', '忄': '豎心旁，跟心情有關',
+      '火': '跟火有關', '灬': '四點底，跟火有關',
+      '亻': '單人旁，跟人有關', '人': '跟人有關', '女': '跟女子有關', '子': '跟孩子有關',
+      '土': '跟泥土有關', '石': '跟石頭有關', '山': '跟山有關', '田': '跟田地有關',
+      '日': '跟太陽有關', '月': '跟月亮或身體有關', '雨': '跟天氣有關',
+      '金': '跟金屬有關', '钅': '金字旁，跟金屬有關',
+      '糸': '跟絲線有關', '纟': '絞絲旁，跟絲線有關',
+      '足': '跟腳有關', '目': '跟眼睛有關', '耳': '跟耳朵有關',
+      '馬': '跟馬有關', '马': '跟馬有關', '鳥': '跟鳥有關', '鸟': '跟鳥有關',
+      '魚': '跟魚有關', '鱼': '跟魚有關', '犭': '反犬旁，跟動物有關', '虫': '跟小蟲子有關',
+      '王': '斜玉旁，跟美玉有關', '玉': '跟美玉有關',
+      '言': '跟說話有關', '讠': '言字旁，跟說話有關',
+      '辶': '走之底，跟走路有關', '彳': '雙人旁，跟行走有關',
+      '宀': '寶蓋頭，跟房屋有關', '門': '跟門有關', '门': '跟門有關',
+      '車': '跟車有關', '车': '跟車有關', '刀': '跟刀有關', '刂': '立刀旁，跟刀有關',
+      '弓': '跟弓箭有關', '米': '跟糧食有關', '禾': '跟莊稼有關',
+      '衣': '跟衣服有關', '衤': '衣字旁，跟衣服有關',
+      '食': '跟吃有關', '饣': '食字旁，跟吃有關', '竹': '跟竹子有關',
+      '頁': '跟頭有關', '页': '跟頭有關', '疒': '病字旁，跟生病有關',
+      '貝': '跟錢財有關', '贝': '跟錢財有關', '力': '跟力氣有關', '寸': '跟尺寸有關',
+      '丁': '像釘子的樣子', '工': '像工具的樣子', '也': '表示讀音', '可': '表示讀音'
+    };
 
-    function elementOf(char) {
-      return ELEMENT_OF[char] || null;
+    // 一個字的部件（獨體字把自己當一個部件）
+    function partsOf(char) {
+      return PARTS.d[char] || [char];
     }
 
-    // 組字力：這個字能和「場上任何字」拼出新字嗎？
-    function forgePower(char, allChars) {
-      let count = 0;
-      let sample = null;
-      for (const other of allChars) {
-        if (other === char || other.length !== 1) continue;
-        const made = recombine(char, other);
-        if (made) {
-          count += 1;
-          if (!sample) sample = { partner: other, made: made[0] };
-        }
-      }
-      return { count, sample };
-    }
-
-    // 每個字五行的「由來」說明
-    function elementWhy(char) {
-      const element = elementOf(char);
-      if (RADICAL_OF[char]) {
-        const r = RADICAL_OF[char];
-        return {
-          zht: `「${r}」部，五行屬${element}`,
-          zhs: `“${r}”部，五行属${element}`,
-          en: `radical ${r} → ${EL_EN[element]}`
-        };
-      }
+    function partsWhy(char) {
       if (PARTS.d[char]) {
         const [l, r] = PARTS.d[char];
         return {
@@ -858,22 +943,41 @@
       return { zht: '獨體字', zhs: '独体字', en: 'single-component' };
     }
 
-    // 相生相剋的典故背景
-    const SHENG_STORY = {
-      '木火': { zht: '鑽木取火，木能生火', zhs: '钻木取火，木能生火', en: 'Wood feeds Fire' },
-      '火土': { zht: '火燒成灰，灰歸於土', zhs: '火烧成灰，灰归于土', en: 'Fire makes Earth' },
-      '土金': { zht: '礦藏於土，土能生金', zhs: '矿藏于土，土能生金', en: 'Earth bears Metal' },
-      '金水': { zht: '金遇寒凝露，金能生水', zhs: '金遇寒凝露，金能生水', en: 'Metal collects Water' },
-      '水木': { zht: '水潤草木，水能生木', zhs: '水润草木，水能生木', en: 'Water grows Wood' }
-    };
+    // 用某個部件組成的例字（常用優先）
+    let PART_EXAMPLES = null;
 
-    const KE_STORY = {
-      '木土': { zht: '樹根破土，木能剋土', zhs: '树根破土，木能克土', en: 'Wood breaks Earth' },
-      '土水': { zht: '水來土掩，土能剋水', zhs: '水来土掩，土能克水', en: 'Earth dams Water' },
-      '水火': { zht: '水能滅火，水剋火', zhs: '水能灭火，水克火', en: 'Water quenches Fire' },
-      '火金': { zht: '烈火熔金，火剋金', zhs: '烈火熔金，火克金', en: 'Fire melts Metal' },
-      '金木': { zht: '利刃伐木，金剋木', zhs: '利刃伐木，金克木', en: 'Metal cuts Wood' }
-    };
+    function examplesWith(part, exclude) {
+      if (!PART_EXAMPLES) {
+        PART_EXAMPLES = {};
+        Object.entries(PARTS.d).forEach(([char, [l, r]]) => {
+          (PART_EXAMPLES[l] = PART_EXAMPLES[l] || []).push(char);
+          if (r !== l) (PART_EXAMPLES[r] = PART_EXAMPLES[r] || []).push(char);
+        });
+        Object.values(PART_EXAMPLES).forEach(list =>
+          list.sort((x, y) => (WORDS_OF[y] || []).length - (WORDS_OF[x] || []).length));
+      }
+      return (PART_EXAMPLES[part] || []).filter(c => !exclude.has(c)).slice(0, 3);
+    }
+
+    // 交叉鍛造：兩個字的部件互相搭配，能拼出哪些新字
+    function crossForge(a, b) {
+      const pa = partsOf(a);
+      const pb = partsOf(b);
+      const seen = new Set([a, b]);
+      const results = [];
+      for (const x of pa) {
+        for (const y of pb) {
+          for (const [l, r] of [[x, y], [y, x]]) {
+            const made = PARTS.c[l + r];
+            if (made && !seen.has(made)) {
+              seen.add(made);
+              results.push({ char: made, l, r });
+            }
+          }
+        }
+      }
+      return results.slice(0, 4);
+    }
 
     function wordOf(a, b) {
       if (WORD_SET.has(a + b)) return a + b;
@@ -979,6 +1083,10 @@
     }
 
     function updateHud() {
+      if ((game.phase === 'battle' || game.phase === 'listen')) {
+        if (game.points.L >= 20) { endGame('L'); }
+        else if (game.points.R >= 20) { endGame('R'); }
+      }
       document.getElementById('hpL').textContent = '❤️'.repeat(game.hp.L) + '🖤'.repeat(5 - game.hp.L);
       document.getElementById('hpR').textContent = '❤️'.repeat(game.hp.R) + '🖤'.repeat(5 - game.hp.R);
       document.getElementById('pointsL').textContent = game.points.L;
@@ -1002,17 +1110,16 @@
       el.className = `tile from-${sideKey === 'L' ? 'left' : 'right'}`;
       el.style.setProperty('--tile', `${size}px`);
       el.textContent = char;
-      const element = elementOf(char);
-      if (element || PARTS.d[char]) {
+      if (PARTS.d[char]) {
         const badge = document.createElement('i');
-        badge.textContent = element || PARTS.d[char][0];
-        badge.style.color = element ? EL_COLOR[element] : 'var(--jade)';
+        badge.textContent = PARTS.d[char][0];
+        badge.style.color = 'var(--jade)';
         el.append(badge);
       }
       const startX = sideKey === 'L' ? -size : field.clientWidth;
       el.style.transform = `translate(${startX}px, ${rowY(index, total)}px)`;
       field.append(el);
-      el.addEventListener('pointerdown', () => speakText(char));
+      el.addEventListener('pointerdown', () => explodeView(char));
       const tile = { char, el, side: sideKey, index, total, launched: false };
       // 進場：懸停在本方三分之一處（已出戰的字不再回頭）
       requestAnimationFrame(() => {
@@ -1043,8 +1150,177 @@
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    // 偏旁重組動畫：兩字裂成部件 → 右偏旁互換 → 合成新字
-    async function comboSwap(a, b, n1, n2, y, size, midX) {
+    // 拆解講解動畫：字裂成部件，配含義說明泡
+    async function splitExplain(tile, y, size, midX) {
+      const char = tile.char;
+      const parts = partsOf(char);
+      const isLeftSide = tile.side === 'L';
+      const partSize = Math.round(size * 0.7);
+      const partY = y + (size - partSize) / 2;
+      const baseX = isLeftSide ? midX - size * 0.56 : midX + size * 0.56;
+      const meanings = parts.map(p => PART_MEANING[p] || '');
+
+      const note = document.createElement('div');
+      note.className = 'swap-note';
+      note.textContent = parts.length === 2
+        ? `${char} ＝ ${parts[0]} ＋ ${parts[1]}${meanings[0] ? `　·　${parts[0]}：${meanings[0]}` : ''}`
+        : `${char}：獨體字，本身就是部件！`;
+      note.style.left = `${midX + size / 2}px`;
+      note.style.top = `${y + size * 1.25}px`;
+      field.append(note);
+
+      if (parts.length === 2) {
+        speakText(`${char}，拆开是${parts[0]}和${parts[1]}。`
+          + (meanings[0] ? `${parts[0]}，${meanings[0]}。` : '')
+          + (meanings[1] ? `${parts[1]}，${meanings[1]}。` : ''));
+      } else {
+        speakText(`${char}，独体字，本身就是一个部件！`);
+      }
+
+      const pieces = [];
+      if (parts.length === 2) {
+        burstTile(tile);
+        const spread = isLeftSide ? [-1.35, -0.55] : [0.55, 1.35];
+        parts.forEach((p, i) => {
+          const el = document.createElement('div');
+          el.className = 'part-tile';
+          el.style.setProperty('--part', `${partSize}px`);
+          el.textContent = p;
+          el.style.transform = `translate(${baseX}px, ${partY}px)`;
+          field.append(el);
+          requestAnimationFrame(() => {
+            el.style.transform = `translate(${midX + size * spread[i]}px, ${partY}px) rotate(${i ? 360 : -360}deg)`;
+          });
+          pieces.push({ part: p, el });
+        });
+      } else {
+        const x = midX + size * (isLeftSide ? -0.95 : 0.95);
+        moveTile(tile, x, y, 600);
+        pieces.push({ part: char, el: tile.el });
+      }
+      await wait(3400);
+      note.remove();
+      return pieces;
+    }
+
+    // 鍛造動畫：兩個部件合體成新字
+    async function forgeMerge(pieceL, pieceR, newChar, y, size, midX) {
+      const partSize = Math.round(size * 0.7);
+      const partY = y + (size - partSize) / 2;
+      const clone = src => {
+        const el = document.createElement('div');
+        el.className = 'part-tile';
+        el.style.setProperty('--part', `${partSize}px`);
+        el.textContent = src.part;
+        el.style.transform = src.el.style.transform.replace(/ rotate\([^)]*\)/, '');
+        field.append(el);
+        return el;
+      };
+      const c1 = clone(pieceL);
+      const c2 = clone(pieceR);
+      const note = document.createElement('div');
+      note.className = 'swap-note';
+      note.textContent = `${pieceL.part} ＋ ${pieceR.part} ＝ ${newChar}`;
+      note.style.left = `${midX + size / 2}px`;
+      note.style.top = `${y + size * 1.25}px`;
+      field.append(note);
+      requestAnimationFrame(() => {
+        c1.style.transform = `translate(${midX - partSize * 0.45}px, ${partY}px)`;
+        c2.style.transform = `translate(${midX + partSize * 0.45}px, ${partY}px)`;
+      });
+      await wait(1400);
+      c1.style.opacity = '0';
+      c2.style.opacity = '0';
+      await wait(300);
+      c1.remove();
+      c2.remove();
+      setTimeout(() => note.remove(), 1400);
+    }
+
+    /* 部件爆炸視圖：點任何字都能拆開看 */
+    function explodeView(char) {
+      document.querySelector('.explode-modal')?.remove();
+      const modal = document.createElement('div');
+      modal.className = 'explode-modal';
+
+      const stage = document.createElement('div');
+      stage.className = 'ex-stage';
+      const big = document.createElement('div');
+      big.className = 'ex-char';
+      big.textContent = char;
+      stage.append(big);
+      modal.append(stage);
+
+      const meta = document.createElement('div');
+      meta.className = 'ex-meta';
+      if (PARTS.p[char]) {
+        const py = document.createElement('span');
+        py.className = 'py';
+        py.textContent = PARTS.p[char];
+        meta.append(py);
+      }
+      meta.append(evoRow(char));
+      const etym = document.createElement('a');
+      etym.className = 'etym-link';
+      etym.href = `https://hanziyuan.net/#${encodeURIComponent(char)}`;
+      etym.target = '_blank';
+      etym.rel = 'noreferrer';
+      etym.textContent = '字源 ↗';
+      meta.append(etym);
+      modal.append(meta);
+
+      const parts = PARTS.d[char];
+      let speech;
+      if (parts) {
+        const exclude = new Set([char]);
+        speech = `${char}，拆开是${parts[0]}和${parts[1]}。`;
+        parts.forEach((p, i) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'ex-part';
+          const glyph = document.createElement('b');
+          glyph.textContent = p;
+          const label = document.createElement('small');
+          const meaning = PART_MEANING[p] || '';
+          label.textContent = meaning || (PARTS.p[p] ? `讀 ${PARTS.p[p]}` : '');
+          const eg = document.createElement('div');
+          eg.className = 'ex-eg';
+          const examples = examplesWith(p, exclude);
+          examples.forEach(egChar => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.textContent = egChar;
+            chip.addEventListener('click', ev => { ev.stopPropagation(); explodeView(egChar); });
+            eg.append(chip);
+          });
+          wrap.append(glyph, label, eg);
+          stage.append(wrap);
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            big.classList.add('is-ghost');
+            wrap.style.opacity = '1';
+            wrap.style.transform = `translate(-50%, -50%) translateX(${i === 0 ? -135 : 135}px)`;
+          }));
+          if (meaning) speech += `${p}，${meaning}。`;
+          if (examples.length) speech += `用${p}的字还有，${examples.join('，')}。`;
+        });
+      } else {
+        const solo = document.createElement('div');
+        solo.className = 'ex-solo';
+        solo.textContent = { zht: '獨體字，拆不開啦！它自己就是部件。', zhs: '独体字，拆不开啦！它自己就是部件。', en: 'A single-component character—nothing to split!' }[language];
+        modal.append(solo);
+        speech = `${char}，独体字，拆不开啦！它自己就是部件。`;
+      }
+
+      const close = document.createElement('button');
+      close.className = 'ex-close';
+      close.textContent = { zht: '知道啦！', zhs: '知道啦！', en: 'Got it!' }[language];
+      close.addEventListener('click', () => modal.remove());
+      modal.addEventListener('click', event => { if (event.target === modal) modal.remove(); });
+      modal.append(close);
+      document.body.append(modal);
+      speakText(speech);
+    }
+
+    async function comboSwapLegacy(a, b, n1, n2, y, size, midX) {
       const [l1, r1] = PARTS.d[a.char];
       const [l2, r2] = PARTS.d[b.char];
       const partSize = Math.round(size * 0.66);
@@ -1106,7 +1382,7 @@
     }
 
     // 新字講解卡：拼音 + 組詞 + 例句
-    async function showNewCharCard(n1, n2, holdMs = 9000) {
+    async function showNewCharCard(chars, holdMs = 9000) {
       const card = document.createElement('div');
       card.className = 'newchar-card';
       const title = document.createElement('div');
@@ -1116,7 +1392,7 @@
       grid.className = 'nc-grid';
 
       const speakParts = [];
-      [n1, n2].forEach(char => {
+      chars.forEach(char => {
         const info = explainChar(char);
         const item = document.createElement('div');
         item.className = 'nc-item';
@@ -1155,7 +1431,7 @@
           }[language];
         }
         item.append(sent);
-        item.addEventListener('pointerdown', () => speakText(char));
+        item.addEventListener('pointerdown', () => explodeView(char));
         grid.append(item);
 
         let part = `${char}`;
@@ -1224,9 +1500,9 @@
         fighter.className = 'cc-fighter';
         const big = document.createElement('b');
         big.textContent = tile.char;
-        big.style.color = EL_COLOR[elementOf(tile.char)];
+        big.style.color = 'var(--led-gold)';
         const why = document.createElement('small');
-        why.textContent = elementWhy(tile.char)[language];
+        why.textContent = partsWhy(tile.char)[language];
         const etym = document.createElement('a');
         etym.className = 'etym-link';
         etym.href = `https://hanziyuan.net/#${encodeURIComponent(tile.char)}`;
@@ -1283,7 +1559,7 @@
       const usedR = new Set();
       const pairs = [];
       [
-        (x, z) => recombine(x, z),
+        (x, z) => crossForge(x, z).length > 0,
         (x, z) => wordOf(x, z)
       ].forEach(match => {
         L.forEach((tileL, i) => {
@@ -1315,30 +1591,45 @@
         moveTile(b, midX + size * 0.56, y, 650);
         await wait(700);
 
-        const word = wordOf(a.char, b.char);
-        const combo = recombine(a.char, b.char);
-        const elA = elementOf(a.char);
-        const elB = elementOf(b.char);
+        // ① 先逐字拆解講解（部件飛散 + 含義）
+        const piecesA = await splitExplain(a, y, size, midX);
+        if (game.phase !== 'battle') return;
+        const piecesB = await splitExplain(b, y, size, midX);
+        if (game.phase !== 'battle') return;
 
-        const smash = async winner => {
-          const targetX = winner.side === 'L' ? field.clientWidth - size * 0.3 : -size * 0.7;
-          moveTile(winner, targetX, y, 500);
-          await wait(520);
-          burstTile(winner);
-          hitPlayer(winner.side === 'L' ? 'R' : 'L');
-          game.points[winner.side] += 1;
-          await wait(400);
+        const word = wordOf(a.char, b.char);
+        const news = crossForge(a.char, b.char);
+        const allPieces = [...piecesA, ...piecesB];
+
+        const clearPieces = () => {
+          allPieces.forEach(piece => {
+            piece.el.style.opacity = '0';
+            setTimeout(() => piece.el.remove(), 400);
+          });
         };
 
-        const speakWhy = `${a.char}，${elementWhy(a.char).zhs}。${b.char}，${elementWhy(b.char).zhs}。`;
-
-        const wordAlly = async (verdictText, speakVerdict) => {
-          // 相生（或同氣）：組成新詞
-          if (!word) return false;
-          speakText(`${speakWhy}${speakVerdict}组成新词，${word}！`);
-          await showClash(a, b, verdictText, pageStrings.resultWord[language](word));
-          burstTile(a);
-          burstTile(b);
+        if (news.length) {
+          // ② 部件交叉鍛造：每拼出一個新字都完整演一遍
+          for (const forged of news) {
+            if (game.phase !== 'battle') return;
+            const pieceL = allPieces.find(p => p.part === forged.l) || piecesA[0];
+            const pieceR = allPieces.find(p => p.part === forged.r && p !== pieceL) || piecesB[0];
+            speakText(`${forged.l}，加${forged.r}，变成新字，${forged.char}！`);
+            await forgeMerge(pieceL, pieceR, forged.char, y, size, midX);
+            const owner = piecesA.some(p => p.part === forged.l) ? a.side : b.side;
+            spawnNewChar(forged.char, owner, y);
+            game.points[owner] += 2;
+            game.newChars.push(forged.char);
+            updateHud();
+            await wait(700);
+          }
+          clearPieces();
+          await showNewCharCard(news.map(n => n.char), game.level === 1 ? 9000 : 5200);
+        } else if (word) {
+          // ② 拼不出新字，但正好組成詞語：結盟
+          speakText(`${a.char}和${b.char}，正好组成新词，${word}！`);
+          await showClash(a, b, pageStrings.verdictAlly[language], pageStrings.resultWord[language](word));
+          clearPieces();
           spawnNewChar(word, 'L', y);
           spawnNewChar(word, 'R', y);
           game.points.L += 2;
@@ -1346,78 +1637,12 @@
           game.newChars.push(word);
           updateHud();
           await wait(1400);
-          return true;
-        };
-
-        if (combo) {
-          // 偏旁能拼出新字：立刻拆解重組！
-          const [n1, n2] = combo;
-          const [l1, r1] = PARTS.d[a.char];
-          const [l2, r2] = PARTS.d[b.char];
-          speakText(`${a.char}，${l1}加${r1}。${b.char}，${l2}加${r2}。偏旁换一换！${n1}！${n2}！`);
-          await comboSwap(a, b, n1, n2, y, size, midX);
-          await showNewCharCard(n1, n2, game.level === 1 ? 9000 : 5200);
-          spawnNewChar(n1, 'L', y);
-          spawnNewChar(n2, 'R', y);
-          game.points.L += 2;
-          game.points.R += 2;
-          game.newChars.push(n1, n2);
-          updateHud();
-          await wait(1500);
-        } else if (elA && elB && (KE[elA] === elB || KE[elB] === elA)) {
-          // 相剋：剋者勝，弱字碎裂，強字直衝對方
-          const winner = KE[elA] === elB ? a : b;
-          const loser = winner === a ? b : a;
-          const story = KE_STORY[elementOf(winner.char) + elementOf(loser.char)];
-          speakText(`${speakWhy}${story.zhs}！${winner.char}获胜！`);
-          await showClash(a, b, story[language], pageStrings.resultKe[language](winner.char));
-          burstTile(loser);
-          await smash(winner);
-        } else if (elA && elB && (SHENG[elA] === elB || SHENG[elB] === elA)) {
-          // 相生：能組詞或拼新字；都不行就共生共榮
-          const pairKey = SHENG[elA] === elB ? elA + elB : elB + elA;
-          const story = SHENG_STORY[pairKey];
-          const done = await wordAlly(story[language], `${story.zhs}！`);
-          if (!done) {
-            speakText(`${speakWhy}${story.zhs}！共生共荣！`);
-            await showClash(a, b, story[language], pageStrings.resultShengPeace[language]);
-            burstTile(a);
-            burstTile(b);
-            game.points.L += 1;
-            game.points.R += 1;
-            updateHud();
-            await wait(500);
-          }
         } else {
-          // 同屬一行或無五行：先組詞，再比組字力——
-          // 能和場上任何字（含雙方句子與戰利品）拼出新字的勝出
-          const sameElement = elA && elA === elB;
-          const done = await wordAlly(
-            sameElement ? pageStrings.verdictSameAlly[language](elA) : pageStrings.verdictAlly[language],
-            sameElement ? `同属${elA}，同气连枝！` : '字字有缘！');
-          if (!done) {
-            const onScreen = [...L, ...R].map(tile => tile.char)
-              .concat([...document.getElementById('shelfL').children].map(chip => chip.textContent))
-              .concat([...document.getElementById('shelfR').children].map(chip => chip.textContent));
-            const fa = forgePower(a.char, onScreen);
-            const fb = forgePower(b.char, onScreen);
-            if (fa.count !== fb.count) {
-              const winner = fa.count > fb.count ? a : b;
-              const loser = winner === a ? b : a;
-              const power = fa.count > fb.count ? fa : fb;
-              speakText(`${speakWhy}${winner.char}能和${power.sample.partner}拼成${power.sample.made}，组字力胜出！`);
-              await showClash(a, b, pageStrings.verdictForge[language],
-                pageStrings.resultForge[language](winner.char, power.sample.partner, power.sample.made));
-              burstTile(loser);
-              await smash(winner);
-            } else {
-              speakText(`${speakWhy}势均力敌，同归于尽！`);
-              await showClash(a, b, pageStrings.verdictForge[language], pageStrings.resultTie[language]);
-              burstTile(a);
-              burstTile(b);
-              await wait(500);
-            }
-          }
+          // ② 什麼也拼不出：同歸於盡
+          speakText('拼不出新字，势均力敌，同归于尽！');
+          await showClash(a, b, pageStrings.verdictForge[language], pageStrings.resultTie[language]);
+          clearPieces();
+          await wait(500);
         }
         if (game.phase === 'over') return;
       }
@@ -1463,7 +1688,7 @@
       const midX = field.clientWidth / 2 - size / 2;
       el.style.transform = `translate(${midX + (sideKey === 'L' ? -size * 0.7 : size * 0.7)}px, ${y}px)`;
       field.append(el);
-      el.addEventListener('pointerdown', () => speakText(char));
+      el.addEventListener('pointerdown', () => explodeView(char));
       // 飛向自己的戰利品架
       setTimeout(() => {
         el.style.transitionDuration = '800ms';
@@ -1482,7 +1707,7 @@
       chip.type = 'button';
       chip.textContent = char;
       chip.title = PARTS.p[char] || '';
-      chip.addEventListener('click', () => speakText(char));
+      chip.addEventListener('click', () => explodeView(char));
       shelf.append(chip);
     }
 

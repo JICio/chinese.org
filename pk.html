@@ -444,6 +444,17 @@
       white-space: nowrap;
     }
 
+    .etym-link {
+      margin-top: 4px;
+      padding: 2px 10px;
+      border: 1px solid rgba(122, 184, 255, .45);
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: .08em;
+      color: var(--blue);
+      text-decoration: none;
+    }
+
     .evo-row {
       display: flex;
       gap: 12px;
@@ -1115,7 +1126,13 @@
         const py = document.createElement('span');
         py.textContent = info.pinyin;
         head.append(big, py);
-        item.append(head, evoRow(char));
+        const etym = document.createElement('a');
+        etym.className = 'etym-link';
+        etym.href = `https://hanziyuan.net/#${encodeURIComponent(char)}`;
+        etym.target = '_blank';
+        etym.rel = 'noreferrer';
+        etym.textContent = { zht: '字源：甲骨文·金文 ↗', zhs: '字源：甲骨文·金文 ↗', en: 'Etymology ↗' }[language];
+        item.append(head, evoRow(char), etym);
         if (info.words.length) {
           const words = document.createElement('div');
           words.className = 'nc-words';
@@ -1209,7 +1226,13 @@
         big.style.color = EL_COLOR[elementOf(tile.char)];
         const why = document.createElement('small');
         why.textContent = elementWhy(tile.char)[language];
-        fighter.append(big, why, evoRow(tile.char));
+        const etym = document.createElement('a');
+        etym.className = 'etym-link';
+        etym.href = `https://hanziyuan.net/#${encodeURIComponent(tile.char)}`;
+        etym.target = '_blank';
+        etym.rel = 'noreferrer';
+        etym.textContent = { zht: '字源：甲骨文·金文 ↗', zhs: '字源：甲骨文·金文 ↗', en: 'Etymology ↗' }[language];
+        fighter.append(big, why, evoRow(tile.char), etym);
         row.append(fighter);
       });
       const verdict = document.createElement('div');

@@ -392,6 +392,28 @@
       animation: card-in 250ms ease;
     }
 
+    /* 第三關抽字按鈕 */
+    .deal-button {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 8;
+      display: none;
+      padding: 18px 44px;
+      border-radius: 999px;
+      background: linear-gradient(160deg, #7fd8b8, #386c5b);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      box-shadow: 0 10px 34px rgba(127, 216, 184, .35);
+    }
+
+    .deal-button.is-visible { display: block; }
+
+    .deal-button:active { transform: translate(-50%, -50%) scale(.95); }
+
     /* 部件爆炸視圖 */
     .explode-modal {
       position: fixed;
@@ -770,14 +792,16 @@
 
     <div class="field" id="field">
       <div class="turn-banner" id="turnBanner"></div>
+      <button class="deal-button" id="dealButton" type="button" data-zht="🎲 抽字開戰！" data-zhs="🎲 抽字开战！" data-en="🎲 Deal &amp; fight!">🎲 抽字開戰！</button>
 
       <div class="overlay is-visible" id="startOverlay">
         <h2 data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</h2>
-        <p data-zht="兩個人面對面，輪流開口出字。兩個字相遇時，先一個一個拆開講解——它的偏旁部首是什麼、什麼意思；然後雙方的部件交叉搭配，能拼出的新字全都當場鍛造出來，誰的偏旁當了新字的「意思旁」，新字就歸誰，得 2 分。拼不出新字但能組成詞語就結盟。先攢到 20 分的一方獲勝！點場上任何一個字，都能看它的部件爆炸拆解圖！" data-zhs="两个人面对面，轮流开口出字。两个字相遇时，先一个一个拆开讲解——它的偏旁部首是什么、什么意思；然后双方的部件交叉搭配，能拼出的新字全都当场锻造出来，谁的偏旁当了新字的“意思旁”，新字就归谁，得 2 分。拼不出新字但能组成词语就结盟。先攒到 20 分的一方获胜！点场上任何一个字，都能看它的部件爆炸拆解图！" data-en="Take turns saying a character. When the two meet, each is exploded into its components with a kid-friendly explanation, then the components cross-combine and every new character they can form is forged on the spot—whoever's component serves as the meaning-radical claims it for 2 points. If nothing forges but the two make a word, they ally. First to 20 points wins! Tap any character to see its component explosion view!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
+        <p data-zht="兩個人面對面，輪流開口出字。兩個字相遇時，先一個一個拆開講解——它的偏旁部首是什麼、什麼意思；然後雙方的部件交叉搭配，能拼出的新字全都當場鍛造出來，誰的偏旁當了新字的「意思旁」，新字就歸誰，得 2 分。拼不出新字但能組成詞語就結盟。先攢到 20 分的一方獲勝！點場上任何一個字，都能看它的部件爆炸拆解圖！第三關還有 3000 形聲字題庫自動出題！" data-zhs="两个人面对面，轮流开口出字。两个字相遇时，先一个一个拆开讲解——它的偏旁部首是什么、什么意思；然后双方的部件交叉搭配，能拼出的新字全都当场锻造出来，谁的偏旁当了新字的“意思旁”，新字就归谁，得 2 分。拼不出新字但能组成词语就结盟。先攒到 20 分的一方获胜！点场上任何一个字，都能看它的部件爆炸拆解图！第三关还有 3000 形声字题库自动出题！" data-en="Take turns saying a character. When the two meet, each is exploded into its components with a kid-friendly explanation, then the components cross-combine and every new character they can form is forged on the spot—whoever's component serves as the meaning-radical claims it for 2 points. If nothing forges but the two make a word, they ally. First to 20 points wins! Tap any character to see its component explosion view!">兩個人面對面，每回合各說一個字。兩個字在空中相遇時，會按五行判定：相生的字可以結盟——組成新詞或交換偏旁變出新字；相剋的字就開戰——剋者獲勝、直衝對方掉一顆心；拚不出新字就比組字力——能和場上任何字拼出新字的勝出。每次相遇都會講解兩個字的五行與部件由來。心先掉光的一方輸！</p>
         <div class="demo">打(扌+丁) ⚡ 江(氵+工) → <b>扛</b> ＋ <b>汀</b></div>
         <p style="font-size:10px; color:rgba(241,238,230,.32); letter-spacing:.05em;" data-zht="篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND" data-zhs="篆体字形：崇羲篆体（中研院小学堂）· CC BY-ND" data-en="Seal glyphs: ChongXi Seal (Academia Sinica) · CC BY-ND">篆體字形：崇羲篆體（中研院小學堂）· CC BY-ND</p>
         <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
+        <button class="cta" id="startL3" type="button" style="background: linear-gradient(160deg, #7fd8b8, #386c5b);" data-zht="第三關 · 形聲字題庫" data-zhs="第三关 · 形声字题库" data-en="Level 3 · Phono-Semantic Bank">第三關 · 形聲字題庫</button>
       </div>
 
       <div class="overlay" id="endOverlay">
@@ -809,6 +833,7 @@
   </footer>
 
   <script src="neural-tts.js"></script>
+  <script src="xingsheng-3000.js"></script>
   <script src="hanzi-parts.js"></script>
   <script src="wuxing-ciyu.js?v=2"></script>
   <script src="opencc-t2cn.js"></script>
@@ -830,6 +855,11 @@
       listening1: { zht: '我在聽……說出你的字！', zhs: '我在听……说出你的字！', en: 'Listening… say your character!' },
       listening2: { zht: '我在聽……說完一句自動上擂臺！', zhs: '我在听……说完一句自动上擂台！', en: 'Listening… your sentence enters the arena!' },
       nextLevel: { zht: '下一關：句子擂臺 →', zhs: '下一关：句子擂台 →', en: 'Next: Sentence Arena →' },
+      nextLevel3: { zht: '下一關：形聲字題庫 →', zhs: '下一关：形声字题库 →', en: 'Next: Phono-Semantic Bank →' },
+      turnLeft3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
+      turnRight3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
+      typePlaceholder3: { zht: '第三關自動抽字，不用打字', zhs: '第三关自动抽字，不用打字', en: 'Level 3 deals automatically' },
+      listening3: { zht: '第三關不用說話，點中間的抽字按鈕！', zhs: '第三关不用说话，点中间的抽字按钮！', en: 'No speech needed—tap the deal button!' },
       again: { zht: '再戰一場', zhs: '再战一场', en: 'Rematch' },
       heard: { zht: '聽到：', zhs: '听到：', en: 'Heard: ' },
       noSpeech: { zht: '沒聽清，再按一次麥克風試試', zhs: '没听清，再按一次麦克风试试', en: 'Didn\'t catch that—tap the mic again' },
@@ -1041,6 +1071,7 @@
     const micButton = document.getElementById('micButton');
     const typeForm = document.getElementById('typeForm');
     const typeInput = document.getElementById('typeInput');
+    const dealButton = document.getElementById('dealButton');
     const startOverlay = document.getElementById('startOverlay');
     const endOverlay = document.getElementById('endOverlay');
 
@@ -1528,10 +1559,38 @@
       game.turn = sideKey;
       setBanner(sideKey);
       setLive('');
+      dealButton.classList.toggle('is-visible', game.level === 3);
+    }
+
+    // 第三關：從 3000 形聲字題庫隨機抽字
+    function drawChars(count, used) {
+      const bank = window.XINGSHENG_3000 || '';
+      const hand = [];
+      let guard = 0;
+      while (hand.length < count && guard < 500) {
+        guard += 1;
+        const c = bank[Math.floor(Math.random() * bank.length)];
+        if (!c || used.has(c)) continue;
+        used.add(c);
+        hand.push(c);
+      }
+      return hand;
+    }
+
+    function dealRound() {
+      if (game.phase !== 'listen' || game.level !== 3) return;
+      dealButton.classList.remove('is-visible');
+      if (game.listening) stopListening();
+      const used = new Set();
+      const handL = drawChars(6, used);
+      const handR = drawChars(6, used);
+      game.squads.L = handL.map((char, i) => makeTile(char, 'L', i, handL.length));
+      game.squads.R = handR.map((char, i) => makeTile(char, 'R', i, handR.length));
+      resolveBattle();
     }
 
     function acceptSentence(text) {
-      if (game.phase !== 'listen') return;
+      if (game.phase !== 'listen' || game.level === 3) return;
       const chars = [...text].filter(c => HAN.test(c)).slice(0, maxChars());
       if (!chars.length) return;
       const sideKey = game.turn;
@@ -1756,15 +1815,18 @@
         box.append(chip);
       });
       document.getElementById('retryButton').textContent =
-        (game.level === 1 ? pageStrings.nextLevel : pageStrings.again)[language];
+        (game.level === 1 ? pageStrings.nextLevel : game.level === 2 ? pageStrings.nextLevel3 : pageStrings.again)[language];
       endOverlay.classList.add('is-visible');
     }
 
     document.getElementById('startL1').addEventListener('click', () => { unlockTTS(); game.level = 1; startGame(); });
     document.getElementById('startL2').addEventListener('click', () => { unlockTTS(); game.level = 2; startGame(); });
+    document.getElementById('startL3').addEventListener('click', () => { unlockTTS(); game.level = 3; startGame(); });
+    document.getElementById('dealButton').addEventListener('click', () => { unlockTTS(); dealRound(); });
     document.getElementById('retryButton').addEventListener('click', () => {
       unlockTTS();
       if (game.level === 1) game.level = 2;
+      else if (game.level === 2) game.level = 3;
       startGame();
     });
 

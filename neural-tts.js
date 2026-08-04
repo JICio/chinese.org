@@ -1,16 +1,16 @@
 /* 雲端自然語音，三級鏈路：
-   ① Azure 神經語音（曉曉等，經自家 Cloudflare Worker 代理，官方接口最穩）
+   ① Amazon Polly 神經語音（經自家 Cloudflare Worker 代理，官方接口最穩）
    ② 百度翻譯發音（無需密鑰的備用線路）
    ③ 頁面內建的瀏覽器語音（最後兜底，由各頁面自己處理）
-   AZURE_PROXY 為空時自動跳過 ①。 */
+   TTS_PROXY 為空時自動跳過 ①。粵語/英文由 Worker 映射到對應聲音。 */
 window.NeuralTTS = (() => {
-  // 部署 cf-worker 後填入，如 'https://chinese-tts.<你的子域>.workers.dev'
-  const AZURE_PROXY = '';
+  // 自家 Cloudflare Worker（Amazon Polly 神經語音代理）
+  const TTS_PROXY = 'https://chinese-tts.lovedaocom.workers.dev';
 
   let audioEl = null;
   let enabled = true;
   let failures = 0;
-  let azureDown = false;
+  let proxyDown = false;
 
   function langOf(voice) {
     if (!voice) return 'zh';
@@ -49,12 +49,12 @@ window.NeuralTTS = (() => {
     if (!enabled || !text) throw new Error('disabled');
     const clipped = text.slice(0, 280);
 
-    // ① Azure（代理已配置且未標記故障時）
-    if (AZURE_PROXY && !azureDown) {
+    // ① Polly（自家代理，官方接口最穩；曉曉名會映射到知語）
+    if (TTS_PROXY && !proxyDown) {
       try {
-        return await playUrl(`${AZURE_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
+        return await playUrl(`${TTS_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
       } catch {
-        azureDown = true; // 本次會話不再嘗試 Azure，直接走百度
+        proxyDown = true; // 本次會話不再嘗試代理，直接走百度
       }
     }
 

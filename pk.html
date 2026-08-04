@@ -134,7 +134,7 @@
     }
 
     .side .face {
-      font-size: 44px;
+      font-size: 58px;
       line-height: 1;
       filter: drop-shadow(0 0 14px rgba(227, 106, 76, .45));
       transition: transform 200ms ease;
@@ -150,16 +150,16 @@
       75% { transform: translateX(7px) rotate(6deg); }
     }
 
-    .side .name { font-size: 13px; font-weight: 800; letter-spacing: .18em; }
+    .side .name { font-size: 16px; font-weight: 800; letter-spacing: .18em; }
 
     .side.left .name { color: var(--led-red); }
     .side.right .name { color: var(--led-gold); }
 
-    .side .hp { font-size: 12px; letter-spacing: 2px; }
+    .side .hp { font-size: 15px; letter-spacing: 2px; }
 
-    .side .points { font-size: 12px; color: var(--muted); }
+    .side .points { font-size: 15px; color: var(--muted); }
 
-    .side .points b { color: var(--paper); font-size: 15px; }
+    .side .points b { color: var(--paper); font-size: 21px; }
 
     .shelf {
       display: flex;
@@ -171,13 +171,13 @@
     }
 
     .shelf button {
-      width: 28px;
-      height: 28px;
+      min-width: 38px;
+      height: 38px;
       display: grid;
       place-items: center;
       border: 1px solid rgba(127, 216, 184, .5);
-      border-radius: 7px;
-      font-size: 17px;
+      border-radius: 9px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--jade);
       background: rgba(127, 216, 184, .08);
@@ -187,7 +187,7 @@
 
     .turn-banner {
       position: absolute;
-      top: 8px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 7;
@@ -195,8 +195,8 @@
       border-radius: 999px;
       border: 1px solid var(--line);
       background: rgba(11, 11, 10, .85);
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: 800;
       letter-spacing: .1em;
       white-space: nowrap;
       transition: border-color 250ms ease, color 250ms ease;
@@ -225,27 +225,27 @@
       color: var(--led-red);
       border: 1px solid rgba(255, 107, 82, .55);
       background: rgba(255, 107, 82, .1);
-      text-shadow: 0 0 12px rgba(255, 107, 82, .55);
+      text-shadow: 0 0 18px rgba(255, 107, 82, .8), 0 0 46px rgba(255, 107, 82, .35);
     }
 
     .tile.from-right {
       color: var(--led-gold);
       border: 1px solid rgba(255, 217, 138, .5);
       background: rgba(255, 217, 138, .08);
-      text-shadow: 0 0 12px rgba(255, 217, 138, .55);
+      text-shadow: 0 0 18px rgba(255, 217, 138, .8), 0 0 46px rgba(255, 217, 138, .35);
     }
 
     .tile.newborn {
       color: var(--jade);
       border: 1px solid rgba(127, 216, 184, .6);
       background: rgba(127, 216, 184, .12);
-      text-shadow: 0 0 16px rgba(127, 216, 184, .7);
+      text-shadow: 0 0 22px rgba(127, 216, 184, .9), 0 0 56px rgba(127, 216, 184, .4);
       animation: newborn-pop 500ms ease;
     }
 
     @keyframes newborn-pop {
       0% { scale: .2; }
-      70% { scale: 1.25; }
+      70% { scale: 1.45; }
       100% { scale: 1; }
     }
 
@@ -294,7 +294,7 @@
       font-size: calc(var(--part) * .68);
       font-weight: 800;
       color: var(--jade);
-      text-shadow: 0 0 14px rgba(127, 216, 184, .75);
+      text-shadow: 0 0 20px rgba(127, 216, 184, .95), 0 0 50px rgba(127, 216, 184, .4);
       border: 1px solid rgba(127, 216, 184, .55);
       border-radius: 10px;
       background: rgba(11, 11, 10, .88);
@@ -323,7 +323,7 @@
     }
 
     .newchar-card .nc-title {
-      font-size: 16px;
+      font-size: 21px;
       font-weight: 800;
       letter-spacing: .14em;
       color: var(--led-gold);
@@ -350,19 +350,19 @@
     .nc-head { display: flex; align-items: baseline; gap: 10px; }
 
     .nc-head b {
-      font-size: 50px;
+      font-size: 80px;
       font-weight: 800;
       color: var(--jade);
       text-shadow: 0 0 18px rgba(127, 216, 184, .6);
       line-height: 1.05;
     }
 
-    .nc-head span { font-size: 19px; font-weight: 700; color: var(--led-gold); }
+    .nc-head span { font-size: 26px; font-weight: 700; color: var(--led-gold); }
 
-    .nc-words { font-size: 14px; color: var(--paper); letter-spacing: .04em; }
+    .nc-words { font-size: 19px; color: var(--paper); letter-spacing: .04em; }
 
     .nc-sent {
-      font-size: 13px;
+      font-size: 15px;
       color: var(--muted);
       text-align: center;
       line-height: 1.6;
@@ -372,20 +372,20 @@
 
     @media (max-width: 700px) {
       .nc-grid { grid-template-columns: 1fr; }
-      .nc-head b { font-size: 40px; }
+      .nc-head b { font-size: 58px; }
     }
 
     .swap-note {
       position: absolute;
       z-index: 9;
       transform: translateX(-50%);
-      padding: 5px 16px;
+      padding: 8px 22px;
       border-radius: 999px;
       border: 1px solid rgba(255, 217, 138, .5);
       background: rgba(11, 11, 10, .92);
       color: var(--led-gold);
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 21px;
+      font-weight: 800;
       letter-spacing: .08em;
       white-space: nowrap;
       pointer-events: none;
@@ -400,11 +400,11 @@
       transform: translate(-50%, -50%);
       z-index: 8;
       display: none;
-      padding: 18px 44px;
+      padding: 22px 54px;
       border-radius: 999px;
       background: linear-gradient(160deg, #7fd8b8, #386c5b);
       color: #fff;
-      font-size: 20px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: .12em;
       box-shadow: 0 10px 34px rgba(127, 216, 184, .35);
@@ -433,7 +433,7 @@
     .ex-stage {
       position: relative;
       width: min(560px, 94vw);
-      height: 250px;
+      height: 310px;
       flex: none;
     }
 
@@ -442,7 +442,7 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      font-size: 112px;
+      font-size: 150px;
       font-weight: 800;
       line-height: 1;
       color: var(--led-gold);
@@ -466,7 +466,7 @@
     }
 
     .ex-part b {
-      font-size: 66px;
+      font-size: 96px;
       font-weight: 800;
       line-height: 1.1;
       color: var(--jade);
@@ -474,8 +474,8 @@
     }
 
     .ex-part small {
-      max-width: 160px;
-      font-size: 13px;
+      max-width: 190px;
+      font-size: 16px;
       color: var(--muted);
       text-align: center;
       line-height: 1.55;
@@ -484,10 +484,10 @@
     .ex-eg { display: flex; gap: 6px; }
 
     .ex-eg button {
-      padding: 3px 10px;
+      padding: 5px 14px;
       border: 1px solid rgba(255, 217, 138, .45);
-      border-radius: 8px;
-      font-size: 17px;
+      border-radius: 10px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--led-gold);
     }
@@ -548,13 +548,13 @@
     }
 
     .cc-fighter b {
-      font-size: 46px;
+      font-size: 74px;
       font-weight: 800;
       line-height: 1.1;
     }
 
     .cc-fighter small {
-      font-size: 12px;
+      font-size: 15px;
       color: var(--muted);
       white-space: nowrap;
     }
@@ -604,7 +604,7 @@
     }
 
     .cc-verdict {
-      font-size: 17px;
+      font-size: 23px;
       font-weight: 800;
       letter-spacing: .08em;
       color: var(--jade);
@@ -612,7 +612,7 @@
     }
 
     .cc-result {
-      font-size: 14px;
+      font-size: 18px;
       color: var(--led-gold);
       letter-spacing: .06em;
       text-align: center;
@@ -648,7 +648,7 @@
     .overlay p { max-width: 520px; font-size: 13px; line-height: 1.9; color: var(--muted); }
 
     .overlay .demo {
-      font-size: 20px;
+      font-size: 25px;
       font-weight: 700;
       color: var(--paper);
       letter-spacing: .08em;
@@ -835,7 +835,7 @@
   <script src="neural-tts.js"></script>
   <script src="xingsheng-3000.js"></script>
   <script src="hanzi-parts.js"></script>
-  <script src="wuxing-ciyu.js?v=2"></script>
+  <script src="wuxing-ciyu.js?v=3"></script>
   <script src="opencc-t2cn.js"></script>
   <script src="tangshi300.js"></script>
   <script>
@@ -1046,7 +1046,7 @@
     // 新字講解：拼音 + 組詞 + 例句（唐詩優先，否則引導造句）
     function explainChar(char) {
       const pinyin = PARTS.p[char] || '';
-      const words = (WORDS_OF[char] || []).slice(0, 2);
+      const words = (WORDS_OF[char] || []).slice(0, 3);
       const line = findPoemLine(char);
       return { char, pinyin, words, line };
     }
@@ -1092,7 +1092,7 @@
     function maxChars() { return game.level === 1 ? 1 : 6; }
 
     function tileSize() {
-      return Math.max(40, Math.min(60, Math.floor(field.clientWidth / 12)));
+      return Math.max(56, Math.min(92, Math.floor(field.clientWidth / 9)));
     }
 
     function setBanner(kind) {
@@ -1201,13 +1201,11 @@
       note.style.top = `${y + size * 1.25}px`;
       field.append(note);
 
-      if (parts.length === 2) {
-        speakText(`${char}：${parts[0]}、${parts[1]}。`
+      const narration = parts.length === 2
+        ? speakText(`${char}：${parts[0]}、${parts[1]}。`
           + (meanings[0] ? `${parts[0]}，${meanings[0]}。` : '')
-          + (meanings[1] ? `${parts[1]}，${meanings[1]}。` : ''));
-      } else {
-        speakText(`${char}，独体字。`);
-      }
+          + (meanings[1] ? `${parts[1]}，${meanings[1]}。` : ''))
+        : speakText(`${char}，独体字。`);
 
       const pieces = [];
       if (parts.length === 2) {
@@ -1230,7 +1228,7 @@
         moveTile(tile, x, y, 600);
         pieces.push({ part: char, el: tile.el });
       }
-      await wait(3400);
+      await Promise.all([narration, wait(2200)]);
       note.remove();
       return pieces;
     }
@@ -1467,13 +1465,14 @@
         grid.append(item);
 
         const d = PARTS.d[char];
-        speakParts.push(d ? `${char}：${d[0]}加${d[1]}` : char);
+        let line = d ? `${char}：${d[0]}加${d[1]}` : `${char}`;
+        if (info.words.length) line += `。组词：${info.words.join('、')}`;
+        speakParts.push(line);
       });
 
       card.append(title, grid);
       field.append(card);
-      speakText(`${speakParts.join('。')}。`);
-      await wait(holdMs);
+      await Promise.all([speakText(`${speakParts.join('。')}。`), wait(holdMs)]);
       card.remove();
     }
 
@@ -1686,8 +1685,9 @@
             if (game.phase !== 'battle') return;
             const pieceL = allPieces.find(p => p.part === forged.l) || piecesA[0];
             const pieceR = allPieces.find(p => p.part === forged.r && p !== pieceL) || piecesB[0];
-            speakText(`${forged.l}，加${forged.r}：${forged.char}！`);
+            const forgeLine = speakText(`${forged.l}，加${forged.r}：${forged.char}！`);
             await forgeMerge(pieceL, pieceR, forged.char, y, size, midX);
+            await forgeLine;
             const owner = piecesA.some(p => p.part === forged.l) ? a.side : b.side;
             spawnNewChar(forged.char, owner, y);
             game.points[owner] += 2;
@@ -1696,11 +1696,12 @@
             await wait(700);
           }
           clearPieces();
-          await showNewCharCard(news.map(n => n.char), game.level === 1 ? 9000 : 5200);
+          await showNewCharCard(news.map(n => n.char), game.level === 1 ? 5000 : 4200);
         } else if (word) {
           // ② 拼不出新字，但正好組成詞語：結盟
-          speakText(`组词：${word}！`);
+          const wordLine = speakText(`组词：${word}！`);
           await showClash(a, b, pageStrings.verdictAlly[language], pageStrings.resultWord[language](word));
+          await wordLine;
           clearPieces();
           spawnNewChar(word, 'L', y);
           spawnNewChar(word, 'R', y);
@@ -1913,7 +1914,7 @@
     }
 
     function speakText(text) {
-      if (!text) return;
+      if (!text) return Promise.resolve();
       // 神經語音（曉曉）優先，失敗自動回退瀏覽器語音
       if (window.NeuralTTS && window.NeuralTTS.enabled) {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -1930,17 +1931,16 @@
             }
           }, 300);
         };
-        window.NeuralTTS.speak(text).then(finish).catch(() => {
+        return window.NeuralTTS.speak(text).then(finish).catch(() => {
           window.NeuralTTS.markFailure();
-          browserSpeak(text);
+          return browserSpeak(text);
         });
-        return;
       }
-      browserSpeak(text);
+      return browserSpeak(text);
     }
 
     function browserSpeak(text) {
-      if (!('speechSynthesis' in window) || !text) return;
+      if (!('speechSynthesis' in window) || !text) return Promise.resolve();
       const synth = window.speechSynthesis;
       let justAborted = false;
       if (game.listening && recognition && !resumeAfterSpeech) {
@@ -1966,6 +1966,12 @@
       };
       utterance.onend = finish;
       utterance.onerror = finish;
+      // 「說完」的承諾：事件不觸發時按字數估時兜底
+      const spoken = new Promise(resolve => {
+        utterance.addEventListener('end', resolve);
+        utterance.addEventListener('error', resolve);
+        setTimeout(resolve, 2000 + text.length * 340);
+      });
       const go = () => {
         synth.resume();
         let started = false;
@@ -1996,6 +2002,7 @@
         go();
       }
       finish();
+      return spoken;
     }
 
     /* ---------- 語音識別（每回合聽一句） ---------- */

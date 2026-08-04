@@ -440,6 +440,83 @@
 
     .radical-half.is-penalty { opacity: .45; pointer-events: none; }
 
+    /* 第六關：拼成語 */
+    .assembly-arena {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+    }
+
+    .assembly-half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 30px;
+      padding: 56px 14px 14px;
+    }
+
+    .assembly-half.left { border-right: 1px dashed rgba(241, 238, 230, .22); }
+
+    .asm-slots { display: flex; justify-content: center; gap: 10px; }
+
+    .asm-slot {
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      border: 2px dashed rgba(241, 238, 230, .35);
+      border-radius: 14px;
+      font-size: 46px;
+      font-weight: 800;
+    }
+
+    .asm-slot.is-filled {
+      border-style: solid;
+      border-color: var(--jade);
+      color: var(--jade);
+      background: rgba(127, 216, 184, .12);
+      text-shadow: 0 0 16px rgba(127, 216, 184, .6);
+    }
+
+    .asm-slot.is-wrong { animation: shake 400ms ease; border-color: var(--led-red); }
+
+    .asm-pool {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .asm-char {
+      position: relative;
+      z-index: 7;
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 40px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, .05);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 200ms ease;
+    }
+
+    .assembly-half.left .asm-char { color: var(--led-red); }
+    .assembly-half.right .asm-char { color: var(--led-gold); }
+
+    .asm-char.is-dragging { transition: none; z-index: 9; cursor: grabbing; }
+
+    .asm-char.is-used { visibility: hidden; }
+
+    .assembly-half.is-penalty { opacity: .5; pointer-events: none; }
+
     .check-pop {
       position: absolute;
       z-index: 12;
@@ -870,6 +947,7 @@
         <button class="cta" id="startL3" type="button" style="background: linear-gradient(160deg, #7fd8b8, #386c5b);" data-zht="第三關 · 形聲字題庫" data-zhs="第三关 · 形声字题库" data-en="Level 3 · Phono-Semantic Bank">第三關 · 形聲字題庫</button>
         <button class="cta" id="startL4" type="button" style="background: linear-gradient(160deg, #7ab8ff, #2f5a96);" data-zht="第四關 · 成語快點" data-zhs="第四关 · 成语快点" data-en="Level 4 · Idiom Rush">第四關 · 成語快點</button>
         <button class="cta" id="startL5" type="button" style="background: linear-gradient(160deg, #d78bff, #6b2f96);" data-zht="第五關 · 部首賽跑" data-zhs="第五关 · 部首赛跑" data-en="Level 5 · Radical Race">第五關 · 部首賽跑</button>
+        <button class="cta" id="startL6" type="button" style="background: linear-gradient(160deg, #ff9d6b, #96422f);" data-zht="第六關 · 拼成語" data-zhs="第六关 · 拼成语" data-en="Level 6 · Idiom Builder">第六關 · 拼成語</button>
       </div>
 
       <div class="overlay" id="endOverlay">
@@ -932,6 +1010,9 @@
       nextLevel5: { zht: '下一關：部首賽跑 →', zhs: '下一关：部首赛跑 →', en: 'Next: Radical Race →' },
       typePlaceholder5: { zht: '第五關用手搶答，不用打字', zhs: '第五关用手抢答，不用打字', en: 'Level 5 is tap-race' },
       listening5: { zht: '第五關不用說話，快搶部首！', zhs: '第五关不用说话，快抢部首！', en: 'No speech—race for radicals!' },
+      nextLevel6: { zht: '下一關：拼成語 →', zhs: '下一关：拼成语 →', en: 'Next: Idiom Builder →' },
+      typePlaceholder6: { zht: '第六關拖字拼成語，不用打字', zhs: '第六关拖字拼成语，不用打字', en: 'Level 6 is drag-to-build' },
+      listening6: { zht: '第六關不用說話，快拼成語！', zhs: '第六关不用说话，快拼成语！', en: 'No speech—build the idiom!' },
       radicalWin: {
         zht: (l, r) => l === r ? `🏁 平手 ${l} : ${r}！` : `🏁 ${l > r ? '紅龍隊' : '金虎隊'}獲勝 ${Math.max(l,r)} : ${Math.min(l,r)}！`,
         zhs: (l, r) => l === r ? `🏁 平手 ${l} : ${r}！` : `🏁 ${l > r ? '红龙队' : '金虎队'}获胜 ${Math.max(l,r)} : ${Math.min(l,r)}！`,
@@ -1679,6 +1760,168 @@
       return pairs;
     }
 
+    /* ---------- 第六關：拼成語 ---------- */
+    const assemblyGame = {
+      entry: null,
+      round: 0,
+      slots: { L: [], R: [] },
+      slotEls: { L: [], R: [] },
+      penalty: { L: false, R: false },
+      locked: true,
+      arena: null
+    };
+
+    const ASSEMBLY_ROUNDS = 10;
+
+    function assemblyCleanup() {
+      if (assemblyGame.arena) { assemblyGame.arena.remove(); assemblyGame.arena = null; }
+      assemblyGame.slotEls = { L: [], R: [] };
+      assemblyGame.locked = true;
+    }
+
+    function assemblyPoolChar(sideKey, char) {
+      const el = document.createElement('div');
+      el.className = 'asm-char';
+      el.textContent = char;
+      let pid = null;
+      let startX = 0;
+      let startY = 0;
+      let moved = false;
+
+      el.addEventListener('pointerdown', event => {
+        if (assemblyGame.locked || assemblyGame.penalty[sideKey] || el.classList.contains('is-used')) return;
+        pid = event.pointerId;
+        el.setPointerCapture(pid);
+        startX = event.clientX;
+        startY = event.clientY;
+        moved = false;
+        el.classList.add('is-dragging');
+      });
+
+      el.addEventListener('pointermove', event => {
+        if (pid === null) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (Math.hypot(dx, dy) > 8) moved = true;
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+
+      const release = event => {
+        if (pid === null) return;
+        try { el.releasePointerCapture(pid); } catch {}
+        pid = null;
+        el.classList.remove('is-dragging');
+        el.style.transform = '';
+        let slotIndex = -1;
+        if (moved) {
+          // 拖放：看指針落在哪個槽上
+          assemblyGame.slotEls[sideKey].forEach((slotEl, i) => {
+            const r = slotEl.getBoundingClientRect();
+            if (event.clientX >= r.left && event.clientX <= r.right
+              && event.clientY >= r.top && event.clientY <= r.bottom) slotIndex = i;
+          });
+          if (slotIndex === -1) return; // 沒放到槽上：飛回原位即可
+        } else {
+          // 輕點：自動放進下一個空槽
+          slotIndex = assemblyGame.slots[sideKey].findIndex(v => v === null);
+          if (slotIndex === -1) return;
+        }
+        assemblyPlace(sideKey, char, el, slotIndex);
+      };
+      el.addEventListener('pointerup', release);
+      el.addEventListener('pointercancel', () => {
+        pid = null;
+        el.classList.remove('is-dragging');
+        el.style.transform = '';
+      });
+      return el;
+    }
+
+    function assemblyPlace(sideKey, char, poolEl, slotIndex) {
+      if (assemblyGame.locked || assemblyGame.penalty[sideKey]) return;
+      const word = assemblyGame.entry.w;
+      const slotEl = assemblyGame.slotEls[sideKey][slotIndex];
+      if (assemblyGame.slots[sideKey][slotIndex] !== null) return; // 槽已滿
+      if (char === word[slotIndex]) {
+        assemblyGame.slots[sideKey][slotIndex] = char;
+        slotEl.textContent = char;
+        slotEl.classList.add('is-filled');
+        poolEl.classList.add('is-used');
+        speakText(char);
+        if (assemblyGame.slots[sideKey].every(v => v !== null)) assemblyWin(sideKey);
+      } else {
+        slotEl.classList.add('is-wrong');
+        assemblyGame.penalty[sideKey] = true;
+        const half = assemblyGame.arena.querySelector(sideKey === 'L' ? '.assembly-half.left' : '.assembly-half.right');
+        half.classList.add('is-penalty');
+        setTimeout(() => {
+          slotEl.classList.remove('is-wrong');
+          half.classList.remove('is-penalty');
+          assemblyGame.penalty[sideKey] = false;
+        }, 800);
+      }
+    }
+
+    async function assemblyRound() {
+      if (game.level !== 6 || game.phase === 'over') return;
+      if (assemblyGame.round >= ASSEMBLY_ROUNDS) {
+        endGame(game.points.L >= game.points.R ? 'L' : 'R');
+        return;
+      }
+      assemblyCleanup();
+      const bank = window.CHENGYU_1000 || [];
+      const entry = bank[Math.floor(Math.random() * bank.length)];
+      assemblyGame.entry = entry;
+      assemblyGame.slots = { L: [null, null, null, null], R: [null, null, null, null] };
+      assemblyGame.penalty = { L: false, R: false };
+      turnBanner.className = 'turn-banner for-battle';
+      turnBanner.textContent = `第 ${assemblyGame.round + 1}/${ASSEMBLY_ROUNDS} · ${entry.w}`;
+
+      // 字池：成語四字 + 四個干擾字，兩隊同一布局
+      const distractors = [];
+      while (distractors.length < 4) {
+        const other = bank[Math.floor(Math.random() * bank.length)].w;
+        const c = other[Math.floor(Math.random() * other.length)];
+        if (!entry.w.includes(c) && !distractors.includes(c)) distractors.push(c);
+      }
+      const pool = [...entry.w, ...distractors].sort(() => Math.random() - 0.5);
+
+      const arena = document.createElement('div');
+      arena.className = 'assembly-arena';
+      ['L', 'R'].forEach(sideKey => {
+        const half = document.createElement('div');
+        half.className = `assembly-half ${sideKey === 'L' ? 'left' : 'right'}`;
+        const slotsRow = document.createElement('div');
+        slotsRow.className = 'asm-slots';
+        for (let i = 0; i < 4; i += 1) {
+          const slot = document.createElement('div');
+          slot.className = 'asm-slot';
+          slotsRow.append(slot);
+          assemblyGame.slotEls[sideKey].push(slot);
+        }
+        const poolGrid = document.createElement('div');
+        poolGrid.className = 'asm-pool';
+        pool.forEach(char => poolGrid.append(assemblyPoolChar(sideKey, char)));
+        half.append(slotsRow, poolGrid);
+        arena.append(half);
+      });
+      field.append(arena);
+      assemblyGame.arena = arena;
+
+      await speakText(`${entry.w}！`);
+      assemblyGame.locked = false;
+    }
+
+    async function assemblyWin(sideKey) {
+      assemblyGame.locked = true;
+      assemblyGame.round += 1;
+      game.points[sideKey] += 1;
+      updateHud();
+      const e = assemblyGame.entry;
+      await speakText(`${sideKey === 'L' ? '红龙队' : '金虎队'}赢啦！${e.w}！${e.e || ''}`);
+      if (game.level === 6 && game.phase !== 'over') setTimeout(assemblyRound, 700);
+    }
+
     /* ---------- 第五關：部首賽跑 ---------- */
     const radicalGame = { set: [], targets: [], round: 0, locked: true, arena: null, buttons: { L: [], R: [] } };
 
@@ -2130,6 +2373,7 @@
       idiomGame.running = false;
       idiomGame.round = 0;
       radicalCleanup();
+      assemblyCleanup();
       game.round = 1;
       game.starter = 'L';
       updateHud();
@@ -2137,13 +2381,14 @@
 
     function startGame() {
       resetGame();
-      if (game.level === 4 || game.level === 5) {
+      if (game.level >= 4) {
         game.phase = 'battle'; // 清掉上一局的 over 狀態，否則回合函數直接返回
         typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
         startOverlay.classList.remove('is-visible');
         endOverlay.classList.remove('is-visible');
         if (game.level === 4) idiomRound();
-        else radicalStart();
+        else if (game.level === 5) radicalStart();
+        else { assemblyGame.round = 0; assemblyRound(); }
         return;
       }
       typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
@@ -2157,8 +2402,9 @@
       idiomGame.running = false;
       clearIdiomTiles();
       radicalCleanup();
+      assemblyCleanup();
       if (game.listening) stopListening();
-      document.getElementById('winnerTitle').textContent = (game.level === 4 || game.level === 5)
+      document.getElementById('winnerTitle').textContent = game.level >= 4
         ? pageStrings.radicalWin[language](game.points.L, game.points.R)
         : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
       document.getElementById('endStats').textContent =
@@ -2177,6 +2423,7 @@
           : game.level === 2 ? pageStrings.nextLevel3
           : game.level === 3 ? pageStrings.nextLevel4
           : game.level === 4 ? pageStrings.nextLevel5
+          : game.level === 5 ? pageStrings.nextLevel6
           : pageStrings.again)[language];
       endOverlay.classList.add('is-visible');
     }
@@ -2186,6 +2433,7 @@
     document.getElementById('startL3').addEventListener('click', () => { unlockTTS(); game.level = 3; startGame(); });
     document.getElementById('startL4').addEventListener('click', () => { unlockTTS(); game.level = 4; startGame(); });
     document.getElementById('startL5').addEventListener('click', () => { unlockTTS(); game.level = 5; startGame(); });
+    document.getElementById('startL6').addEventListener('click', () => { unlockTTS(); game.level = 6; startGame(); });
 
     // ☰ 關卡菜單：隨時回到選關頁
     document.getElementById('menuLevels').addEventListener('click', () => {
@@ -2194,6 +2442,7 @@
       idiomGame.running = false;
       clearIdiomTiles();
       radicalCleanup();
+      assemblyCleanup();
       window.NeuralTTS?.stop();
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       game.squads = { L: [], R: [] };
@@ -2209,6 +2458,7 @@
       else if (game.level === 2) game.level = 3;
       else if (game.level === 3) game.level = 4;
       else if (game.level === 4) game.level = 5;
+      else if (game.level === 5) game.level = 6;
       startGame();
     });
 

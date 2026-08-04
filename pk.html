@@ -392,6 +392,8 @@
       animation: card-in 250ms ease;
     }
 
+    .tile.is-wrong { animation: shake 400ms ease; border-color: var(--led-red) !important; }
+
     /* 第三關抽字按鈕 */
     .deal-button {
       position: absolute;
@@ -802,6 +804,7 @@
         <button class="cta" id="startL1" type="button" data-zht="第一關 · 單字對決" data-zhs="第一关 · 单字对决" data-en="Level 1 · One-Character Duel">第一關 · 單字對決</button>
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
         <button class="cta" id="startL3" type="button" style="background: linear-gradient(160deg, #7fd8b8, #386c5b);" data-zht="第三關 · 形聲字題庫" data-zhs="第三关 · 形声字题库" data-en="Level 3 · Phono-Semantic Bank">第三關 · 形聲字題庫</button>
+        <button class="cta" id="startL4" type="button" style="background: linear-gradient(160deg, #7ab8ff, #2f5a96);" data-zht="第四關 · 成語快點" data-zhs="第四关 · 成语快点" data-en="Level 4 · Idiom Rush">第四關 · 成語快點</button>
       </div>
 
       <div class="overlay" id="endOverlay">
@@ -834,6 +837,7 @@
 
   <script src="neural-tts.js"></script>
   <script src="xingsheng-3000.js"></script>
+  <script src="chengyu-1000.js"></script>
   <script src="hanzi-parts.js"></script>
   <script src="wuxing-ciyu.js?v=3"></script>
   <script src="opencc-t2cn.js"></script>
@@ -856,6 +860,10 @@
       listening2: { zht: '我在聽……說完一句自動上擂臺！', zhs: '我在听……说完一句自动上擂台！', en: 'Listening… your sentence enters the arena!' },
       nextLevel: { zht: '下一關：句子擂臺 →', zhs: '下一关：句子擂台 →', en: 'Next: Sentence Arena →' },
       nextLevel3: { zht: '下一關：形聲字題庫 →', zhs: '下一关：形声字题库 →', en: 'Next: Phono-Semantic Bank →' },
+      nextLevel4: { zht: '下一關：成語快點 →', zhs: '下一关：成语快点 →', en: 'Next: Idiom Rush →' },
+      typePlaceholder4: { zht: '第四關用手點字，不用打字', zhs: '第四关用手点字，不用打字', en: 'Level 4 is tap-only' },
+      listening4: { zht: '第四關不用說話，快點字！', zhs: '第四关不用说话，快点字！', en: 'No speech needed—tap fast!' },
+      idiomDone: { zht: n => `⭐ 完成 ${n} 個成語！`, zhs: n => `⭐ 完成 ${n} 个成语！`, en: n => `⭐ ${n} idioms completed!` },
       turnLeft3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
       turnRight3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
       typePlaceholder3: { zht: '第三關自動抽字，不用打字', zhs: '第三关自动抽字，不用打字', en: 'Level 3 deals automatically' },
@@ -1086,6 +1094,7 @@
       points: { L: 0, R: 0 },
       squads: { L: [], R: [] },   // 本回合的字 tile 物件
       newChars: [],
+      idiomsDone: 0,
       listening: false
     };
 
@@ -1585,6 +1594,111 @@
       return pairs;
     }
 
+    /* ---------- 第四關：成語快點 ---------- */
+    const idiomGame = { tiles: [], raf: null, next: 0, entry: null, running: false };
+
+    function idiomBanner() {
+      const word = idiomGame.entry.w;
+      turnBanner.className = 'turn-banner for-battle';
+      turnBanner.innerHTML = [...word].map((c, i) =>
+        `<span style="color:${i < idiomGame.next ? 'var(--jade)' : 'var(--led-gold)'}">${c}</span>`).join('') +
+        ` <small style="color:var(--muted);font-size:.7em">${idiomGame.entry.p}</small>`;
+    }
+
+    function clearIdiomTiles() {
+      if (idiomGame.raf) cancelAnimationFrame(idiomGame.raf);
+      idiomGame.raf = null;
+      idiomGame.tiles.forEach(t => t.el.remove());
+      idiomGame.tiles = [];
+    }
+
+    async function idiomRound() {
+      if (game.level !== 4 || game.phase === 'over') return;
+      game.phase = 'battle';
+      const bank = window.CHENGYU_1000 || [];
+      const entry = bank[Math.floor(Math.random() * bank.length)];
+      idiomGame.entry = entry;
+      idiomGame.next = 0;
+      idiomBanner();
+      // ① 先報成語
+      await speakText(`听好啦！${entry.w}！`);
+      if (game.level !== 4 || game.phase === 'over') return;
+      idiomGame.running = true;
+
+      // ② 字塊開始下落（按亂序欄位、先後錯開）
+      const size = tileSize();
+      const cols = 5;
+      const colW = field.clientWidth / cols;
+      const order = [...entry.w].map((c, i) => ({ c, i }));
+      const lanes = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5).slice(0, 4);
+      const speed = field.clientHeight / 13; // px/s
+      order.forEach(({ c }, i) => {
+        const el = document.createElement('div');
+        el.className = 'tile from-left';
+        el.style.setProperty('--tile', `${size}px`);
+        el.textContent = c;
+        const x = lanes[i] * colW + (colW - size) / 2;
+        el.style.transform = `translate(${x}px, ${-size - i * size * 1.6}px)`;
+        field.append(el);
+        const tile = { char: c, el, x, y: -size - i * size * 1.6, done: false };
+        el.addEventListener('pointerdown', () => idiomTap(tile));
+        idiomGame.tiles.push(tile);
+      });
+
+      let last = performance.now();
+      const step = now => {
+        const dt = Math.min(50, now - last) / 1000;
+        last = now;
+        let landed = false;
+        idiomGame.tiles.forEach(tile => {
+          if (tile.done) return;
+          tile.y += speed * dt;
+          tile.el.style.transform = `translate(${tile.x}px, ${tile.y}px)`;
+          if (tile.y > field.clientHeight - size) landed = true;
+        });
+        if (landed) { idiomMiss(); return; }
+        if (idiomGame.running) idiomGame.raf = requestAnimationFrame(step);
+      };
+      idiomGame.raf = requestAnimationFrame(step);
+    }
+
+    function idiomTap(tile) {
+      if (!idiomGame.running || tile.done) return;
+      const word = idiomGame.entry.w;
+      if (tile.char === word[idiomGame.next]) {
+        tile.done = true;
+        speakText(tile.char);
+        burstTile(tile);
+        idiomGame.next += 1;
+        idiomBanner();
+        if (idiomGame.next >= word.length) idiomComplete();
+      } else {
+        tile.el.classList.add('is-wrong');
+        setTimeout(() => tile.el.classList.remove('is-wrong'), 420);
+      }
+    }
+
+    async function idiomComplete() {
+      idiomGame.running = false;
+      clearIdiomTiles();
+      game.idiomsDone += 1;
+      game.points.L += 4;
+      updateHud();
+      const e = idiomGame.entry;
+      await speakText(`${e.w}！${e.e || ''}`);
+      if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
+    }
+
+    async function idiomMiss() {
+      idiomGame.running = false;
+      clearIdiomTiles();
+      const e = idiomGame.entry;
+      hitPlayer('L');
+      if (game.phase === 'over') return;
+      await speakText(`哎呀，掉下去了！是${e.w}。`);
+      if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
+    }
+
     function dealRound() {
       if (game.phase !== 'listen' || game.level !== 3) return;
       dealButton.classList.remove('is-visible');
@@ -1597,7 +1711,7 @@
     }
 
     function acceptSentence(text) {
-      if (game.phase !== 'listen' || game.level === 3) return;
+      if (game.phase !== 'listen' || game.level >= 3) return;
       const chars = [...text].filter(c => HAN.test(c)).slice(0, maxChars());
       if (!chars.length) return;
       const sideKey = game.turn;
@@ -1803,6 +1917,9 @@
       game.squads = { L: [], R: [] };
       game.newChars = [];
       game.dealtPairs = null;
+      game.idiomsDone = 0;
+      clearIdiomTiles();
+      idiomGame.running = false;
       game.round = 1;
       game.starter = 'L';
       updateHud();
@@ -1810,6 +1927,13 @@
 
     function startGame() {
       resetGame();
+      if (game.level === 4) {
+        typeInput.placeholder = pageStrings.typePlaceholder4[language];
+        startOverlay.classList.remove('is-visible');
+        endOverlay.classList.remove('is-visible');
+        idiomRound();
+        return;
+      }
       typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
       startOverlay.classList.remove('is-visible');
       endOverlay.classList.remove('is-visible');
@@ -1818,9 +1942,12 @@
 
     function endGame(winner) {
       game.phase = 'over';
+      idiomGame.running = false;
+      clearIdiomTiles();
       if (game.listening) stopListening();
-      document.getElementById('winnerTitle').textContent =
-        winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language];
+      document.getElementById('winnerTitle').textContent = game.level === 4
+        ? pageStrings.idiomDone[language](game.idiomsDone)
+        : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
       document.getElementById('endStats').textContent =
         pageStrings.statsTemplate[language]({ rounds: game.round, newChars: game.newChars.length });
       const box = document.getElementById('wonChars');
@@ -1833,18 +1960,23 @@
         box.append(chip);
       });
       document.getElementById('retryButton').textContent =
-        (game.level === 1 ? pageStrings.nextLevel : game.level === 2 ? pageStrings.nextLevel3 : pageStrings.again)[language];
+        (game.level === 1 ? pageStrings.nextLevel
+          : game.level === 2 ? pageStrings.nextLevel3
+          : game.level === 3 ? pageStrings.nextLevel4
+          : pageStrings.again)[language];
       endOverlay.classList.add('is-visible');
     }
 
     document.getElementById('startL1').addEventListener('click', () => { unlockTTS(); game.level = 1; startGame(); });
     document.getElementById('startL2').addEventListener('click', () => { unlockTTS(); game.level = 2; startGame(); });
     document.getElementById('startL3').addEventListener('click', () => { unlockTTS(); game.level = 3; startGame(); });
+    document.getElementById('startL4').addEventListener('click', () => { unlockTTS(); game.level = 4; startGame(); });
     document.getElementById('dealButton').addEventListener('click', () => { unlockTTS(); dealRound(); });
     document.getElementById('retryButton').addEventListener('click', () => {
       unlockTTS();
       if (game.level === 1) game.level = 2;
       else if (game.level === 2) game.level = 3;
+      else if (game.level === 3) game.level = 4;
       startGame();
     });
 

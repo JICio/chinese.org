@@ -1,15 +1,21 @@
-/* 雲端自然語音：百度翻譯發音接口（大陸訪問快、無需密鑰、任意文本）。
-   非官方端點；連續失敗兩次自動停用，回退瀏覽器語音。
-   粵語不支持（自動回退），英文走 lan=en。 */
+/* 雲端自然語音，三級鏈路：
+   ① Azure 神經語音（曉曉等，經自家 Cloudflare Worker 代理，官方接口最穩）
+   ② 百度翻譯發音（無需密鑰的備用線路）
+   ③ 頁面內建的瀏覽器語音（最後兜底，由各頁面自己處理）
+   AZURE_PROXY 為空時自動跳過 ①。 */
 window.NeuralTTS = (() => {
+  // 部署 cf-worker 後填入，如 'https://chinese-tts.<你的子域>.workers.dev'
+  const AZURE_PROXY = '';
+
   let audioEl = null;
   let enabled = true;
   let failures = 0;
+  let azureDown = false;
 
   function langOf(voice) {
     if (!voice) return 'zh';
     if (voice.includes('en-US')) return 'en';
-    if (voice.includes('zh-HK') || voice.includes('yue')) return null; // 不支持
+    if (voice.includes('zh-HK') || voice.includes('yue')) return null; // 百度不支持粵語
     return 'zh';
   }
 
@@ -22,18 +28,10 @@ window.NeuralTTS = (() => {
     }
   }
 
-  function speak(text, { voice } = {}) {
+  function playUrl(url) {
     return new Promise((resolve, reject) => {
-      if (!enabled || !text) { reject(new Error('disabled')); return; }
-      const lan = langOf(voice);
-      if (!lan) {
-        failures -= 1; // 語言不支持不算失敗（外層仍會 markFailure，淨值歸零）
-        reject(new Error('unsupported-lang'));
-        return;
-      }
       stop();
-      const clipped = text.slice(0, 280);
-      const el = new Audio(`https://fanyi.baidu.com/gettts?lan=${lan}&spd=5&source=web&text=${encodeURIComponent(clipped)}`);
+      const el = new Audio(url);
       audioEl = el;
       let settled = false;
       let started = false;
@@ -42,11 +40,31 @@ window.NeuralTTS = (() => {
       el.onplaying = () => { started = true; };
       el.onended = ok;
       el.onerror = () => bad(new Error('audio error'));
-      // 8 秒還沒開始播放就放棄（網絡不通/被攔截）
       setTimeout(() => { if (!started && !settled) { el.pause(); bad(new Error('timeout')); } }, 8000);
-      // 播放被自動播放策略拒絕時 reject → 外層回退
       el.play().catch(bad);
     });
+  }
+
+  async function speak(text, { voice = 'zh-CN-XiaoxiaoNeural' } = {}) {
+    if (!enabled || !text) throw new Error('disabled');
+    const clipped = text.slice(0, 280);
+
+    // ① Azure（代理已配置且未標記故障時）
+    if (AZURE_PROXY && !azureDown) {
+      try {
+        return await playUrl(`${AZURE_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
+      } catch {
+        azureDown = true; // 本次會話不再嘗試 Azure，直接走百度
+      }
+    }
+
+    // ② 百度
+    const lan = langOf(voice);
+    if (!lan) {
+      failures -= 1; // 語言不支持不算失敗（外層仍會 markFailure，淨值歸零）
+      throw new Error('unsupported-lang');
+    }
+    return playUrl(`https://fanyi.baidu.com/gettts?lan=${lan}&spd=5&source=web&text=${encodeURIComponent(clipped)}`);
   }
 
   function markFailure() {

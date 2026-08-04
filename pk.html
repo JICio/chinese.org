@@ -1760,55 +1760,91 @@
       }
     }
 
-    /* ---------- 第四關：成語快點 ---------- */
-    const idiomGame = { tiles: [], raf: null, next: 0, entry: null, running: false };
+    /* ---------- 第四關：成語快點（雙隊競速） ---------- */
+    const idiomGame = {
+      tiles: { L: [], R: [] },
+      raf: null,
+      next: { L: 0, R: 0 },
+      penalty: { L: false, R: false },
+      entry: null,
+      running: false,
+      round: 0,
+      divider: null
+    };
+
+    const IDIOM_ROUNDS = 10;
+
+    function idiomDots(n, total) {
+      return '●'.repeat(n) + '○'.repeat(Math.max(0, total - n));
+    }
 
     function idiomBanner() {
-      const word = idiomGame.entry.w;
+      const entry = idiomGame.entry;
+      if (!entry) return;
+      const len = entry.w.length;
       turnBanner.className = 'turn-banner for-battle';
-      turnBanner.innerHTML = [...word].map((c, i) =>
-        `<span style="color:${i < idiomGame.next ? 'var(--jade)' : 'var(--led-gold)'}">${c}</span>`).join('') +
-        ` <small style="color:var(--muted);font-size:.7em">${idiomGame.entry.p}</small>`;
+      turnBanner.innerHTML =
+        `第 ${Math.min(idiomGame.round + 1, IDIOM_ROUNDS)}/${IDIOM_ROUNDS} · ${entry.w}` +
+        ` <span style="color:var(--led-red)">${idiomDots(idiomGame.next.L, len)}</span>` +
+        ` <span style="color:var(--led-gold)">${idiomDots(idiomGame.next.R, len)}</span>`;
     }
 
     function clearIdiomTiles() {
       if (idiomGame.raf) cancelAnimationFrame(idiomGame.raf);
       idiomGame.raf = null;
-      idiomGame.tiles.forEach(t => t.el.remove());
-      idiomGame.tiles = [];
+      idiomGame.tiles.L.concat(idiomGame.tiles.R).forEach(t => t.el.remove());
+      idiomGame.tiles = { L: [], R: [] };
+      if (idiomGame.divider) { idiomGame.divider.remove(); idiomGame.divider = null; }
     }
 
     async function idiomRound() {
       if (game.level !== 4 || game.phase === 'over') return;
+      if (idiomGame.round >= IDIOM_ROUNDS) {
+        endGame(game.points.L >= game.points.R ? 'L' : 'R');
+        return;
+      }
       game.phase = 'battle';
       const bank = window.CHENGYU_1000 || [];
       const entry = bank[Math.floor(Math.random() * bank.length)];
       idiomGame.entry = entry;
-      idiomGame.next = 0;
+      idiomGame.next = { L: 0, R: 0 };
+      idiomGame.penalty = { L: false, R: false };
       idiomBanner();
       // ① 先報成語
       await speakText(`听好啦！${entry.w}！`);
       if (game.level !== 4 || game.phase === 'over') return;
       idiomGame.running = true;
 
-      // ② 字塊開始下落（按亂序欄位、先後錯開）
+      // 中線
+      const divider = document.createElement('div');
+      divider.style.cssText = 'position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed rgba(241,238,230,.22);z-index:3;';
+      field.append(divider);
+      idiomGame.divider = divider;
+
+      // ② 同一套亂序方案鏡像鋪到兩個半場：同成語、同速度、同布局，看誰先按順序點完
       const size = tileSize();
-      const cols = 5;
-      const colW = field.clientWidth / cols;
-      const order = [...entry.w].map((c, i) => ({ c, i }));
-      const lanes = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5).slice(0, 4);
-      const speed = field.clientHeight / 13; // px/s
-      order.forEach(({ c }, i) => {
-        const el = document.createElement('div');
-        el.className = 'tile from-left';
-        el.style.setProperty('--tile', `${size}px`);
-        el.textContent = c;
-        const x = lanes[i] * colW + (colW - size) / 2;
-        el.style.transform = `translate(${x}px, ${-size - i * size * 1.6}px)`;
-        field.append(el);
-        const tile = { char: c, el, x, y: -size - i * size * 1.6, done: false };
-        el.addEventListener('pointerdown', () => idiomTap(tile));
-        idiomGame.tiles.push(tile);
+      const halfW = field.clientWidth / 2;
+      const colW = halfW / 4;
+      const chars = [...entry.w];
+      const spawnOrder = chars.map((_, i) => i).sort(() => Math.random() - 0.5); // 打亂出場順序
+      const lanePerm = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+      const speed = field.clientHeight / 7.5; // 加快掉落
+
+      spawnOrder.forEach((charIdx, k) => {
+        ['L', 'R'].forEach(sideKey => {
+          const el = document.createElement('div');
+          el.className = `tile ${sideKey === 'L' ? 'from-left' : 'from-right'}`;
+          el.style.setProperty('--tile', `${size}px`);
+          el.textContent = chars[charIdx];
+          const baseX = sideKey === 'L' ? 0 : halfW;
+          const x = baseX + lanePerm[k] * colW + (colW - size) / 2;
+          const y = -size - k * size * 1.25;
+          el.style.transform = `translate(${x}px, ${y}px)`;
+          field.append(el);
+          const tile = { char: chars[charIdx], el, x, y, done: false };
+          el.addEventListener('pointerdown', () => idiomTap(sideKey, tile));
+          idiomGame.tiles[sideKey].push(tile);
+        });
       });
 
       let last = performance.now();
@@ -1816,7 +1852,7 @@
         const dt = Math.min(50, now - last) / 1000;
         last = now;
         let landed = false;
-        idiomGame.tiles.forEach(tile => {
+        idiomGame.tiles.L.concat(idiomGame.tiles.R).forEach(tile => {
           if (tile.done) return;
           tile.y += speed * dt;
           tile.el.style.transform = `translate(${tile.x}px, ${tile.y}px)`;
@@ -1828,41 +1864,45 @@
       idiomGame.raf = requestAnimationFrame(step);
     }
 
-    function idiomTap(tile) {
-      if (!idiomGame.running || tile.done) return;
+    function idiomTap(sideKey, tile) {
+      if (!idiomGame.running || tile.done || idiomGame.penalty[sideKey]) return;
       const word = idiomGame.entry.w;
-      if (tile.char === word[idiomGame.next]) {
+      if (tile.char === word[idiomGame.next[sideKey]]) {
         tile.done = true;
         const charLine = speakText(tile.char);
         burstTile(tile);
-        idiomGame.next += 1;
+        idiomGame.next[sideKey] += 1;
         idiomBanner();
-        if (idiomGame.next >= word.length) idiomComplete(charLine);
+        if (idiomGame.next[sideKey] >= word.length) idiomWin(sideKey, charLine);
       } else {
+        // 點錯：本隊冷卻 0.8 秒，防止亂拍試出順序
         tile.el.classList.add('is-wrong');
-        setTimeout(() => tile.el.classList.remove('is-wrong'), 420);
+        idiomGame.penalty[sideKey] = true;
+        setTimeout(() => {
+          tile.el.classList.remove('is-wrong');
+          idiomGame.penalty[sideKey] = false;
+        }, 800);
       }
     }
 
-    async function idiomComplete(lastCharLine) {
+    async function idiomWin(sideKey, lastCharLine) {
       idiomGame.running = false;
       clearIdiomTiles();
-      game.idiomsDone += 1;
-      game.points.L += 4;
+      idiomGame.round += 1;
+      game.points[sideKey] += 1;
       updateHud();
       const e = idiomGame.entry;
       if (lastCharLine) await lastCharLine; // 先讓最後一個字讀完
-      await speakText(`${e.w}！${e.e || ''}`);
+      await speakText(`${sideKey === 'L' ? '红龙队' : '金虎队'}赢啦！${e.w}！${e.e || ''}`);
       if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
     }
 
     async function idiomMiss() {
       idiomGame.running = false;
       clearIdiomTiles();
+      idiomGame.round += 1;
       const e = idiomGame.entry;
-      hitPlayer('L');
-      if (game.phase === 'over') return;
-      await speakText(`哎呀，掉下去了！是${e.w}。`);
+      await speakText(`都没接住！是${e.w}。`);
       if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
     }
 
@@ -2087,6 +2127,7 @@
       game.idiomsDone = 0;
       clearIdiomTiles();
       idiomGame.running = false;
+      idiomGame.round = 0;
       radicalCleanup();
       game.round = 1;
       game.starter = 'L';
@@ -2115,11 +2156,9 @@
       clearIdiomTiles();
       radicalCleanup();
       if (game.listening) stopListening();
-      document.getElementById('winnerTitle').textContent = game.level === 4
-        ? pageStrings.idiomDone[language](game.idiomsDone)
-        : game.level === 5
-          ? pageStrings.radicalWin[language](game.points.L, game.points.R)
-          : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
+      document.getElementById('winnerTitle').textContent = (game.level === 4 || game.level === 5)
+        ? pageStrings.radicalWin[language](game.points.L, game.points.R)
+        : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
       document.getElementById('endStats').textContent =
         pageStrings.statsTemplate[language]({ rounds: game.round, newChars: game.newChars.length });
       const box = document.getElementById('wonChars');

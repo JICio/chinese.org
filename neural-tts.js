@@ -1,59 +1,16 @@
-/* 微軟 Edge 朗讀接口（曉曉 Neural 等自然語音）。
-   非官方端點，失敗兩次自動停用並回退瀏覽器語音。 */
+/* 雲端自然語音：百度翻譯發音接口（大陸訪問快、無需密鑰、任意文本）。
+   非官方端點；連續失敗兩次自動停用，回退瀏覽器語音。
+   粵語不支持（自動回退），英文走 lan=en。 */
 window.NeuralTTS = (() => {
-  const TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4';
-  const cache = new Map(); // voice|text -> blob URL
   let audioEl = null;
-  let enabled = 'WebSocket' in window && 'crypto' in window && !!crypto.subtle;
+  let enabled = true;
   let failures = 0;
 
-  async function gecToken() {
-    const seconds = Math.floor(Date.now() / 1000) + 11644473600;
-    const rounded = seconds - (seconds % 300);
-    const input = `${rounded * 1e7}${TOKEN}`;
-    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-    return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-  }
-
-  const uuid = () => crypto.randomUUID().replace(/-/g, '');
-
-  const escapeXml = text => text.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
-
-  function synthesize(text, voice, rate) {
-    return new Promise((resolve, reject) => {
-      gecToken().then(gec => {
-        const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1`
-          + `?TrustedClientToken=${TOKEN}&Sec-MS-GEC=${gec}&Sec-MS-GEC-Version=1-130.0.2849.68&ConnectionId=${uuid()}`;
-        const ws = new WebSocket(url);
-        ws.binaryType = 'arraybuffer';
-        const chunks = [];
-        const timer = setTimeout(() => { try { ws.close(); } catch {} reject(new Error('timeout')); }, 10000);
-        ws.onopen = () => {
-          const now = new Date().toISOString();
-          ws.send(`X-Timestamp:${now}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n`
-            + '{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}');
-          const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='zh-CN'>`
-            + `<voice name='${voice}'><prosody rate='${rate}'>${escapeXml(text)}</prosody></voice></speak>`;
-          ws.send(`X-RequestId:${uuid()}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${new Date().toISOString()}\r\nPath:ssml\r\n\r\n${ssml}`);
-        };
-        ws.onmessage = event => {
-          if (typeof event.data === 'string') {
-            if (event.data.includes('Path:turn.end')) {
-              clearTimeout(timer);
-              try { ws.close(); } catch {}
-              resolve(new Blob(chunks, { type: 'audio/mpeg' }));
-            }
-            return;
-          }
-          const data = new Uint8Array(event.data);
-          const headerLen = (data[0] << 8) | data[1];
-          const header = new TextDecoder().decode(data.subarray(2, 2 + headerLen));
-          if (header.includes('Path:audio')) chunks.push(data.subarray(2 + headerLen));
-        };
-        ws.onerror = () => { clearTimeout(timer); reject(new Error('ws error')); };
-        ws.onclose = () => { clearTimeout(timer); if (!chunks.length) reject(new Error('no audio')); };
-      }).catch(reject);
-    });
+  function langOf(voice) {
+    if (!voice) return 'zh';
+    if (voice.includes('en-US')) return 'en';
+    if (voice.includes('zh-HK') || voice.includes('yue')) return null; // 不支持
+    return 'zh';
   }
 
   function stop() {
@@ -65,28 +22,30 @@ window.NeuralTTS = (() => {
     }
   }
 
-  async function speak(text, { voice = 'zh-CN-XiaoxiaoNeural', rate = '+8%' } = {}) {
-    if (!enabled) throw new Error('disabled');
-    const key = `${voice}|${rate}|${text}`;
-    let url = cache.get(key);
-    if (!url) {
-      const blob = await synthesize(text, voice, rate);
-      if (blob.size < 256) throw new Error('empty audio');
-      url = URL.createObjectURL(blob);
-      if (cache.size > 80) {
-        const oldest = cache.keys().next().value;
-        URL.revokeObjectURL(cache.get(oldest));
-        cache.delete(oldest);
+  function speak(text, { voice } = {}) {
+    return new Promise((resolve, reject) => {
+      if (!enabled || !text) { reject(new Error('disabled')); return; }
+      const lan = langOf(voice);
+      if (!lan) {
+        failures -= 1; // 語言不支持不算失敗（外層仍會 markFailure，淨值歸零）
+        reject(new Error('unsupported-lang'));
+        return;
       }
-      cache.set(key, url);
-    }
-    stop();
-    const el = new Audio(url);
-    audioEl = el;
-    await el.play(); // 未解鎖自動播放時會 reject → 外層回退
-    return new Promise(resolve => {
-      el.onended = resolve;
-      el.onerror = resolve;
+      stop();
+      const clipped = text.slice(0, 280);
+      const el = new Audio(`https://fanyi.baidu.com/gettts?lan=${lan}&spd=5&source=web&text=${encodeURIComponent(clipped)}`);
+      audioEl = el;
+      let settled = false;
+      let started = false;
+      const ok = () => { if (!settled) { settled = true; resolve(); } };
+      const bad = err => { if (!settled) { settled = true; reject(err); } };
+      el.onplaying = () => { started = true; };
+      el.onended = ok;
+      el.onerror = () => bad(new Error('audio error'));
+      // 8 秒還沒開始播放就放棄（網絡不通/被攔截）
+      setTimeout(() => { if (!started && !settled) { el.pause(); bad(new Error('timeout')); } }, 8000);
+      // 播放被自動播放策略拒絕時 reject → 外層回退
+      el.play().catch(bad);
     });
   }
 

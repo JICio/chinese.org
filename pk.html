@@ -1562,30 +1562,38 @@
       dealButton.classList.toggle('is-visible', game.level === 3);
     }
 
-    // 第三關：從 3000 形聲字題庫隨機抽字
-    function drawChars(count, used) {
+    // 第三關：構造式抽取——每一對都保證能交叉鍛造出新字
+    function drawForgeablePairs(count) {
       const bank = window.XINGSHENG_3000 || '';
-      const hand = [];
+      const used = new Set();
+      const pairs = [];
       let guard = 0;
-      while (hand.length < count && guard < 500) {
+      while (pairs.length < count && guard < 4000) {
         guard += 1;
-        const c = bank[Math.floor(Math.random() * bank.length)];
-        if (!c || used.has(c)) continue;
-        used.add(c);
-        hand.push(c);
+        const a = bank[Math.floor(Math.random() * bank.length)];
+        if (!a || used.has(a) || !PARTS.d[a]) continue;
+        let partner = null;
+        for (let attempt = 0; attempt < 150 && !partner; attempt += 1) {
+          const b = bank[Math.floor(Math.random() * bank.length)];
+          if (!b || b === a || used.has(b)) continue;
+          if (crossForge(a, b).length) partner = b;
+        }
+        if (!partner) continue;
+        used.add(a);
+        used.add(partner);
+        pairs.push([a, partner]);
       }
-      return hand;
+      return pairs;
     }
 
     function dealRound() {
       if (game.phase !== 'listen' || game.level !== 3) return;
       dealButton.classList.remove('is-visible');
       if (game.listening) stopListening();
-      const used = new Set();
-      const handL = drawChars(6, used);
-      const handR = drawChars(6, used);
-      game.squads.L = handL.map((char, i) => makeTile(char, 'L', i, handL.length));
-      game.squads.R = handR.map((char, i) => makeTile(char, 'R', i, handR.length));
+      const dealt = drawForgeablePairs(6);
+      game.dealtPairs = dealt;
+      game.squads.L = dealt.map(([a], i) => makeTile(a, 'L', i, dealt.length));
+      game.squads.R = dealt.map(([, b], i) => makeTile(b, 'R', i, dealt.length));
       resolveBattle();
     }
 
@@ -1611,31 +1619,38 @@
       const L = game.squads.L;
       const R = game.squads.R;
 
-      // 智能配對：先把能拼新字的字配到一起，其次能組詞的，剩下按順序
-      const usedL = new Set();
-      const usedR = new Set();
-      const pairs = [];
-      [
-        (x, z) => crossForge(x, z).length > 0,
-        (x, z) => wordOf(x, z)
-      ].forEach(match => {
-        L.forEach((tileL, i) => {
-          if (usedL.has(i)) return;
-          for (let j = 0; j < R.length; j += 1) {
-            if (usedR.has(j)) continue;
-            if (match(tileL.char, R[j].char)) {
-              pairs.push([tileL, R[j]]);
-              usedL.add(i);
-              usedR.add(j);
-              return;
+      let pairs = [];
+      let restL = [];
+      let restR = [];
+      if (game.level === 3 && game.dealtPairs && L.length === R.length) {
+        // 第三關：按抽定配對上場，每對保證能鍛造
+        pairs = L.map((tileL, i) => [tileL, R[i]]);
+      } else {
+        // 智能配對：先把能拼新字的字配到一起，其次能組詞的，剩下按順序
+        const usedL = new Set();
+        const usedR = new Set();
+        [
+          (x, z) => crossForge(x, z).length > 0,
+          (x, z) => wordOf(x, z)
+        ].forEach(match => {
+          L.forEach((tileL, i) => {
+            if (usedL.has(i)) return;
+            for (let j = 0; j < R.length; j += 1) {
+              if (usedR.has(j)) continue;
+              if (match(tileL.char, R[j].char)) {
+                pairs.push([tileL, R[j]]);
+                usedL.add(i);
+                usedR.add(j);
+                return;
+              }
             }
-          }
+          });
         });
-      });
-      const restL = L.filter((_, i) => !usedL.has(i));
-      const restR = R.filter((_, j) => !usedR.has(j));
-      const restCount = Math.min(restL.length, restR.length);
-      for (let k = 0; k < restCount; k += 1) pairs.push([restL[k], restR[k]]);
+        restL = L.filter((_, i) => !usedL.has(i));
+        restR = R.filter((_, j) => !usedR.has(j));
+        const restCount = Math.min(restL.length, restR.length);
+        for (let k = 0; k < restCount; k += 1) pairs.push([restL[k], restR[k]]);
+      }
       const pairCount = pairs.length;
 
       for (let i = 0; i < pairCount; i += 1) {
@@ -1704,7 +1719,8 @@
       }
 
       // 多出來的字直衝對方
-      const extras = restL.length > restR.length ? restL.slice(restCount) : restR.slice(restCount);
+      const extrasCount = Math.min(restL.length, restR.length);
+      const extras = restL.length > restR.length ? restL.slice(extrasCount) : restR.slice(extrasCount);
       for (const tile of extras) {
         if (game.phase !== 'battle') return;
         tile.launched = true;
@@ -1785,6 +1801,7 @@
       game.points = { L: 0, R: 0 };
       game.squads = { L: [], R: [] };
       game.newChars = [];
+      game.dealtPairs = null;
       game.round = 1;
       game.starter = 'L';
       updateHud();

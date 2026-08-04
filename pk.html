@@ -1747,7 +1747,7 @@
         game.points[sideKey] += 1;
         updateHud();
         radicalGame.round += 1;
-        speakText(`${name}！${sideKey === 'L' ? '红龙队' : '金虎队'}得分！`);
+        speakText(sideKey === 'L' ? '红龙队得分！' : '金虎队得分！');
         setTimeout(radicalNext, 1400);
       } else {
         // 點錯：本方冷卻，防止亂拍

@@ -1811,7 +1811,7 @@
       idiomGame.penalty = { L: false, R: false };
       idiomBanner();
       // ① 先報成語
-      await speakText(`听好啦！${entry.w}！`);
+      await speakText(`${entry.w}！`);
       if (game.level !== 4 || game.phase === 'over') return;
       idiomGame.running = true;
 

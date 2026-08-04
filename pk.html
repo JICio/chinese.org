@@ -1902,7 +1902,7 @@
       clearIdiomTiles();
       idiomGame.round += 1;
       const e = idiomGame.entry;
-      await speakText(`都没接住！是${e.w}。`);
+      await speakText(`是${e.w}。`);
       if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
     }
 

@@ -394,6 +394,52 @@
 
     .tile.is-wrong { animation: shake 400ms ease; border-color: var(--led-red) !important; }
 
+    /* 第五關：部首賽跑 */
+    .radical-arena {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+    }
+
+    .radical-half {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      align-content: center;
+      padding: 64px 18px 18px;
+    }
+
+    .radical-half.left { border-right: 1px dashed rgba(241, 238, 230, .22); }
+
+    .radical-half button {
+      min-height: 64px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      font-size: 40px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, .04);
+      transition: transform 120ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .radical-half.left button { color: var(--led-red); }
+    .radical-half.right button { color: var(--led-gold); }
+
+    .radical-half button:active { transform: scale(.92); }
+
+    .radical-half button.is-hit {
+      border-color: var(--jade);
+      background: rgba(127, 216, 184, .25);
+      color: var(--jade);
+    }
+
+    .radical-half button.is-miss { animation: shake 400ms ease; border-color: var(--led-red); }
+
+    .radical-half.is-penalty { opacity: .45; pointer-events: none; }
+
     /* 第三關抽字按鈕 */
     .deal-button {
       position: absolute;
@@ -805,6 +851,7 @@
         <button class="cta" id="startL2" type="button" style="background: linear-gradient(160deg, #ffd98a, #a5762c);" data-zht="第二關 · 句子擂臺" data-zhs="第二关 · 句子擂台" data-en="Level 2 · Sentence Arena">第二關 · 句子擂臺</button>
         <button class="cta" id="startL3" type="button" style="background: linear-gradient(160deg, #7fd8b8, #386c5b);" data-zht="第三關 · 形聲字題庫" data-zhs="第三关 · 形声字题库" data-en="Level 3 · Phono-Semantic Bank">第三關 · 形聲字題庫</button>
         <button class="cta" id="startL4" type="button" style="background: linear-gradient(160deg, #7ab8ff, #2f5a96);" data-zht="第四關 · 成語快點" data-zhs="第四关 · 成语快点" data-en="Level 4 · Idiom Rush">第四關 · 成語快點</button>
+        <button class="cta" id="startL5" type="button" style="background: linear-gradient(160deg, #d78bff, #6b2f96);" data-zht="第五關 · 部首賽跑" data-zhs="第五关 · 部首赛跑" data-en="Level 5 · Radical Race">第五關 · 部首賽跑</button>
       </div>
 
       <div class="overlay" id="endOverlay">
@@ -864,6 +911,14 @@
       typePlaceholder4: { zht: '第四關用手點字，不用打字', zhs: '第四关用手点字，不用打字', en: 'Level 4 is tap-only' },
       listening4: { zht: '第四關不用說話，快點字！', zhs: '第四关不用说话，快点字！', en: 'No speech needed—tap fast!' },
       idiomDone: { zht: n => `⭐ 完成 ${n} 個成語！`, zhs: n => `⭐ 完成 ${n} 个成语！`, en: n => `⭐ ${n} idioms completed!` },
+      nextLevel5: { zht: '下一關：部首賽跑 →', zhs: '下一关：部首赛跑 →', en: 'Next: Radical Race →' },
+      typePlaceholder5: { zht: '第五關用手搶答，不用打字', zhs: '第五关用手抢答，不用打字', en: 'Level 5 is tap-race' },
+      listening5: { zht: '第五關不用說話，快搶部首！', zhs: '第五关不用说话，快抢部首！', en: 'No speech—race for radicals!' },
+      radicalWin: {
+        zht: (l, r) => l === r ? `🏁 平手 ${l} : ${r}！` : `🏁 ${l > r ? '紅龍隊' : '金虎隊'}獲勝 ${Math.max(l,r)} : ${Math.min(l,r)}！`,
+        zhs: (l, r) => l === r ? `🏁 平手 ${l} : ${r}！` : `🏁 ${l > r ? '红龙队' : '金虎队'}获胜 ${Math.max(l,r)} : ${Math.min(l,r)}！`,
+        en: (l, r) => l === r ? `🏁 Tie ${l} : ${r}!` : `🏁 ${l > r ? 'Red Dragon' : 'Gold Tiger'} wins ${Math.max(l,r)} : ${Math.min(l,r)}!`
+      },
       turnLeft3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
       turnRight3: { zht: '🎲 第三關：每方自動抽 6 個形聲字！', zhs: '🎲 第三关：每方自动抽 6 个形声字！', en: '🎲 Level 3: six random characters each!' },
       typePlaceholder3: { zht: '第三關自動抽字，不用打字', zhs: '第三关自动抽字，不用打字', en: 'Level 3 deals automatically' },
@@ -964,6 +1019,18 @@
       '貝': '跟錢財有關', '贝': '跟錢財有關', '力': '跟力氣有關', '寸': '跟尺寸有關',
       '丁': '像釘子的樣子', '工': '像工具的樣子', '也': '表示讀音', '可': '表示讀音'
     };
+
+    // 部首與孩子熟悉的叫名（第五關出題用）
+    const RADICAL_CALLS = [
+      ['艹', '草字頭'], ['氵', '三點水'], ['扌', '提手旁'], ['亻', '單人旁'], ['忄', '豎心旁'],
+      ['宀', '寶蓋頭'], ['辶', '走之底'], ['钅', '金字旁'], ['讠', '言字旁'], ['纟', '絞絲旁'],
+      ['犭', '反犬旁'], ['灬', '四點底'], ['刂', '立刀旁'], ['饣', '食字旁'], ['衤', '衣字旁'],
+      ['木', '木字旁'], ['口', '口字旁'], ['日', '日字旁'], ['月', '月字旁'], ['山', '山字旁'],
+      ['土', '土字旁'], ['石', '石字旁'], ['火', '火字旁'], ['虫', '蟲字旁'], ['女', '女字旁'],
+      ['马', '馬字旁'], ['鸟', '鳥字旁'], ['鱼', '魚字旁'], ['雨', '雨字頭'], ['竹', '竹字頭'],
+      ['门', '門字框'], ['车', '車字旁'], ['弓', '弓字旁'], ['足', '足字旁'], ['目', '目字旁'],
+      ['米', '米字旁'], ['禾', '禾木旁'], ['贝', '貝字旁'], ['王', '王字旁'], ['疒', '病字旁']
+    ];
 
     // 一個字的部件（獨體字把自己當一個部件）
     function partsOf(char) {
@@ -1594,6 +1661,78 @@
       return pairs;
     }
 
+    /* ---------- 第五關：部首賽跑 ---------- */
+    const radicalGame = { set: [], targets: [], round: 0, locked: true, arena: null, buttons: { L: [], R: [] } };
+
+    function radicalCleanup() {
+      if (radicalGame.arena) { radicalGame.arena.remove(); radicalGame.arena = null; }
+      radicalGame.buttons = { L: [], R: [] };
+      radicalGame.locked = true;
+    }
+
+    function radicalStart() {
+      radicalCleanup();
+      const pool = [...RADICAL_CALLS].sort(() => Math.random() - 0.5);
+      radicalGame.set = pool.slice(0, 12);
+      radicalGame.targets = [...radicalGame.set].sort(() => Math.random() - 0.5).slice(0, 10);
+      radicalGame.round = 0;
+
+      const arena = document.createElement('div');
+      arena.className = 'radical-arena';
+      ['L', 'R'].forEach(sideKey => {
+        const half = document.createElement('div');
+        half.className = `radical-half ${sideKey === 'L' ? 'left' : 'right'}`;
+        [...radicalGame.set].sort(() => Math.random() - 0.5).forEach(([r]) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = r;
+          btn.addEventListener('pointerdown', () => radicalTap(sideKey, r, btn, half));
+          half.append(btn);
+          radicalGame.buttons[sideKey].push(btn);
+        });
+        arena.append(half);
+      });
+      field.append(arena);
+      radicalGame.arena = arena;
+      radicalNext();
+    }
+
+    async function radicalNext() {
+      if (game.level !== 5 || game.phase === 'over') return;
+      if (radicalGame.round >= radicalGame.targets.length) {
+        endGame(game.points.L >= game.points.R ? 'L' : 'R');
+        return;
+      }
+      const [, name] = radicalGame.targets[radicalGame.round];
+      turnBanner.className = 'turn-banner for-battle';
+      turnBanner.textContent = `第 ${radicalGame.round + 1}/10 題 · ${name}`;
+      radicalGame.buttons.L.concat(radicalGame.buttons.R).forEach(b => b.classList.remove('is-hit'));
+      await speakText(`${name}！`);
+      radicalGame.locked = false;
+    }
+
+    function radicalTap(sideKey, r, btn, half) {
+      if (radicalGame.locked || game.phase === 'over') return;
+      const [target, name] = radicalGame.targets[radicalGame.round];
+      if (r === target) {
+        radicalGame.locked = true;
+        btn.classList.add('is-hit');
+        game.points[sideKey] += 1;
+        updateHud();
+        radicalGame.round += 1;
+        speakText(`${name}！${sideKey === 'L' ? '红龙队' : '金虎队'}得分！`);
+        setTimeout(radicalNext, 1400);
+      } else {
+        // 點錯：本方冷卻，防止亂拍
+        btn.classList.add('is-miss');
+        half.classList.add('is-penalty');
+        setTimeout(() => {
+          btn.classList.remove('is-miss');
+          half.classList.remove('is-penalty');
+        }, 900);
+      }
+    }
+
     /* ---------- 第四關：成語快點 ---------- */
     const idiomGame = { tiles: [], raf: null, next: 0, entry: null, running: false };
 
@@ -1920,6 +2059,7 @@
       game.idiomsDone = 0;
       clearIdiomTiles();
       idiomGame.running = false;
+      radicalCleanup();
       game.round = 1;
       game.starter = 'L';
       updateHud();
@@ -1927,11 +2067,12 @@
 
     function startGame() {
       resetGame();
-      if (game.level === 4) {
-        typeInput.placeholder = pageStrings.typePlaceholder4[language];
+      if (game.level === 4 || game.level === 5) {
+        typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
         startOverlay.classList.remove('is-visible');
         endOverlay.classList.remove('is-visible');
-        idiomRound();
+        if (game.level === 4) idiomRound();
+        else radicalStart();
         return;
       }
       typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
@@ -1944,10 +2085,13 @@
       game.phase = 'over';
       idiomGame.running = false;
       clearIdiomTiles();
+      radicalCleanup();
       if (game.listening) stopListening();
       document.getElementById('winnerTitle').textContent = game.level === 4
         ? pageStrings.idiomDone[language](game.idiomsDone)
-        : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
+        : game.level === 5
+          ? pageStrings.radicalWin[language](game.points.L, game.points.R)
+          : (winner === 'L' ? pageStrings.winLeft[language] : pageStrings.winRight[language]);
       document.getElementById('endStats').textContent =
         pageStrings.statsTemplate[language]({ rounds: game.round, newChars: game.newChars.length });
       const box = document.getElementById('wonChars');
@@ -1963,6 +2107,7 @@
         (game.level === 1 ? pageStrings.nextLevel
           : game.level === 2 ? pageStrings.nextLevel3
           : game.level === 3 ? pageStrings.nextLevel4
+          : game.level === 4 ? pageStrings.nextLevel5
           : pageStrings.again)[language];
       endOverlay.classList.add('is-visible');
     }
@@ -1971,12 +2116,14 @@
     document.getElementById('startL2').addEventListener('click', () => { unlockTTS(); game.level = 2; startGame(); });
     document.getElementById('startL3').addEventListener('click', () => { unlockTTS(); game.level = 3; startGame(); });
     document.getElementById('startL4').addEventListener('click', () => { unlockTTS(); game.level = 4; startGame(); });
+    document.getElementById('startL5').addEventListener('click', () => { unlockTTS(); game.level = 5; startGame(); });
     document.getElementById('dealButton').addEventListener('click', () => { unlockTTS(); dealRound(); });
     document.getElementById('retryButton').addEventListener('click', () => {
       unlockTTS();
       if (game.level === 1) game.level = 2;
       else if (game.level === 2) game.level = 3;
       else if (game.level === 3) game.level = 4;
+      else if (game.level === 4) game.level = 5;
       startGame();
     });
 

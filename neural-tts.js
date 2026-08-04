@@ -35,21 +35,43 @@ window.NeuralTTS = (() => {
     }
   }
 
+  // 播放序號：舊播放被新語音頂掉後，它的一切回調（含超時器）全部作廢，
+  // 不會誤暫停共享元件，也不會把「被頂掉」記成失敗
+  let playSeq = 0;
+  let settlePrevious = null;
+
   function playUrl(url) {
     return new Promise((resolve, reject) => {
+      const myId = ++playSeq;
+      if (settlePrevious) { settlePrevious(); settlePrevious = null; } // 被頂掉＝正常結束
       stop();
       const el = ensureEl();
-      el.volume = 1;
-      el.src = url;
       let settled = false;
       let started = false;
-      const ok = () => { if (!settled) { settled = true; resolve(); } };
-      const bad = err => { if (!settled) { settled = true; reject(err); } };
-      el.onplaying = () => { started = true; };
-      el.onended = ok;
-      el.onerror = () => bad(new Error('audio error'));
-      setTimeout(() => { if (!started && !settled) { el.pause(); bad(new Error('timeout')); } }, 8000);
-      el.play().catch(bad);
+      const ok = () => {
+        if (settled) return;
+        settled = true;
+        if (settlePrevious === ok) settlePrevious = null;
+        resolve();
+      };
+      const bad = err => {
+        if (settled) return;
+        settled = true;
+        if (settlePrevious === ok) settlePrevious = null;
+        reject(err);
+      };
+      settlePrevious = ok;
+      el.volume = 1;
+      el.src = url;
+      el.onplaying = () => { if (myId === playSeq) started = true; };
+      el.onended = () => { if (myId === playSeq) ok(); };
+      el.onerror = () => { if (myId === playSeq) bad(new Error('audio error')); };
+      setTimeout(() => {
+        if (myId !== playSeq) return; // 已被新語音接管，別碰共享元件
+        if (!started && !settled) { el.pause(); bad(new Error('timeout')); }
+      }, 8000);
+      el.play().then(() => { if (myId === playSeq) started = true; })
+        .catch(err => { if (myId === playSeq) bad(err); });
     });
   }
 
@@ -60,7 +82,9 @@ window.NeuralTTS = (() => {
     // ① Polly（自家代理，官方接口最穩；曉曉名會映射到知語）
     if (TTS_PROXY && !proxyDown) {
       try {
-        return await playUrl(`${TTS_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
+        const done = await playUrl(`${TTS_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
+        failures = 0; // 播放成功即恢復信用
+        return done;
       } catch {
         proxyDown = true; // 本次會話不再嘗試代理，直接走百度
       }
@@ -72,7 +96,9 @@ window.NeuralTTS = (() => {
       failures -= 1; // 語言不支持不算失敗（外層仍會 markFailure，淨值歸零）
       throw new Error('unsupported-lang');
     }
-    return playUrl(`https://fanyi.baidu.com/gettts?lan=${lan}&spd=5&source=web&text=${encodeURIComponent(clipped)}`);
+    const done = await playUrl(`https://fanyi.baidu.com/gettts?lan=${lan}&spd=5&source=web&text=${encodeURIComponent(clipped)}`);
+    failures = 0;
+    return done;
   }
 
   function markFailure() {

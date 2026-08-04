@@ -843,6 +843,7 @@
     </a>
     <p class="bar-title" data-zht="漢字龍虎鬥" data-zhs="汉字龙虎斗" data-en="Hanzi Battle">漢字龍虎鬥</p>
     <a href="tts.html" style="font-size:17px;text-decoration:none" aria-label="選擇聲音">🔊</a>
+    <button class="round-pill" id="menuLevels" type="button" style="cursor:pointer" data-zht="☰ 關卡" data-zhs="☰ 关卡" data-en="☰ Levels">☰ 關卡</button>
     <span class="round-pill"><span data-zht="回合" data-zhs="回合" data-en="Round">回合</span> <b id="roundCount">1</b></span>
   </header>
 
@@ -2137,6 +2138,7 @@
     function startGame() {
       resetGame();
       if (game.level === 4 || game.level === 5) {
+        game.phase = 'battle'; // 清掉上一局的 over 狀態，否則回合函數直接返回
         typeInput.placeholder = pageStrings[`typePlaceholder${game.level}`][language];
         startOverlay.classList.remove('is-visible');
         endOverlay.classList.remove('is-visible');
@@ -2184,6 +2186,22 @@
     document.getElementById('startL3').addEventListener('click', () => { unlockTTS(); game.level = 3; startGame(); });
     document.getElementById('startL4').addEventListener('click', () => { unlockTTS(); game.level = 4; startGame(); });
     document.getElementById('startL5').addEventListener('click', () => { unlockTTS(); game.level = 5; startGame(); });
+
+    // ☰ 關卡菜單：隨時回到選關頁
+    document.getElementById('menuLevels').addEventListener('click', () => {
+      game.phase = 'idle';
+      if (game.listening) stopListening();
+      idiomGame.running = false;
+      clearIdiomTiles();
+      radicalCleanup();
+      window.NeuralTTS?.stop();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      game.squads = { L: [], R: [] };
+      field.querySelectorAll('.tile, .part-tile, .clash-card, .newchar-card, .swap-note').forEach(el => el.remove());
+      dealButton.classList.remove('is-visible');
+      endOverlay.classList.remove('is-visible');
+      startOverlay.classList.add('is-visible');
+    });
     document.getElementById('dealButton').addEventListener('click', () => { unlockTTS(); dealRound(); });
     document.getElementById('retryButton').addEventListener('click', () => {
       unlockTTS();

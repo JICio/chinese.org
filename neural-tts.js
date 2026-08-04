@@ -7,10 +7,17 @@ window.NeuralTTS = (() => {
   // 自家 Cloudflare Worker（Amazon Polly 神經語音代理）
   const TTS_PROXY = 'https://chinese-tts.lovedaocom.workers.dev';
 
+  // 始終復用同一個 audio 元件：在首次用戶手勢裡播過一次後，
+  // 之後從定時器/異步鏈發起的播放不會再被自動播放策略攔截
   let audioEl = null;
   let enabled = true;
   let failures = 0;
   let proxyDown = false;
+
+  function ensureEl() {
+    if (!audioEl) audioEl = new Audio();
+    return audioEl;
+  }
 
   function langOf(voice) {
     if (!voice) return 'zh';
@@ -23,16 +30,17 @@ window.NeuralTTS = (() => {
     if (audioEl) {
       audioEl.onended = null;
       audioEl.onerror = null;
+      audioEl.onplaying = null;
       audioEl.pause();
-      audioEl = null;
     }
   }
 
   function playUrl(url) {
     return new Promise((resolve, reject) => {
       stop();
-      const el = new Audio(url);
-      audioEl = el;
+      const el = ensureEl();
+      el.volume = 1;
+      el.src = url;
       let settled = false;
       let started = false;
       const ok = () => { if (!settled) { settled = true; resolve(); } };
@@ -72,12 +80,17 @@ window.NeuralTTS = (() => {
     if (failures >= 2) enabled = false;
   }
 
-  // 在用戶手勢裡呼叫一次，解鎖之後的自動播放
+  // 在用戶手勢裡呼叫：用「同一個」元件播一段無聲音頻，把它標記為用戶啟動過
+  let unlocked = false;
   function unlock() {
+    if (unlocked) return;
     try {
-      const el = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=');
-      el.volume = 0.01;
-      el.play().catch(() => {});
+      const el = ensureEl();
+      if (el.src && !el.paused) return; // 正在說話就別打斷
+      unlocked = true;
+      el.volume = 0.05;
+      el.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+      el.play().catch(() => { unlocked = false; });
     } catch {}
   }
 

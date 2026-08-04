@@ -1833,24 +1833,25 @@
       const word = idiomGame.entry.w;
       if (tile.char === word[idiomGame.next]) {
         tile.done = true;
-        speakText(tile.char);
+        const charLine = speakText(tile.char);
         burstTile(tile);
         idiomGame.next += 1;
         idiomBanner();
-        if (idiomGame.next >= word.length) idiomComplete();
+        if (idiomGame.next >= word.length) idiomComplete(charLine);
       } else {
         tile.el.classList.add('is-wrong');
         setTimeout(() => tile.el.classList.remove('is-wrong'), 420);
       }
     }
 
-    async function idiomComplete() {
+    async function idiomComplete(lastCharLine) {
       idiomGame.running = false;
       clearIdiomTiles();
       game.idiomsDone += 1;
       game.points.L += 4;
       updateHud();
       const e = idiomGame.entry;
+      if (lastCharLine) await lastCharLine; // 先讓最後一個字讀完
       await speakText(`${e.w}！${e.e || ''}`);
       if (game.level === 4 && game.phase !== 'over') setTimeout(idiomRound, 700);
     }

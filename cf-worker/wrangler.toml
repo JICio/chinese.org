@@ -3,8 +3,9 @@ main = "worker.js"
 compatibility_date = "2026-08-01"
 
 [vars]
-# Azure 語音資源所在區域（建議 eastasia，離大陸用戶最近）
-AZURE_REGION = "eastasia"
+# Polly 區域：us-east-1 神經語音最全（知語/Hiujin/Ivy 都支持）
+AWS_REGION = "us-east-1"
 
 # 密鑰不放這裡！部署後用命令設置（只進 Cloudflare 加密存儲）：
-#   npx wrangler secret put AZURE_TTS_KEY
+#   npx wrangler secret put AWS_ACCESS_KEY_ID
+#   npx wrangler secret put AWS_SECRET_ACCESS_KEY

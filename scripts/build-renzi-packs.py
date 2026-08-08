@@ -1,0 +1,83 @@
+# 生成「读懂经典」系列数据 renzi-packs.js
+# 输入: scratchpad/texts/*.txt (殆知阁语料, 简体) + tangshi300.json (繁体, 转简)
+# 每个系列: 按该书字频降序, 语境词取书内最高频二字组合, 拼音用 pypinyin
+# 运行: fontenv/bin/python scripts/build-renzi-packs.py <texts_dir> <output_js> <output_charlist>
+import json, re, sys, unicodedata
+from collections import Counter
+from pypinyin import pinyin, Style
+from opencc import OpenCC
+
+t2s = OpenCC('t2s')
+CJK = re.compile(r'[一-鿿]+')
+COVER_TARGET = 0.995   # 收录到累计覆盖 99.5%
+CHAR_CAP = 2000        # 每系列至多 2000 字
+
+REPO = '/Users/dou/创业/项目/chinese'
+
+def runs_of(text):
+    return CJK.findall(text)
+
+def analyze(texts):
+    chars, bigrams = Counter(), Counter()
+    for text in texts:
+        for run in runs_of(text):
+            chars.update(run)
+            bigrams.update(run[i:i+2] for i in range(len(run) - 1))
+    return chars, bigrams
+
+def build_pack(pid, title, emoji, desc, texts):
+    chars, bigrams = analyze(texts)
+    total = sum(chars.values())
+    # 每个字挑书内最高频的二字搭配作语境词
+    best_word = {}
+    for bg, n in bigrams.items():
+        for ch in bg:
+            if n > best_word.get(ch, ('', 0))[1]:
+                best_word[ch] = (bg, n)
+    kept, cum = [], 0
+    for ch, n in chars.most_common():
+        if cum / total >= COVER_TARGET or len(kept) >= CHAR_CAP:
+            break
+        cum += n
+        py = pinyin(ch, style=Style.TONE)[0][0]
+        word = best_word.get(ch, (ch, 0))[0]
+        kept.append([ch, py, word, n])
+    print(f'{title}: 全文 {total} 字, 独立字 {len(chars)}, 收录 {len(kept)} 字 (覆盖 {cum/total*100:.1f}%)')
+    return { 'id': pid, 'title': title, 'emoji': emoji, 'desc': desc,
+             'total': total, 'chars': kept }
+
+def main():
+    tdir, out_js, out_chars = sys.argv[1], sys.argv[2], sys.argv[3]
+    read = lambda name: open(f'{tdir}/{name}', encoding='utf-8').read()
+
+    tangshi = json.load(open(f'{REPO}/tangshi300.json', encoding='utf-8'))
+    tangshi_text = t2s.convert(''.join(''.join(p['paragraphs']) + p['title'] for p in tangshi))
+
+    packs = [
+        build_pack('tangshi', '唐诗三百首', '🌙', '能认这些字，就能读懂唐诗三百首', [tangshi_text]),
+        build_pack('lunyu', '论语', '📜', '能认这些字，就能读懂论语', [read('lunyu.txt')]),
+        build_pack('neijing', '黄帝内经', '🌿', '能认这些字，就能读懂黄帝内经', [read('suwen2.txt'), read('lingshu.txt')]),
+        build_pack('mingzhu', '四大名著', '🏯', '能认这些字，就能读懂西游记、三国、水浒、红楼梦',
+                   [read('xiyouji.txt'), read('sanguo.txt'), read('shuihuzhuan.txt'), read('hongloumeng.txt')]),
+    ]
+
+    with open(out_js, 'w', encoding='utf-8') as f:
+        f.write('/* 读懂经典系列 · 自动生成 (scripts/build-renzi-packs.py)\n')
+        f.write('   字按书内频次降序; 语境词取书内最高频二字搭配; total=全书总字数 */\n')
+        f.write('window.RENZI_PACKS=')
+        json.dump(packs, f, ensure_ascii=False, separators=(',', ':'))
+        f.write(';\n')
+
+    # 字体子集用: 全部系列字 + 分级字库
+    union = set()
+    for p in packs:
+        union.update(c[0] for c in p['chars'])
+        union.update(ch for c in p['chars'] for ch in c[2])
+    band_src = open(f'{REPO}/renzi-data.js', encoding='utf-8').read()
+    union.update(CJK.findall(band_src) and ''.join(CJK.findall(band_src)))
+    with open(out_chars, 'w', encoding='utf-8') as f:
+        f.write(''.join(sorted(union)))
+    print(f'字体子集字符数: {len(union)}')
+
+if __name__ == '__main__':
+    main()

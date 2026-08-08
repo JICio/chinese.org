@@ -10,7 +10,7 @@
    iPad/iPhone 系统不带楷体，靠它保证字卡是楷书 */
 @font-face {
   font-family: 'KaiZi';
-  src: url('assets/kaizi.woff2') format('woff2');
+  src: url('assets/kaizi.woff2?v=2') format('woff2');
   font-display: swap;
 }
 :root {
@@ -76,6 +76,8 @@ button { font-family: inherit; border: none; cursor: pointer; }
 .band-row { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; border-radius: 10px; padding: 3px 6px; }
 .band-row:active { background: #eef2ff; }
 .band-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+.sec-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; }
+.sec-title small { font-weight: 400; font-size: 11px; color: var(--muted); }
 .band-row .bname { width: 92px; font-weight: 700; }
 .band-row .bbar { flex: 1; height: 10px; background: #eef2ff; border-radius: 5px; overflow: hidden; }
 .band-row .bbar > div { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); border-radius: 5px; }
@@ -169,7 +171,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
       <button class="switch-btn" id="btnSwitch">换人</button>
     </div>
     <div class="card stat-card">
-      <div class="big-num"><span id="statCount">0</span><small> / 1017 字</small></div>
+      <div class="big-num"><span id="statCount">0</span><small> 字</small></div>
       <div class="coverage">已能读懂日常文字的 <b id="statCover">0%</b></div>
       <div class="cover-bar"><div id="coverFill" style="width:0%"></div></div>
     </div>
@@ -178,7 +180,12 @@ button { font-family: inherit; border: none; cursor: pointer; }
       <button class="action-btn learn" id="btnLearn">📚 学新字<span class="badge" id="learnBadge">8 个</span></button>
       <button class="action-btn review" id="btnReview">🔁 复习<span class="badge" id="reviewBadge">0</span></button>
     </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="sec-title">📖 读懂经典 <small>每认一个字，离读懂一部书更近一步</small></div>
+      <div class="bands" id="packList"></div>
+    </div>
     <div class="card">
+      <div class="sec-title">🪜 分级识字</div>
       <div class="bands" id="bandList"></div>
       <div class="band-hint">点段位：太简单可以跳级 ⚡ 忘了可以重新学 🔄</div>
     </div>
@@ -247,6 +254,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
 </div>
 
 <script src="renzi-data.js?v=2"></script>
+<script src="renzi-packs.js?v=1"></script>
 <script src="neural-tts.js?v=2"></script>
 <script>
 /* ============ 数据索引 ============ */
@@ -258,6 +266,27 @@ BANDS.forEach((b, bi) => b.chars.forEach(s => {
 }));
 const TOTAL = ALL.length;
 const BY_CH = new Map(ALL.map(c => [c.ch, c]));
+
+/* 读懂经典系列：字按书内频次降序，认一个字直接换算成该书的可读百分比 */
+const PACKS = window.RENZI_PACKS || [];
+const PACK_ITEMS = new Map();
+for (const p of PACKS) {
+  PACK_ITEMS.set(p.id, p.chars.map(([ch, py, w, n], i) => ({ ch, py, w, n, pack: p.id, rank: i })));
+}
+/* 全字目录：分级字库 + 系列字（复习队列、到期判断都走这里） */
+const CATALOG = new Map(BY_CH);
+{
+  let grank = ALL.length;
+  for (const items of PACK_ITEMS.values())
+    for (const it of items)
+      if (!CATALOG.has(it.ch)) CATALOG.set(it.ch, { ...it, rank: grank++ });
+}
+function packPercent(p) {
+  let got = 0;
+  for (const [ch, , , n] of p.chars) { const r = rec(ch); if (r && r.b >= 2) got += n; }
+  return got / p.total * 100;
+}
+const fmtPct = x => x >= 10 ? Math.round(x) + '%' : x.toFixed(1) + '%';
 
 /* 覆盖率曲线（现代汉语字频累计覆盖，分段线性插值） */
 const COVER = [[0,0],[100,42],[200,55],[300,64],[400,70],[500,75],[600,79],[700,82],[800,84.5],[900,86.5],[1000,88.3],[1100,89.8],[1200,91]];
@@ -300,7 +329,7 @@ function setBox(ch, box) {
 function knownCount() { let n = 0; for (const k in P.chars) if (P.chars[k].b >= 2) n++; return n; }
 function dueList() {
   const t = today();
-  return ALL.filter(c => { const r = rec(c.ch); return r && r.b >= 1 && r.due <= t; });
+  return [...CATALOG.values()].filter(c => { const r = rec(c.ch); return r && r.b >= 1 && r.due <= t; });
 }
 function newList(n) {
   return ALL.filter(c => { const r = rec(c.ch); return !r || r.b === 0; }).slice(0, n);
@@ -322,13 +351,14 @@ async function say(text) {
     } catch {}
   }
 }
-const sayChar = it => say(`${it.ch}，${it.w}`);
+const textOf = it => (it.w && it.w !== it.ch) ? `${it.ch}，${it.w}` : it.ch;
+const sayChar = it => say(textOf(it));
 
 /* 预载下一个字的音频：iPad 网络慢时，播放能直接命中缓存，不会超时断声 */
 let prefetchEl = null;
 function prefetch(it) {
   if (!it) return;
-  const url = NeuralTTS.ttsUrl(`${it.ch}，${it.w}`);
+  const url = NeuralTTS.ttsUrl(textOf(it));
   if (!url) return;
   try {
     prefetchEl = prefetchEl || new Audio();
@@ -398,9 +428,22 @@ function renderHome() {
   document.getElementById('homeAvatar').textContent = avatarOf(curName);
   const n = knownCount();
   document.getElementById('statCount').textContent = n;
-  const cov = coverageOf(n);
+  /* 日常覆盖率只按现代高频字库算，经典系列的古字不掺进来 */
+  let bandKnown = 0;
+  for (const k in P.chars) if (P.chars[k].b >= 2 && BY_CH.has(k)) bandKnown++;
+  const cov = coverageOf(bandKnown);
   document.getElementById('statCover').textContent = cov + '%';
   document.getElementById('coverFill').style.width = cov + '%';
+  const packBox = document.getElementById('packList');
+  packBox.innerHTML = '';
+  for (const p of PACKS) {
+    const pct = packPercent(p);
+    const row = document.createElement('div');
+    row.className = 'band-row';
+    row.innerHTML = `<span class="bname">${p.emoji} ${p.title}</span><span class="bbar"><div style="width:${Math.min(100, pct)}%"></div></span><span class="bnum">${fmtPct(pct)}</span>`;
+    row.onclick = () => startPackLearn(p);
+    packBox.appendChild(row);
+  }
   const due = dueList().length;
   document.getElementById('reviewBadge').textContent = due;
   document.getElementById('btnReview').style.opacity = due ? 1 : .55;
@@ -484,10 +527,11 @@ function quizStart(items, title, onDone) {
   quizNext();
 }
 function pickOptions(target) {
-  /* 干扰项：同段位优先，排除同音字（含声调全同），不够再从邻段补 */
-  const pool = ALL.filter(c => c.ch !== target.ch && c.py !== target.py);
-  const near = pool.filter(c => Math.abs(c.band - target.band) <= 0);
-  const mid = pool.filter(c => Math.abs(c.band - target.band) === 1);
+  /* 干扰项：从同一字库（系列或分级）里选，频次排名相近的优先，排除同音字（含声调全同） */
+  const source = target.pack ? PACK_ITEMS.get(target.pack) : ALL;
+  const pool = source.filter(c => c.ch !== target.ch && c.py !== target.py);
+  const near = pool.filter(c => Math.abs(c.rank - target.rank) <= 80);
+  const mid = pool.filter(c => Math.abs(c.rank - target.rank) <= 250);
   const pickFrom = (arr, n, out) => {
     const a = [...arr];
     while (n > 0 && a.length) {
@@ -552,12 +596,31 @@ function quizAnswer(btn, opt) {
 }
 document.getElementById('btnQuizPlay').onclick = () => Quiz.cur && sayChar(Quiz.cur);
 
-/* ============ 学新字：闪认 → 抢答 ============ */
+/* ============ 学新字：闪认 → 抢答（分级 / 经典系列共用） ============ */
 let flashItems = [], flashIdx = 0;
+let learnPack = null, packPctBefore = 0;
+function bandKnownCount() {
+  let n = 0;
+  for (const k in P.chars) if (P.chars[k].b >= 2 && BY_CH.has(k)) n++;
+  return n;
+}
 function startLearn() {
+  learnPack = null;
   flashItems = newList(8);
   if (!flashItems.length) { alert('1017 个字全部学完啦！🎉'); return; }
   flashIdx = 0;
+  document.querySelector('#screen-flash .title').textContent = '👀 闪认新字';
+  show('screen-flash');
+  renderFlash();
+}
+function startPackLearn(p) {
+  const items = PACK_ITEMS.get(p.id).filter(it => { const r = rec(it.ch); return !r || r.b === 0; }).slice(0, 8);
+  if (!items.length) { alert(`《${p.title}》的字全都认识啦！🎉`); return; }
+  learnPack = p;
+  packPctBefore = packPercent(p);
+  flashItems = items;
+  flashIdx = 0;
+  document.querySelector('#screen-flash .title').textContent = `${p.emoji}《${p.title}》`;
   show('screen-flash');
   renderFlash();
 }
@@ -574,7 +637,7 @@ document.getElementById('btnReplay').onclick = () => sayChar(flashItems[flashIdx
 document.getElementById('btnFlashNext').onclick = () => {
   flashIdx++;
   if (flashIdx < flashItems.length) renderFlash();
-  else quizStart(flashItems, '🎧 抢答：刚学的字', firstTry => {
+  else quizStart(flashItems, learnPack ? `📖《${learnPack.title}》抢答` : '🎧 抢答：刚学的字', firstTry => {
     let firstAll = 0;
     for (const it of flashItems) {
       /* 一次答对 → 盒2（明天复习）；重试才对 → 盒1（下次继续） */
@@ -582,12 +645,23 @@ document.getElementById('btnFlashNext').onclick = () => {
       if (firstTry[it.ch]) firstAll++;
     }
     save();
-    showResult({
-      stars: firstAll === flashItems.length ? 3 : firstAll >= flashItems.length * .7 ? 2 : 1,
-      title: firstAll === flashItems.length ? '全对！新字入袋 🎒' : '学会了，明天再巩固！',
-      stats: [[`+${flashItems.length}`, '新学的字'], [knownCount(), '认字总量'], [coverageOf(knownCount()) + '%', '日常覆盖率']],
-      again: startLearn, againText: '再学一组 🔥',
-    });
+    const stars = firstAll === flashItems.length ? 3 : firstAll >= flashItems.length * .7 ? 2 : 1;
+    if (learnPack) {
+      const p = learnPack, after = packPercent(p);
+      showResult({
+        stars,
+        title: `离读懂《${p.title}》更近了！`,
+        stats: [[`+${flashItems.length}`, '新学的字'], [fmtPct(after), '这本书读懂度'], [`+${(after - packPctBefore).toFixed(1)}%`, '本次提升']],
+        again: () => startPackLearn(p), againText: '继续攻克 🔥',
+      });
+    } else {
+      showResult({
+        stars,
+        title: firstAll === flashItems.length ? '全对！新字入袋 🎒' : '学会了，明天再巩固！',
+        stats: [[`+${flashItems.length}`, '新学的字'], [knownCount(), '认字总量'], [coverageOf(bandKnownCount()) + '%', '日常覆盖率']],
+        again: startLearn, againText: '再学一组 🔥',
+      });
+    }
   });
 };
 

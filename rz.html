@@ -10,7 +10,7 @@
    iPad/iPhone 系统不带楷体，靠它保证字卡是楷书 */
 @font-face {
   font-family: 'KaiZi';
-  src: url('assets/kaizi.woff2?v=3') format('woff2');
+  src: url('assets/kaizi.woff2?v=4') format('woff2');
   font-display: swap;
 }
 :root {
@@ -94,6 +94,8 @@ button { font-family: inherit; border: none; cursor: pointer; }
 .sheet-row .st { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .sheet-row.ok { background: #ecfdf5; }
 .sheet-row.ok .st { color: #059669; }
+.pack-group { font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 2px; margin: 6px 0 -2px; }
+.pack-group:first-child { margin-top: 0; }
 .band-row .bname { width: 92px; font-weight: 700; }
 .band-row .bbar { flex: 1; height: 10px; background: #eef2ff; border-radius: 5px; overflow: hidden; }
 .band-row .bbar > div { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); border-radius: 5px; }
@@ -286,8 +288,8 @@ button { font-family: inherit; border: none; cursor: pointer; }
 </div>
 
 <script src="renzi-data.js?v=2"></script>
-<script src="renzi-packs.js?v=1"></script>
-<script src="renzi-passages.js?v=1"></script>
+<script src="renzi-packs.js?v=2"></script>
+<script src="renzi-passages.js?v=2"></script>
 <script src="neural-tts.js?v=2"></script>
 <script>
 /* ============ 数据索引 ============ */
@@ -469,7 +471,15 @@ function renderHome() {
   document.getElementById('coverFill').style.width = cov + '%';
   const packBox = document.getElementById('packList');
   packBox.innerHTML = '';
+  let lastGroup = null;
   for (const p of PACKS) {
+    if (p.group && p.group !== lastGroup) {
+      lastGroup = p.group;
+      const g = document.createElement('div');
+      g.className = 'pack-group';
+      g.textContent = p.group;
+      packBox.appendChild(g);
+    }
     const pct = packPercent(p);
     const row = document.createElement('div');
     row.className = 'band-row';

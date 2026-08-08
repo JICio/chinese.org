@@ -25,7 +25,7 @@ def analyze(texts):
             bigrams.update(run[i:i+2] for i in range(len(run) - 1))
     return chars, bigrams
 
-def build_pack(pid, title, emoji, desc, texts):
+def build_pack(pid, title, emoji, desc, texts, group=''):
     chars, bigrams = analyze(texts)
     total = sum(chars.values())
     # 每个字挑书内最高频的二字搭配作语境词
@@ -43,7 +43,7 @@ def build_pack(pid, title, emoji, desc, texts):
         word = best_word.get(ch, (ch, 0))[0]
         kept.append([ch, py, word, n])
     print(f'{title}: 全文 {total} 字, 独立字 {len(chars)}, 收录 {len(kept)} 字 (覆盖 {cum/total*100:.1f}%)')
-    return { 'id': pid, 'title': title, 'emoji': emoji, 'desc': desc,
+    return { 'id': pid, 'title': title, 'emoji': emoji, 'group': group, 'desc': desc,
              'total': total, 'chars': kept }
 
 def main():
@@ -52,13 +52,26 @@ def main():
 
     tangshi = json.load(open(f'{REPO}/tangshi300.json', encoding='utf-8'))
     tangshi_text = t2s.convert(''.join(''.join(p['paragraphs']) + p['title'] for p in tangshi))
+    shijing = json.load(open(f'{tdir}/shijing.json', encoding='utf-8'))
+    shijing_text = t2s.convert(''.join(''.join(p['content']) + p['title'] for p in shijing))
 
+    G_MENG, G_JING, G_SHI, G_ZHU = '蒙学启蒙', '诸子经典', '诗歌之美', '传世名著'
     packs = [
-        build_pack('tangshi', '唐诗三百首', '🌙', '能认这些字，就能读懂唐诗三百首', [tangshi_text]),
-        build_pack('lunyu', '论语', '📜', '能认这些字，就能读懂论语', [read('lunyu.txt')]),
-        build_pack('neijing', '黄帝内经', '🌿', '能认这些字，就能读懂黄帝内经', [read('suwen2.txt'), read('lingshu.txt')]),
-        build_pack('mingzhu', '四大名著', '🏯', '能认这些字，就能读懂西游记、三国、水浒、红楼梦',
-                   [read('xiyouji.txt'), read('sanguo.txt'), read('shuihuzhuan.txt'), read('hongloumeng.txt')]),
+        build_pack('sanzijing', '三字经', '🧒', '能认这些字，就能读懂三字经', [read('sanzijing.txt')], G_MENG),
+        build_pack('qianziwen', '千字文', '📝', '一千个不重复的字，古人的识字第一课', [read('qianziwen.txt')], G_MENG),
+        build_pack('dizigui', '弟子规', '🎎', '能认这些字，就能读懂弟子规', [read('dizigui.txt')], G_MENG),
+        build_pack('shenglv', '声律启蒙', '🎵', '云对雨，雪对风——对出汉语的韵律', [read('shenglv.txt')], G_MENG),
+        build_pack('lunyu', '论语', '📜', '能认这些字，就能读懂论语', [read('lunyu.txt')], G_JING),
+        build_pack('daodejing', '道德经', '☯️', '能认这些字，就能读懂道德经', [read('daodejing.txt')], G_JING),
+        build_pack('sunzi', '孙子兵法', '🛡️', '能认这些字，就能读懂孙子兵法', [read('sunzi.txt')], G_JING),
+        build_pack('neijing', '黄帝内经', '🌿', '能认这些字，就能读懂黄帝内经', [read('suwen2.txt'), read('lingshu.txt')], G_JING),
+        build_pack('tangshi', '唐诗三百首', '🌙', '能认这些字，就能读懂唐诗三百首', [tangshi_text], G_SHI),
+        build_pack('shijing', '诗经', '🦌', '能认这些字，就能读懂诗经', [shijing_text], G_SHI),
+        build_pack('xiyou', '西游记', '🐒', '能认这些字，就能读懂西游记', [read('xiyouji.txt')], G_ZHU),
+        build_pack('sanguo', '三国演义', '🐎', '能认这些字，就能读懂三国演义', [read('sanguo.txt')], G_ZHU),
+        build_pack('shuihu', '水浒传', '🐯', '能认这些字，就能读懂水浒传', [read('shuihuzhuan.txt')], G_ZHU),
+        build_pack('honglou', '红楼梦', '🌸', '能认这些字，就能读懂红楼梦', [read('hongloumeng.txt')], G_ZHU),
+        build_pack('shanhai', '山海经', '🐉', '能认这些字，就能读懂山海经的奇兽世界', [read('shanhai.txt')], G_ZHU),
     ]
 
     with open(out_js, 'w', encoding='utf-8') as f:

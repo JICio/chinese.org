@@ -6,6 +6,13 @@
 <title>极客快速认字 ⚡</title>
 <link rel="icon" href="favicon.svg">
 <style>
+/* 自托管楷体子集（霞鹜文楷 Medium，OFL 授权，仅含本应用 1017 字）：
+   iPad/iPhone 系统不带楷体，靠它保证字卡是楷书 */
+@font-face {
+  font-family: 'KaiZi';
+  src: url('assets/kaizi.woff2') format('woff2');
+  font-display: swap;
+}
 :root {
   --bg1: #7c3aed; --bg2: #2563eb;
   --card: #ffffff; --ink: #1e1b4b; --muted: #6b7280;
@@ -84,7 +91,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
 /* 闪认 */
 .flash-card { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .flash-char {
-  font-family: "Kaiti SC", "KaiTi", "STKaiti", serif;
+  font-family: "KaiZi", "Kaiti SC", "KaiTi", "STKaiti", serif;
   font-size: min(52vw, 240px); font-weight: 700; line-height: 1.15; color: var(--ink);
 }
 .flash-py { font-size: 26px; color: var(--accent); font-weight: 700; margin-top: 2px; }
@@ -106,7 +113,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
 .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .quiz-opt {
   aspect-ratio: 1; border-radius: 22px; background: var(--card);
-  font-family: "Kaiti SC", "KaiTi", "STKaiti", serif;
+  font-family: "KaiZi", "Kaiti SC", "KaiTi", "STKaiti", serif;
   font-size: min(22vw, 96px); font-weight: 700; color: var(--ink);
   box-shadow: 0 6px 18px rgba(0,0,0,.15); transition: transform .1s;
 }

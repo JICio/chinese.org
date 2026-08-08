@@ -12,7 +12,8 @@ window.NeuralTTS = (() => {
   let audioEl = null;
   let enabled = true;
   let failures = 0;
-  let proxyDown = false;
+  // 代理失敗只冷卻 15 秒，不整場棄用：iPad 網絡抖一下不至於永遠沒聲音
+  let proxyDownUntil = 0;
 
   function ensureEl() {
     if (!audioEl) audioEl = new Audio();
@@ -80,13 +81,13 @@ window.NeuralTTS = (() => {
     const clipped = text.slice(0, 280);
 
     // ① Polly（自家代理，官方接口最穩；曉曉名會映射到知語）
-    if (TTS_PROXY && !proxyDown) {
+    if (TTS_PROXY && Date.now() > proxyDownUntil) {
       try {
         const done = await playUrl(`${TTS_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(clipped)}`);
         failures = 0; // 播放成功即恢復信用
         return done;
       } catch {
-        proxyDown = true; // 本次會話不再嘗試代理，直接走百度
+        proxyDownUntil = Date.now() + 15000; // 冷卻 15 秒後再試代理
       }
     }
 
@@ -117,8 +118,21 @@ window.NeuralTTS = (() => {
       el.volume = 0.05;
       el.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
       el.play().catch(() => { unlocked = false; });
+      // 同時在手勢裡預熱系統朗讀：iOS 要求 speechSynthesis 由用戶手勢啟動過，
+      // 否則後續定時器裡的兜底朗讀會被靜音
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(' ');
+        u.volume = 0;
+        speechSynthesis.speak(u);
+      }
     } catch {}
   }
 
-  return { speak, stop, markFailure, unlock, get enabled() { return enabled; } };
+  // 給頁面做預加載用：拿到某句話的代理音頻地址（代理未配置時為 null）
+  function ttsUrl(text, voice = 'zh-CN-XiaoxiaoNeural') {
+    if (!TTS_PROXY || !text) return null;
+    return `${TTS_PROXY}/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(text.slice(0, 280))}`;
+  }
+
+  return { speak, stop, markFailure, unlock, ttsUrl, get enabled() { return enabled; } };
 })();

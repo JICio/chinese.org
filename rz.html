@@ -246,8 +246,8 @@ button { font-family: inherit; border: none; cursor: pointer; }
 
 </div>
 
-<script src="renzi-data.js"></script>
-<script src="neural-tts.js"></script>
+<script src="renzi-data.js?v=2"></script>
+<script src="neural-tts.js?v=2"></script>
 <script>
 /* ============ 数据索引 ============ */
 const BANDS = window.RENZI_BANDS;
@@ -323,6 +323,20 @@ async function say(text) {
   }
 }
 const sayChar = it => say(`${it.ch}，${it.w}`);
+
+/* 预载下一个字的音频：iPad 网络慢时，播放能直接命中缓存，不会超时断声 */
+let prefetchEl = null;
+function prefetch(it) {
+  if (!it) return;
+  const url = NeuralTTS.ttsUrl(`${it.ch}，${it.w}`);
+  if (!url) return;
+  try {
+    prefetchEl = prefetchEl || new Audio();
+    prefetchEl.preload = 'auto';
+    prefetchEl.src = url;
+    prefetchEl.load();
+  } catch {}
+}
 
 /* 音效（WebAudio，不打扰语音） */
 let AC = null;
@@ -511,6 +525,7 @@ function quizNext() {
     grid.appendChild(b);
   }
   sayChar(Quiz.cur);
+  prefetch(Quiz.queue[1]);
 }
 function quizAnswer(btn, opt) {
   if (Quiz.lock) return;
@@ -553,6 +568,7 @@ function renderFlash() {
   document.getElementById('flashPy').textContent = it.py;
   document.getElementById('flashWord').textContent = it.w;
   sayChar(it);
+  prefetch(flashItems[flashIdx + 1]);
 }
 document.getElementById('btnReplay').onclick = () => sayChar(flashItems[flashIdx]);
 document.getElementById('btnFlashNext').onclick = () => {

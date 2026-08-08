@@ -10,7 +10,7 @@
    iPad/iPhone 系统不带楷体，靠它保证字卡是楷书 */
 @font-face {
   font-family: 'KaiZi';
-  src: url('assets/kaizi.woff2?v=2') format('woff2');
+  src: url('assets/kaizi.woff2?v=3') format('woff2');
   font-display: swap;
 }
 :root {
@@ -78,6 +78,22 @@ button { font-family: inherit; border: none; cursor: pointer; }
 .band-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
 .sec-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; }
 .sec-title small { font-weight: 400; font-size: 11px; color: var(--muted); }
+
+/* 读原文 */
+.read-text {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-family: "KaiZi", "Kaiti SC", "KaiTi", "STKaiti", serif;
+  font-size: clamp(26px, 7vw, 40px); line-height: 2; text-align: center;
+  padding: 10px 4px; white-space: pre-line;
+}
+.sheet-row {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 13px 14px; border-radius: 14px; font-size: 16px; font-weight: 700;
+  background: #f4f4fb; color: var(--ink); text-align: left;
+}
+.sheet-row .st { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.sheet-row.ok { background: #ecfdf5; }
+.sheet-row.ok .st { color: #059669; }
 .band-row .bname { width: 92px; font-weight: 700; }
 .band-row .bbar { flex: 1; height: 10px; background: #eef2ff; border-radius: 5px; overflow: hidden; }
 .band-row .bbar > div { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); border-radius: 5px; }
@@ -238,6 +254,22 @@ button { font-family: inherit; border: none; cursor: pointer; }
     </div>
   </section>
 
+  <!-- 读原文 -->
+  <section class="screen" id="screen-read">
+    <div class="topbar">
+      <button class="back" data-home>← 退出</button>
+      <span class="title" id="readTitle">名段</span>
+      <span class="count" id="readFrom">📖</span>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column">
+      <div class="read-text" id="readText"></div>
+      <div class="flash-btns">
+        <button class="btn-listen" id="btnReadPlay">🔊 听一遍</button>
+        <button class="btn-next" id="btnReadDone">我读完啦 🎉</button>
+      </div>
+    </div>
+  </section>
+
   <!-- 摸底介绍 / 段间提示 -->
   <section class="screen" id="screen-place">
     <div class="card place-intro" id="placeCard">
@@ -255,6 +287,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
 
 <script src="renzi-data.js?v=2"></script>
 <script src="renzi-packs.js?v=1"></script>
+<script src="renzi-passages.js?v=1"></script>
 <script src="neural-tts.js?v=2"></script>
 <script>
 /* ============ 数据索引 ============ */
@@ -441,7 +474,7 @@ function renderHome() {
     const row = document.createElement('div');
     row.className = 'band-row';
     row.innerHTML = `<span class="bname">${p.emoji} ${p.title}</span><span class="bbar"><div style="width:${Math.min(100, pct)}%"></div></span><span class="bnum">${fmtPct(pct)}</span>`;
-    row.onclick = () => startPackLearn(p);
+    row.onclick = () => openPackSheet(p);
     packBox.appendChild(row);
   }
   const due = dueList().length;
@@ -598,7 +631,7 @@ document.getElementById('btnQuizPlay').onclick = () => Quiz.cur && sayChar(Quiz.
 
 /* ============ 学新字：闪认 → 抢答（分级 / 经典系列共用） ============ */
 let flashItems = [], flashIdx = 0;
-let learnPack = null, packPctBefore = 0;
+let learnPack = null, learnPassage = null, packPctBefore = 0;
 function bandKnownCount() {
   let n = 0;
   for (const k in P.chars) if (P.chars[k].b >= 2 && BY_CH.has(k)) n++;
@@ -606,6 +639,7 @@ function bandKnownCount() {
 }
 function startLearn() {
   learnPack = null;
+  learnPassage = null;
   flashItems = newList(8);
   if (!flashItems.length) { alert('1017 个字全部学完啦！🎉'); return; }
   flashIdx = 0;
@@ -613,10 +647,90 @@ function startLearn() {
   show('screen-flash');
   renderFlash();
 }
+/* ============ 名段解锁与朗读 ============ */
+const PASSAGES = window.RENZI_PASSAGES || [];
+function missingChars(text) {
+  const set = new Set();
+  for (const ch of text) {
+    if (!/[一-鿿]/.test(ch) || !CATALOG.has(ch)) continue;
+    const r = rec(ch);
+    if (!r || r.b < 2) set.add(ch);
+  }
+  return [...set];
+}
+function openPackSheet(p) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = 'max-width:400px;width:100%';
+  card.innerHTML = `<div style="font-size:18px;font-weight:800;text-align:center">${p.emoji}《${p.title}》</div>
+    <div style="font-size:13px;color:var(--muted);text-align:center;margin:4px 0 14px">读懂度 ${fmtPct(packPercent(p))} · ${p.desc}</div>`;
+  const list = document.createElement('div');
+  list.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+  const learnBtn = document.createElement('button');
+  learnBtn.className = 'btn-again';
+  learnBtn.style.cssText = 'padding:14px;border-radius:16px;font-size:17px;font-weight:800';
+  learnBtn.textContent = '📚 学这本书的字';
+  learnBtn.onclick = () => { wrap.remove(); startPackLearn(p); };
+  list.appendChild(learnBtn);
+  for (const ps of PASSAGES.filter(x => x.pack === p.id)) {
+    const missing = missingChars(ps.text);
+    const row = document.createElement('button');
+    row.className = 'sheet-row' + (missing.length ? '' : ' ok');
+    row.innerHTML = missing.length
+      ? `🔒 ${ps.title}<span class="st">还差 ${missing.length} 字</span>`
+      : `📖 ${ps.title}<span class="st">可以读啦 ✓</span>`;
+    row.onclick = () => { wrap.remove(); missing.length ? startUnlockLearn(p, ps) : openReading(ps); };
+    list.appendChild(row);
+  }
+  const cancel = document.createElement('button');
+  cancel.className = 'btn-home';
+  cancel.style.cssText = 'padding:12px;border-radius:14px;font-size:15px;font-weight:700;margin-top:2px';
+  cancel.textContent = '关闭';
+  cancel.onclick = () => wrap.remove();
+  list.appendChild(cancel);
+  card.appendChild(list);
+  wrap.appendChild(card);
+  document.body.appendChild(wrap);
+}
+let readingPassage = null;
+function openReading(ps) {
+  readingPassage = ps;
+  const p = PACKS.find(x => x.id === ps.pack);
+  document.getElementById('readTitle').textContent = `📖 ${ps.title}`;
+  document.getElementById('readFrom').textContent = `${p.emoji}《${p.title}》`;
+  document.getElementById('readText').textContent = ps.text;
+  show('screen-read');
+  say(ps.text);
+}
+document.getElementById('btnReadPlay').onclick = () => readingPassage && say(readingPassage.text);
+document.getElementById('btnReadDone').onclick = () => {
+  confetti();
+  setTimeout(() => { renderHome(); show('screen-home'); }, 900);
+};
+/* 为解锁某一名段，只学缺的那几个字 */
+function startUnlockLearn(p, ps) {
+  const missing = missingChars(ps.text);
+  const items = missing
+    .map(ch => (PACK_ITEMS.get(p.id) || []).find(it => it.ch === ch) || CATALOG.get(ch))
+    .filter(Boolean).slice(0, 8);
+  if (!items.length) { openReading(ps); return; }
+  learnPack = p;
+  learnPassage = ps;
+  packPctBefore = packPercent(p);
+  flashItems = items;
+  flashIdx = 0;
+  document.querySelector('#screen-flash .title').textContent = `🔓 解锁《${ps.title}》`;
+  show('screen-flash');
+  renderFlash();
+}
+
 function startPackLearn(p) {
   const items = PACK_ITEMS.get(p.id).filter(it => { const r = rec(it.ch); return !r || r.b === 0; }).slice(0, 8);
   if (!items.length) { alert(`《${p.title}》的字全都认识啦！🎉`); return; }
   learnPack = p;
+  learnPassage = null;
   packPctBefore = packPercent(p);
   flashItems = items;
   flashIdx = 0;
@@ -646,7 +760,16 @@ document.getElementById('btnFlashNext').onclick = () => {
     }
     save();
     const stars = firstAll === flashItems.length ? 3 : firstAll >= flashItems.length * .7 ? 2 : 1;
-    if (learnPack) {
+    if (learnPack && learnPassage) {
+      const p = learnPack, ps = learnPassage, left = missingChars(ps.text).length;
+      showResult({
+        stars,
+        title: left === 0 ? `解锁《${ps.title}》！🎉` : `还差 ${left} 个字解锁《${ps.title}》`,
+        stats: [[`+${flashItems.length}`, '新学的字'], [fmtPct(packPercent(p)), '这本书读懂度'], [left === 0 ? '🔓' : left, left === 0 ? '已解锁' : '待解锁字']],
+        again: left === 0 ? () => openReading(ps) : () => startUnlockLearn(p, ps),
+        againText: left === 0 ? '去读原文 📖' : '继续解锁 🔓',
+      });
+    } else if (learnPack) {
       const p = learnPack, after = packPercent(p);
       showResult({
         stars,

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>极客快速认字 ⚡</title>
+<link rel="icon" href="favicon.svg">
+<style>
+:root {
+  --bg1: #7c3aed; --bg2: #2563eb;
+  --card: #ffffff; --ink: #1e1b4b; --muted: #6b7280;
+  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+  --accent: #7c3aed;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(160deg, var(--bg1), var(--bg2));
+  color: var(--ink);
+  display: flex; justify-content: center;
+  min-height: 100dvh;
+  user-select: none; -webkit-user-select: none;
+}
+.app { width: 100%; max-width: 540px; padding: 16px 16px 32px; display: flex; flex-direction: column; }
+.screen { display: none; flex: 1; flex-direction: column; }
+.screen.active { display: flex; }
+.card { background: var(--card); border-radius: 24px; padding: 20px; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+h1 { font-size: 26px; color: #fff; text-align: center; margin: 12px 0 4px; }
+.sub { color: rgba(255,255,255,.85); text-align: center; font-size: 14px; margin-bottom: 20px; }
+button { font-family: inherit; border: none; cursor: pointer; }
+
+/* 档案选择 */
+.profiles { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.profile-btn {
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  background: var(--card); border-radius: 20px; padding: 18px 22px;
+  font-size: 22px; font-weight: 700; color: var(--ink);
+  box-shadow: 0 6px 20px rgba(0,0,0,.15); transition: transform .1s;
+}
+.profile-btn:active { transform: scale(.97); }
+.profile-btn .avatar { font-size: 40px; }
+.profile-btn .meta { font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+
+/* 首页 */
+.home-head { display: flex; align-items: center; justify-content: space-between; color: #fff; margin-bottom: 14px; }
+.home-head .who { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; }
+.home-head .who span.avatar { font-size: 30px; }
+.switch-btn { background: rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 8px 12px; font-size: 13px; }
+.stat-card { text-align: center; margin-bottom: 14px; }
+.big-num { font-size: 54px; font-weight: 900; color: var(--accent); line-height: 1.1; }
+.big-num small { font-size: 18px; color: var(--muted); font-weight: 600; }
+.coverage { font-size: 15px; color: var(--muted); margin-top: 4px; }
+.coverage b { color: var(--ink); }
+.cover-bar { height: 12px; border-radius: 6px; background: #eef2ff; margin-top: 10px; overflow: hidden; }
+.cover-bar > div { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #a78bfa, #7c3aed); transition: width .6s; }
+.actions { display: flex; flex-direction: column; gap: 12px; margin: 14px 0; }
+.action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 18px; border-radius: 20px; font-size: 20px; font-weight: 800; color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.2); transition: transform .1s;
+}
+.action-btn:active { transform: scale(.97); }
+.action-btn.learn { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.action-btn.review { background: linear-gradient(135deg, #10b981, #059669); }
+.action-btn.place { background: linear-gradient(135deg, #ec4899, #db2777); }
+.action-btn .badge { background: rgba(255,255,255,.3); border-radius: 999px; padding: 2px 10px; font-size: 15px; }
+.bands { display: flex; flex-direction: column; gap: 8px; }
+.band-row { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; border-radius: 10px; padding: 3px 6px; }
+.band-row:active { background: #eef2ff; }
+.band-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+.band-row .bname { width: 92px; font-weight: 700; }
+.band-row .bbar { flex: 1; height: 10px; background: #eef2ff; border-radius: 5px; overflow: hidden; }
+.band-row .bbar > div { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); border-radius: 5px; }
+.band-row .bnum { width: 70px; text-align: right; color: var(--muted); font-size: 12px; }
+.method-note { color: rgba(255,255,255,.75); font-size: 12px; text-align: center; margin-top: 14px; line-height: 1.7; }
+
+/* 顶部条（学习/测验内） */
+.topbar { display: flex; align-items: center; justify-content: space-between; color: #fff; margin-bottom: 12px; }
+.topbar .back { background: rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 8px 14px; font-size: 14px; }
+.topbar .title { font-weight: 800; font-size: 17px; }
+.topbar .count { background: rgba(255,255,255,.2); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+
+/* 闪认 */
+.flash-card { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.flash-char {
+  font-family: "Kaiti SC", "KaiTi", "STKaiti", serif;
+  font-size: min(52vw, 240px); font-weight: 700; line-height: 1.15; color: var(--ink);
+}
+.flash-py { font-size: 26px; color: var(--accent); font-weight: 700; margin-top: 2px; }
+.flash-word { font-size: 24px; color: var(--muted); margin-top: 8px; }
+.flash-btns { display: flex; gap: 12px; margin-top: 20px; width: 100%; }
+.flash-btns button { flex: 1; padding: 16px; border-radius: 18px; font-size: 19px; font-weight: 800; }
+.btn-listen { background: #eef2ff; color: var(--accent); }
+.btn-next { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; }
+
+/* 测验 */
+.quiz-question { text-align: center; margin: 8px 0 16px; }
+.quiz-speaker {
+  width: 96px; height: 96px; border-radius: 50%; font-size: 44px;
+  background: var(--card); box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  animation: breathe 1.6s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.quiz-tip { color: rgba(255,255,255,.85); font-size: 14px; margin-top: 10px; }
+.quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.quiz-opt {
+  aspect-ratio: 1; border-radius: 22px; background: var(--card);
+  font-family: "Kaiti SC", "KaiTi", "STKaiti", serif;
+  font-size: min(22vw, 96px); font-weight: 700; color: var(--ink);
+  box-shadow: 0 6px 18px rgba(0,0,0,.15); transition: transform .1s;
+}
+.quiz-opt:active { transform: scale(.96); }
+.quiz-opt.good { background: var(--green); color: #fff; }
+.quiz-opt.bad { background: var(--red); color: #fff; animation: shake .35s; }
+.quiz-opt.reveal { outline: 5px solid var(--gold); }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.35); }
+.dot.on { background: #fff; }
+.dot.err { background: var(--gold); }
+
+/* 结算 */
+.result-card { text-align: center; margin: auto 0; }
+.stars { font-size: 52px; letter-spacing: 6px; margin: 6px 0; }
+.result-title { font-size: 26px; font-weight: 900; }
+.result-stats { display: flex; justify-content: center; gap: 22px; margin: 18px 0; }
+.result-stats .item .v { font-size: 30px; font-weight: 900; color: var(--accent); }
+.result-stats .item .k { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.result-btns { display: flex; gap: 12px; }
+.result-btns button { flex: 1; padding: 16px; border-radius: 18px; font-size: 18px; font-weight: 800; }
+.btn-again { background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; }
+.btn-home { background: #eef2ff; color: var(--accent); }
+
+/* 摸底 */
+.place-intro { text-align: center; margin: auto 0; }
+.place-intro .emoji { font-size: 64px; }
+.place-intro h2 { font-size: 24px; margin: 10px 0; }
+.place-intro p { color: var(--muted); font-size: 15px; line-height: 1.8; }
+.place-band-tag { display: inline-block; background: #eef2ff; color: var(--accent); border-radius: 999px; padding: 6px 16px; font-weight: 800; margin-bottom: 10px; }
+
+/* 撒花 */
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 99; }
+.confetti span { position: absolute; top: -10%; font-size: 26px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(115vh) rotate(720deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 档案选择 -->
+  <section class="screen" id="screen-profile">
+    <h1>⚡ 极客快速认字</h1>
+    <div class="sub">按字频学字 · 摸底跳级 · 到期复习，用最短时间认最多的字</div>
+    <div class="profiles" id="profileList"></div>
+  </section>
+
+  <!-- 首页 -->
+  <section class="screen" id="screen-home">
+    <div class="home-head">
+      <div class="who"><span class="avatar" id="homeAvatar">🦖</span><span id="homeName">ACE</span></div>
+      <button class="switch-btn" id="btnSwitch">换人</button>
+    </div>
+    <div class="card stat-card">
+      <div class="big-num"><span id="statCount">0</span><small> / 1017 字</small></div>
+      <div class="coverage">已能读懂日常文字的 <b id="statCover">0%</b></div>
+      <div class="cover-bar"><div id="coverFill" style="width:0%"></div></div>
+    </div>
+    <div class="actions">
+      <button class="action-btn place" id="btnPlace">🎯 摸底测试<span class="badge">跳过已认识的字</span></button>
+      <button class="action-btn learn" id="btnLearn">📚 学新字<span class="badge" id="learnBadge">8 个</span></button>
+      <button class="action-btn review" id="btnReview">🔁 复习<span class="badge" id="reviewBadge">0</span></button>
+    </div>
+    <div class="card">
+      <div class="bands" id="bandList"></div>
+      <div class="band-hint">觉得太简单？点上面的段位可以直接跳级 ⚡</div>
+    </div>
+    <div class="method-note">极客快速认知法：高频字优先（认识 1000 字 ≈ 读懂 88% 日常文字）<br>闪认曝光 → 听音抢答 → 间隔复习（记忆盒子）</div>
+  </section>
+
+  <!-- 闪认 -->
+  <section class="screen" id="screen-flash">
+    <div class="topbar">
+      <button class="back" data-home>← 退出</button>
+      <span class="title">👀 闪认新字</span>
+      <span class="count" id="flashCount">1/8</span>
+    </div>
+    <div class="card flash-card">
+      <div class="flash-char" id="flashChar">字</div>
+      <div class="flash-py" id="flashPy">zì</div>
+      <div class="flash-word" id="flashWord">汉字</div>
+      <div class="flash-btns">
+        <button class="btn-listen" id="btnReplay">🔊 再听</button>
+        <button class="btn-next" id="btnFlashNext">下一个 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 听音选字 -->
+  <section class="screen" id="screen-quiz">
+    <div class="topbar">
+      <button class="back" data-home>← 退出</button>
+      <span class="title" id="quizTitle">🎧 听音选字</span>
+      <span class="count" id="quizCount">1/8</span>
+    </div>
+    <div class="quiz-question">
+      <button class="quiz-speaker" id="btnQuizPlay">🔊</button>
+      <div class="quiz-tip">听声音，点出对的字</div>
+    </div>
+    <div class="quiz-grid" id="quizGrid"></div>
+    <div class="dots" id="quizDots"></div>
+  </section>
+
+  <!-- 结算 -->
+  <section class="screen" id="screen-result">
+    <div class="card result-card">
+      <div class="stars" id="resultStars">⭐⭐⭐</div>
+      <div class="result-title" id="resultTitle">太棒了！</div>
+      <div class="result-stats" id="resultStats"></div>
+      <div class="result-btns">
+        <button class="btn-again" id="btnAgain">再来一组 🔥</button>
+        <button class="btn-home" data-home>回首页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 摸底介绍 / 段间提示 -->
+  <section class="screen" id="screen-place">
+    <div class="card place-intro" id="placeCard">
+      <div class="emoji">🎯</div>
+      <h2>摸底测试</h2>
+      <p>每个段位抽查 5 个字，听声音选字。<br>答对 4 个以上，整段算你已认识，直接跳级！<br>测到不熟的段位就停，从那里开始学。</p>
+      <div class="result-btns" style="margin-top:18px">
+        <button class="btn-again" id="btnPlaceStart">开始 🚀</button>
+        <button class="btn-home" data-home>先不测</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="renzi-data.js"></script>
+<script src="neural-tts.js"></script>
+<script>
+/* ============ 数据索引 ============ */
+const BANDS = window.RENZI_BANDS;
+const ALL = [];
+BANDS.forEach((b, bi) => b.chars.forEach(s => {
+  const [ch, py, w] = s.split(' ');
+  ALL.push({ ch, py, w, band: bi, rank: ALL.length });
+}));
+const TOTAL = ALL.length;
+const BY_CH = new Map(ALL.map(c => [c.ch, c]));
+
+/* 覆盖率曲线（现代汉语字频累计覆盖，分段线性插值） */
+const COVER = [[0,0],[100,42],[200,55],[300,64],[400,70],[500,75],[600,79],[700,82],[800,84.5],[900,86.5],[1000,88.3],[1100,89.8],[1200,91]];
+function coverageOf(n) {
+  for (let i = 1; i < COVER.length; i++) {
+    if (n <= COVER[i][0]) {
+      const [x0,y0] = COVER[i-1], [x1,y1] = COVER[i];
+      return Math.round(y0 + (y1-y0) * (n-x0) / (x1-x0));
+    }
+  }
+  return 91;
+}
+
+/* ============ 档案与进度 ============ */
+const PRESET_PROFILES = [
+  { name: 'ACE', avatar: '🦖' },
+  { name: 'Alice', avatar: '🦄' },
+];
+const today = () => Math.floor(Date.now() / 864e5);
+/* 记忆盒子：盒号越高记得越牢，间隔天数越长 */
+const BOX_GAP = { 1: 0, 2: 1, 3: 3, 4: 7, 5: 21 };
+let P = null;       // 当前进度对象
+let curName = '';
+
+function loadProfile(name) {
+  curName = name;
+  localStorage.setItem('renzi_current', name);
+  try { P = JSON.parse(localStorage.getItem('renzi_p_' + name)) || null; } catch { P = null; }
+  if (!P) P = { placementDone: false, chars: {} };
+  if (!P.chars) P.chars = {};
+}
+function save() { localStorage.setItem('renzi_p_' + curName, JSON.stringify(P)); }
+function rec(ch) { return P.chars[ch]; }
+function setBox(ch, box) {
+  box = Math.max(1, Math.min(5, box));
+  const r = P.chars[ch] || (P.chars[ch] = { b: 0, due: 0 });
+  r.b = box;
+  r.due = today() + BOX_GAP[box];
+}
+function knownCount() { let n = 0; for (const k in P.chars) if (P.chars[k].b >= 2) n++; return n; }
+function dueList() {
+  const t = today();
+  return ALL.filter(c => { const r = rec(c.ch); return r && r.b >= 1 && r.due <= t; });
+}
+function newList(n) {
+  return ALL.filter(c => { const r = rec(c.ch); return !r || r.b === 0; }).slice(0, n);
+}
+function avatarOf(name) {
+  const p = PRESET_PROFILES.find(p => p.name === name);
+  return p ? p.avatar : '🐼';
+}
+
+/* ============ 语音 ============ */
+document.addEventListener('pointerdown', () => NeuralTTS.unlock(), { capture: true });
+async function say(text) {
+  try { await NeuralTTS.speak(text); }
+  catch (e) {
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-CN'; u.rate = 0.85;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch {}
+  }
+}
+const sayChar = it => say(`${it.ch}，${it.w}`);
+
+/* 音效（WebAudio，不打扰语音） */
+let AC = null;
+function tone(freq, dur, type, delay, vol) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, AC.currentTime + delay);
+    g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + delay + dur);
+    o.connect(g); g.connect(AC.destination);
+    o.start(AC.currentTime + delay); o.stop(AC.currentTime + delay + dur);
+  } catch {}
+}
+const ding = () => { tone(880, .12, 'sine', 0, .25); tone(1320, .18, 'sine', .1, .25); };
+const buzz = () => tone(160, .25, 'sawtooth', 0, .18);
+
+/* ============ 屏幕切换 ============ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => { renderHome(); show('screen-home'); });
+
+/* ============ 档案选择 ============ */
+function renderProfiles() {
+  const box = document.getElementById('profileList');
+  box.innerHTML = '';
+  const extras = JSON.parse(localStorage.getItem('renzi_profiles') || '[]');
+  const list = [...PRESET_PROFILES, ...extras.map(n => ({ name: n, avatar: '🐼' }))];
+  for (const p of list) {
+    let meta = '新同学';
+    try {
+      const d = JSON.parse(localStorage.getItem('renzi_p_' + p.name));
+      if (d) { let n = 0; for (const k in d.chars) if (d.chars[k].b >= 2) n++; meta = `已认识 ${n} 个字`; }
+    } catch {}
+    const btn = document.createElement('button');
+    btn.className = 'profile-btn';
+    btn.innerHTML = `<span class="avatar">${p.avatar}</span><span>${p.name}<div class="meta">${meta}</div></span>`;
+    btn.onclick = () => { loadProfile(p.name); renderHome(); show('screen-home'); };
+    box.appendChild(btn);
+  }
+  const add = document.createElement('button');
+  add.className = 'profile-btn';
+  add.innerHTML = `<span class="avatar">➕</span><span>新的小伙伴<div class="meta">加一个档案</div></span>`;
+  add.onclick = () => {
+    const name = prompt('小伙伴叫什么名字？');
+    if (!name || !name.trim()) return;
+    const extras2 = JSON.parse(localStorage.getItem('renzi_profiles') || '[]');
+    if (!extras2.includes(name.trim())) { extras2.push(name.trim()); localStorage.setItem('renzi_profiles', JSON.stringify(extras2)); }
+    renderProfiles();
+  };
+  box.appendChild(add);
+}
+
+/* ============ 首页 ============ */
+function renderHome() {
+  document.getElementById('homeName').textContent = curName;
+  document.getElementById('homeAvatar').textContent = avatarOf(curName);
+  const n = knownCount();
+  document.getElementById('statCount').textContent = n;
+  const cov = coverageOf(n);
+  document.getElementById('statCover').textContent = cov + '%';
+  document.getElementById('coverFill').style.width = cov + '%';
+  const due = dueList().length;
+  document.getElementById('reviewBadge').textContent = due;
+  document.getElementById('btnReview').style.opacity = due ? 1 : .55;
+  const news = newList(8).length;
+  document.getElementById('learnBadge').textContent = news ? news + ' 个' : '全学完啦';
+  document.getElementById('btnPlace').style.display = P.placementDone ? 'none' : 'flex';
+  const box = document.getElementById('bandList');
+  box.innerHTML = '';
+  BANDS.forEach((b, bi) => {
+    const total = b.chars.length;
+    let got = 0;
+    for (const s of b.chars) { const r = rec(s.split(' ')[0]); if (r && r.b >= 2) got++; }
+    const row = document.createElement('div');
+    row.className = 'band-row';
+    row.innerHTML = `<span class="bname">${b.emoji} ${b.grade}</span><span class="bbar"><div style="width:${total ? got/total*100 : 0}%"></div></span><span class="bnum">${got}/${total}</span>`;
+    row.onclick = () => jumpToBand(bi);
+    box.appendChild(row);
+  });
+}
+document.getElementById('btnSwitch').onclick = () => { renderProfiles(); show('screen-profile'); };
+
+/* 觉得太简单？点段位直接跳级：前面段位全部标为已认识 */
+function askConfirm(text, onYes) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px';
+  wrap.innerHTML = `<div class="card" style="max-width:360px;text-align:center">
+    <div style="font-size:17px;font-weight:700;line-height:1.7;white-space:pre-line">${text}</div>
+    <div class="result-btns" style="margin-top:18px">
+      <button class="btn-again" data-yes>确定 ⚡</button>
+      <button class="btn-home" data-no>取消</button>
+    </div></div>`;
+  wrap.querySelector('[data-yes]').onclick = () => { wrap.remove(); onYes(); };
+  wrap.querySelector('[data-no]').onclick = () => wrap.remove();
+  document.body.appendChild(wrap);
+}
+function jumpToBand(bi) {
+  if (bi === 0) return;
+  const before = BANDS.slice(0, bi).reduce((n, b) => n + b.chars.length, 0);
+  askConfirm(`直接从「${BANDS[bi].grade}」开始学？\n前面 ${before} 个字会标记为已认识`, () => {
+    for (let i = 0; i < bi; i++) {
+      for (const s of BANDS[i].chars) {
+        const ch = s.split(' ')[0];
+        const r = rec(ch);
+        if (!r || r.b < 4) setBox(ch, 4);
+      }
+    }
+    P.placementDone = true;
+    save();
+    renderHome();
+  });
+}
+
+/* ============ 测验引擎（学习/复习/摸底共用） ============ */
+const Quiz = { queue: [], firstTry: {}, items: [], onDone: null, cur: null, lock: false };
+function quizStart(items, title, onDone) {
+  Quiz.items = items;
+  Quiz.queue = [...items];
+  Quiz.firstTry = {};
+  items.forEach(it => Quiz.firstTry[it.ch] = true);
+  Quiz.onDone = onDone;
+  document.getElementById('quizTitle').textContent = title;
+  const dots = document.getElementById('quizDots');
+  dots.innerHTML = items.map(() => '<span class="dot"></span>').join('');
+  show('screen-quiz');
+  quizNext();
+}
+function pickOptions(target) {
+  /* 干扰项：同段位优先，排除同音字（含声调全同），不够再从邻段补 */
+  const pool = ALL.filter(c => c.ch !== target.ch && c.py !== target.py);
+  const near = pool.filter(c => Math.abs(c.band - target.band) <= 0);
+  const mid = pool.filter(c => Math.abs(c.band - target.band) === 1);
+  const pickFrom = (arr, n, out) => {
+    const a = [...arr];
+    while (n > 0 && a.length) {
+      const i = Math.floor(Math.random() * a.length);
+      const c = a.splice(i, 1)[0];
+      if (!out.includes(c) && !out.some(o => o.py === c.py)) { out.push(c); n--; }
+    }
+    return n;
+  };
+  const out = [];
+  let need = pickFrom(near, 3, out);
+  if (need > 0) need = pickFrom(mid, need, out);
+  if (need > 0) pickFrom(pool, need, out);
+  const opts = [target, ...out];
+  for (let i = opts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [opts[i], opts[j]] = [opts[j], opts[i]]; }
+  return opts;
+}
+function quizNext() {
+  const solved = Quiz.items.length - new Set(Quiz.queue.map(q => q.ch)).size;
+  document.getElementById('quizCount').textContent = `${Math.min(solved + 1, Quiz.items.length)}/${Quiz.items.length}`;
+  const dots = document.querySelectorAll('#quizDots .dot');
+  Quiz.items.forEach((it, i) => {
+    if (!Quiz.queue.some(q => q.ch === it.ch)) dots[i].classList.add(Quiz.firstTry[it.ch] ? 'on' : 'err');
+  });
+  if (!Quiz.queue.length) { Quiz.onDone(Quiz.firstTry); return; }
+  Quiz.cur = Quiz.queue[0];
+  Quiz.lock = false;
+  const grid = document.getElementById('quizGrid');
+  grid.innerHTML = '';
+  for (const opt of pickOptions(Quiz.cur)) {
+    const b = document.createElement('button');
+    b.className = 'quiz-opt';
+    b.textContent = opt.ch;
+    b.onclick = () => quizAnswer(b, opt);
+    grid.appendChild(b);
+  }
+  sayChar(Quiz.cur);
+}
+function quizAnswer(btn, opt) {
+  if (Quiz.lock) return;
+  if (opt.ch === Quiz.cur.ch) {
+    Quiz.lock = true;
+    btn.classList.add('good');
+    ding();
+    Quiz.queue.shift();
+    setTimeout(quizNext, 650);
+  } else {
+    btn.classList.add('bad');
+    btn.disabled = true;
+    buzz();
+    if (Quiz.firstTry[Quiz.cur.ch]) {
+      Quiz.firstTry[Quiz.cur.ch] = false;
+      /* 答错的字排到队尾再考一次 */
+      Quiz.queue.push(Quiz.queue.shift());
+    }
+    /* 亮出正确答案 1 秒后进下一题 */
+    Quiz.lock = true;
+    [...document.querySelectorAll('.quiz-opt')].find(b => b.textContent === Quiz.cur.ch)?.classList.add('reveal');
+    setTimeout(quizNext, 1400);
+  }
+}
+document.getElementById('btnQuizPlay').onclick = () => Quiz.cur && sayChar(Quiz.cur);
+
+/* ============ 学新字：闪认 → 抢答 ============ */
+let flashItems = [], flashIdx = 0;
+function startLearn() {
+  flashItems = newList(8);
+  if (!flashItems.length) { alert('1017 个字全部学完啦！🎉'); return; }
+  flashIdx = 0;
+  show('screen-flash');
+  renderFlash();
+}
+function renderFlash() {
+  const it = flashItems[flashIdx];
+  document.getElementById('flashCount').textContent = `${flashIdx + 1}/${flashItems.length}`;
+  document.getElementById('flashChar').textContent = it.ch;
+  document.getElementById('flashPy').textContent = it.py;
+  document.getElementById('flashWord').textContent = it.w;
+  sayChar(it);
+}
+document.getElementById('btnReplay').onclick = () => sayChar(flashItems[flashIdx]);
+document.getElementById('btnFlashNext').onclick = () => {
+  flashIdx++;
+  if (flashIdx < flashItems.length) renderFlash();
+  else quizStart(flashItems, '🎧 抢答：刚学的字', firstTry => {
+    let firstAll = 0;
+    for (const it of flashItems) {
+      /* 一次答对 → 盒2（明天复习）；重试才对 → 盒1（下次继续） */
+      setBox(it.ch, firstTry[it.ch] ? 2 : 1);
+      if (firstTry[it.ch]) firstAll++;
+    }
+    save();
+    showResult({
+      stars: firstAll === flashItems.length ? 3 : firstAll >= flashItems.length * .7 ? 2 : 1,
+      title: firstAll === flashItems.length ? '全对！新字入袋 🎒' : '学会了，明天再巩固！',
+      stats: [[`+${flashItems.length}`, '新学的字'], [knownCount(), '认字总量'], [coverageOf(knownCount()) + '%', '日常覆盖率']],
+      again: startLearn, againText: '再学一组 🔥',
+    });
+  });
+};
+
+/* ============ 复习 ============ */
+function startReview() {
+  const due = dueList();
+  if (!due.length) { alert('现在没有到期的字，先去学新字吧！'); return; }
+  /* 盒号低的（最不熟）优先，一次最多 12 个 */
+  const items = due.sort((a, b) => rec(a.ch).b - rec(b.ch).b).slice(0, 12);
+  quizStart(items, '🔁 复习时间', firstTry => {
+    let good = 0;
+    for (const it of items) {
+      const r = rec(it.ch);
+      if (firstTry[it.ch]) { setBox(it.ch, r.b + 1); good++; }
+      else setBox(it.ch, r.b - 1);
+    }
+    save();
+    showResult({
+      stars: good === items.length ? 3 : good >= items.length * .7 ? 2 : 1,
+      title: good === items.length ? '记忆超人！🧠' : '复习完成！',
+      stats: [[`${good}/${items.length}`, '一次答对'], [knownCount(), '认字总量'], [dueList().length, '还需复习']],
+      again: startReview, againText: '继续复习 🔁',
+    });
+  });
+}
+
+/* ============ 摸底测试 ============ */
+let placeBand = 0;
+function startPlacement() { show('screen-place'); }
+function placeBandTest() {
+  if (placeBand >= BANDS.length) { placementFinish(); return; }
+  const band = BANDS[placeBand];
+  /* 段内均匀抽 5 个：开头、1/4、1/2、3/4、结尾 */
+  const idx = [0, .25, .5, .75, .97].map(r => Math.min(band.chars.length - 1, Math.floor(band.chars.length * r)));
+  const items = [...new Set(idx)].map(i => BY_CH.get(band.chars[i].split(' ')[0]));
+  quizStart(items, `🎯 摸底：${band.emoji} ${band.grade}`, firstTry => {
+    const good = items.filter(it => firstTry[it.ch]).length;
+    if (good >= 4) {
+      /* 整段视为已认识，跳级 */
+      for (const s of band.chars) { const ch = s.split(' ')[0]; const r = rec(ch); if (!r || r.b < 4) setBox(ch, 4); }
+      save();
+      placeBand++;
+      placeBandTest();
+    } else {
+      /* 测出边界：答对的字记盒3，从这段开始学 */
+      for (const it of items) if (firstTry[it.ch]) setBox(it.ch, 3);
+      placementFinish();
+    }
+  });
+}
+function placementFinish() {
+  P.placementDone = true;
+  save();
+  const n = knownCount();
+  showResult({
+    stars: 3,
+    title: n ? `摸底完成！已认识约 ${n} 字` : '摸底完成！从头开始',
+    stats: [[n, '认字量'], [coverageOf(n) + '%', '日常覆盖率'], [BANDS[Math.min(placeBand, BANDS.length - 1)].grade, '起点段位']],
+    again: startLearn, againText: '马上学新字 📚',
+  });
+}
+document.getElementById('btnPlaceStart').onclick = () => { placeBand = 0; placeBandTest(); };
+
+/* ============ 结算 ============ */
+function showResult({ stars, title, stats, again, againText }) {
+  document.getElementById('resultStars').textContent = '⭐'.repeat(stars);
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultStats').innerHTML = stats.map(([v, k]) =>
+    `<div class="item"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+  const btn = document.getElementById('btnAgain');
+  btn.textContent = againText;
+  btn.onclick = again;
+  show('screen-result');
+  if (stars >= 2) confetti();
+}
+function confetti() {
+  const box = document.createElement('div');
+  box.className = 'confetti';
+  const em = ['🎉', '⭐', '✨', '🎊', '💛', '💜'];
+  for (let i = 0; i < 26; i++) {
+    const s = document.createElement('span');
+    s.textContent = em[i % em.length];
+    s.style.left = Math.random() * 100 + '%';
+    s.style.animationDuration = (2 + Math.random() * 2) + 's';
+    s.style.animationDelay = Math.random() * .8 + 's';
+    box.appendChild(s);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 5000);
+}
+
+/* ============ 入口 ============ */
+document.getElementById('btnLearn').onclick = startLearn;
+document.getElementById('btnReview').onclick = startReview;
+document.getElementById('btnPlace').onclick = startPlacement;
+
+renderProfiles();
+const last = localStorage.getItem('renzi_current');
+if (last) { loadProfile(last); renderHome(); show('screen-home'); }
+else show('screen-profile');
+</script>
+</body>
+</html>

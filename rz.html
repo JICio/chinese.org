@@ -173,7 +173,7 @@ button { font-family: inherit; border: none; cursor: pointer; }
     </div>
     <div class="card">
       <div class="bands" id="bandList"></div>
-      <div class="band-hint">觉得太简单？点上面的段位可以直接跳级 ⚡</div>
+      <div class="band-hint">点段位：太简单可以跳级 ⚡ 忘了可以重新学 🔄</div>
     </div>
     <div class="method-note">极客快速认知法：高频字优先（认识 1000 字 ≈ 读懂 88% 日常文字）<br>闪认曝光 → 听音抢答 → 间隔复习（记忆盒子）</div>
   </section>
@@ -401,24 +401,33 @@ function renderHome() {
 }
 document.getElementById('btnSwitch').onclick = () => { renderProfiles(); show('screen-profile'); };
 
-/* 觉得太简单？点段位直接跳级：前面段位全部标为已认识 */
-function askConfirm(text, onYes) {
+/* 点段位：可以直接跳级，也可以把这段重新学一遍 */
+function askChoice(text, choices) {
   const wrap = document.createElement('div');
   wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px';
-  wrap.innerHTML = `<div class="card" style="max-width:360px;text-align:center">
-    <div style="font-size:17px;font-weight:700;line-height:1.7;white-space:pre-line">${text}</div>
-    <div class="result-btns" style="margin-top:18px">
-      <button class="btn-again" data-yes>确定 ⚡</button>
-      <button class="btn-home" data-no>取消</button>
-    </div></div>`;
-  wrap.querySelector('[data-yes]').onclick = () => { wrap.remove(); onYes(); };
-  wrap.querySelector('[data-no]').onclick = () => wrap.remove();
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = 'max-width:360px;width:100%;text-align:center';
+  card.innerHTML = `<div style="font-size:17px;font-weight:700;line-height:1.7;white-space:pre-line">${text}</div>`;
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin-top:18px';
+  for (const c of choices) {
+    const b = document.createElement('button');
+    b.className = c.primary ? 'btn-again' : 'btn-home';
+    b.style.cssText = 'padding:14px;border-radius:16px;font-size:17px;font-weight:800';
+    b.textContent = c.label;
+    b.onclick = () => { wrap.remove(); c.fn && c.fn(); };
+    btns.appendChild(b);
+  }
+  card.appendChild(btns);
+  wrap.appendChild(card);
   document.body.appendChild(wrap);
 }
 function jumpToBand(bi) {
-  if (bi === 0) return;
+  const band = BANDS[bi];
   const before = BANDS.slice(0, bi).reduce((n, b) => n + b.chars.length, 0);
-  askConfirm(`直接从「${BANDS[bi].grade}」开始学？\n前面 ${before} 个字会标记为已认识`, () => {
+  const choices = [];
+  if (bi > 0) choices.push({ label: '⚡ 从这段开始学（前面标为已认识）', primary: true, fn: () => {
     for (let i = 0; i < bi; i++) {
       for (const s of BANDS[i].chars) {
         const ch = s.split(' ')[0];
@@ -429,7 +438,14 @@ function jumpToBand(bi) {
     P.placementDone = true;
     save();
     renderHome();
-  });
+  }});
+  choices.push({ label: '🔄 重新学这段（清空这段进度）', primary: bi === 0, fn: () => {
+    for (const s of band.chars) delete P.chars[s.split(' ')[0]];
+    save();
+    renderHome();
+  }});
+  choices.push({ label: '取消', fn: null });
+  askChoice(`${band.emoji}「${band.grade}」段位${bi > 0 ? `\n（前面共 ${before} 个字）` : ''}`, choices);
 }
 
 /* ============ 测验引擎（学习/复习/摸底共用） ============ */
